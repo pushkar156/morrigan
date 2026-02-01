@@ -4,457 +4,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description"
-    content="Morrigan - Intelligent insights and thought leadership on AI, technology, and innovation">
-  <title>Morrigan | Intelligent Insights & Editorial Excellence</title>
+  <meta name="description" content="The Morrigan - Your intelligent blog platform with AI-powered insights">
+  <title>The Morrigan | Journal</title>
   <link rel="stylesheet" href="style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
     rel="stylesheet">
 </head>
 
 <body>
-  <!-- Navigation -->
-  <nav class="navbar" id="navbar">
+  <!-- Navigation Bar -->
+  <nav class="navbar">
     <div class="nav-container">
       <div class="nav-logo">
-        <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20 5L35 15V25L20 35L5 25V15L20 5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
-          <circle cx="20" cy="20" r="5" fill="currentColor" />
-        </svg>
-        <span class="logo-text">Morrigan</span>
+        <div class="logo-circle">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="18" stroke="white" stroke-width="2" />
+            <path d="M20 10 L20 30 M12 20 L28 20" stroke="white" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </div>
       </div>
-      <ul class="nav-menu" id="navMenu">
-        <li><a href="#home" class="nav-link active">Home</a></li>
-        <li><a href="#featured" class="nav-link">Featured</a></li>
-        <li><a href="#articles" class="nav-link">Articles</a></li>
-        <li><a href="#about" class="nav-link">About</a></li>
-        <li><a href="#contact" class="nav-link">Contact</a></li>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
+        <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
+        <li class="nav-item"><a href="#journal" class="nav-link active">Journal</a></li>
       </ul>
-      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
     </div>
   </nav>
 
   <!-- Hero Section -->
-  <section class="hero" id="home">
-    <div class="hero-background">
-      <div class="gradient-orb orb-1"></div>
-      <div class="gradient-orb orb-2"></div>
+  <header class="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">THE MORRIGAN</h1>
     </div>
-    <div class="hero-container">
-      <div class="hero-content">
-        <h1 class="hero-title">
-          <span class="title-line">Intelligence Meets</span>
-          <span class="title-line gradient-text">Editorial Excellence</span>
-        </h1>
-        <p class="hero-description">
-          Explore cutting-edge insights on artificial intelligence, technology innovation,
-          and the future of digital transformation. Where deep analysis meets clarity.
-        </p>
-        <div class="hero-actions">
-          <a href="#articles" class="btn btn-primary">
-            <span>Read Blogs</span>
-            <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round" />
-            </svg>
-          </a>
-          <a href="#featured" class="btn btn-secondary">
-            <span>Explore Featured</span>
-          </a>
-        </div>
-        <div class="hero-stats">
-          <div class="stat-item">
-            <div class="stat-number">500+</div>
-            <div class="stat-label">Articles</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-number">50K+</div>
-            <div class="stat-label">Readers</div>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
-            <div class="stat-number">25+</div>
-            <div class="stat-label">Topics</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="scroll-indicator">
-      <div class="scroll-line"></div>
-      <span class="scroll-text">Scroll to explore</span>
-    </div>
-  </section>
+  </header>
 
-  <!-- Featured Blogs Section -->
-  <section class="featured" id="featured">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-label">Curated Selection</span>
-        <h2 class="section-title">Featured Insights</h2>
-        <p class="section-description">
-          Hand-picked articles that showcase the depth and breadth of our editorial vision
-        </p>
-      </div>
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="content-container">
+      <!-- Section Header -->
+      <section class="section-header">
+        <h2 class="section-title">Stock Analysis</h2>
+      </section>
 
-      <div class="featured-grid">
-        <!-- Featured Article 1 - Large -->
-        <article class="featured-card featured-card-large">
-          <div class="card-image">
-            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop"
-              alt="AI Neural Network" loading="lazy">
-            <div class="card-category">AI & Machine Learning</div>
+      <!-- Blog Grid -->
+      <div class="blog-grid">
+        <!-- Blog Card 1 -->
+        <article class="blog-card">
+          <div class="blog-image">
+            <img src="https://via.placeholder.com/400x300/4A90E2/ffffff?text=ICICI+Bank" alt="ICICI Bank Analysis">
           </div>
-          <div class="card-content">
-            <div class="card-meta">
-              <span class="meta-date">Jan 28, 2026</span>
-              <span class="meta-divider">•</span>
-              <span class="meta-read">8 min read</span>
-            </div>
-            <h3 class="card-title">The Future of Neural Networks: Beyond Deep Learning</h3>
-            <p class="card-excerpt">
-              Exploring the next generation of AI architectures that promise to revolutionize
-              how machines learn, adapt, and interact with complex real-world scenarios.
-            </p>
-            <a href="#" class="card-link">
-              <span>Read Article</span>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              </svg>
-            </a>
+          <div class="blog-content">
+            <h3 class="blog-title">ICICI Prudential AMC IPO: Evaluating</h3>
           </div>
         </article>
 
-        <!-- Featured Article 2 -->
-        <article class="featured-card">
-          <div class="card-image">
-            <img src="https://images.unsplash.com/photo-1639322537228-f710d846310a?w=600&h=400&fit=crop"
-              alt="Quantum Computing" loading="lazy">
-            <div class="card-category">Quantum Tech</div>
+        <!-- Blog Card 2 -->
+        <article class="blog-card">
+          <div class="blog-image">
+            <img src="https://via.placeholder.com/400x300/D4A574/ffffff?text=Wakefit" alt="Wakefit Analysis">
           </div>
-          <div class="card-content">
-            <div class="card-meta">
-              <span class="meta-date">Jan 25, 2026</span>
-              <span class="meta-divider">•</span>
-              <span class="meta-read">6 min read</span>
-            </div>
-            <h3 class="card-title">Quantum Computing: From Theory to Practice</h3>
-            <p class="card-excerpt">
-              How quantum computers are transitioning from research labs to solving real-world problems.
-            </p>
-            <a href="#" class="card-link">
-              <span>Read Article</span>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              </svg>
-            </a>
+          <div class="blog-content">
+            <h3 class="blog-title">Wakefit Innovations: From Mattress</h3>
           </div>
         </article>
 
-        <!-- Featured Article 3 -->
-        <article class="featured-card">
-          <div class="card-image">
-            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop"
-              alt="Data Analytics" loading="lazy">
-            <div class="card-category">Data Science</div>
+        <!-- Blog Card 3 -->
+        <article class="blog-card">
+          <div class="blog-image">
+            <img src="https://via.placeholder.com/400x300/6B8CAE/ffffff?text=Market+Analysis" alt="Market Analysis">
           </div>
-          <div class="card-content">
-            <div class="card-meta">
-              <span class="meta-date">Jan 22, 2026</span>
-              <span class="meta-divider">•</span>
-              <span class="meta-read">5 min read</span>
-            </div>
-            <h3 class="card-title">RAG Systems: The New Paradigm in AI</h3>
-            <p class="card-excerpt">
-              Understanding Retrieval-Augmented Generation and its impact on intelligent systems.
-            </p>
-            <a href="#" class="card-link">
-              <span>Read Article</span>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M6 3L11 8L6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              </svg>
-            </a>
+          <div class="blog-content">
+            <h3 class="blog-title">Market Trends and Insights</h3>
+          </div>
+        </article>
+
+        <!-- Blog Card 4 -->
+        <article class="blog-card">
+          <div class="blog-image">
+            <img src="https://via.placeholder.com/400x300/8B7355/ffffff?text=Investment+Guide" alt="Investment Guide">
+          </div>
+          <div class="blog-content">
+            <h3 class="blog-title">Investment Strategies for 2026</h3>
           </div>
         </article>
       </div>
     </div>
-  </section>
+  </main>
 
-  <!-- Latest Articles Section -->
-  <section class="articles" id="articles">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-label">Fresh Perspectives</span>
-        <h2 class="section-title">Latest Articles</h2>
-        <p class="section-description">
-          Stay updated with our newest insights and analysis
-        </p>
-      </div>
-
-      <div class="articles-grid">
-        <!-- Article 1 -->
-        <article class="article-card">
-          <div class="article-image">
-            <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=500&h=350&fit=crop" alt="AI Ethics"
-              loading="lazy">
-          </div>
-          <div class="article-content">
-            <span class="article-category">Ethics</span>
-            <h3 class="article-title">Ethical AI: Building Responsible Systems</h3>
-            <p class="article-excerpt">
-              Examining the principles and practices that ensure AI systems serve humanity responsibly.
-            </p>
-            <div class="article-footer">
-              <div class="article-meta">
-                <span class="meta-date">Jan 20, 2026</span>
-                <span class="meta-divider">•</span>
-                <span class="meta-read">7 min</span>
-              </div>
-              <a href="#" class="article-link" aria-label="Read article">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Article 2 -->
-        <article class="article-card">
-          <div class="article-image">
-            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500&h=350&fit=crop"
-              alt="Cloud Computing" loading="lazy">
-          </div>
-          <div class="article-content">
-            <span class="article-category">Cloud Tech</span>
-            <h3 class="article-title">Edge Computing: The Next Frontier</h3>
-            <p class="article-excerpt">
-              How edge computing is reshaping data processing and enabling real-time applications.
-            </p>
-            <div class="article-footer">
-              <div class="article-meta">
-                <span class="meta-date">Jan 18, 2026</span>
-                <span class="meta-divider">•</span>
-                <span class="meta-read">6 min</span>
-              </div>
-              <a href="#" class="article-link" aria-label="Read article">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Article 3 -->
-        <article class="article-card">
-          <div class="article-image">
-            <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=500&h=350&fit=crop" alt="Blockchain"
-              loading="lazy">
-          </div>
-          <div class="article-content">
-            <span class="article-category">Blockchain</span>
-            <h3 class="article-title">Decentralized Systems in Modern Enterprise</h3>
-            <p class="article-excerpt">
-              Understanding how blockchain technology is transforming business operations and trust.
-            </p>
-            <div class="article-footer">
-              <div class="article-meta">
-                <span class="meta-date">Jan 15, 2026</span>
-                <span class="meta-divider">•</span>
-                <span class="meta-read">9 min</span>
-              </div>
-              <a href="#" class="article-link" aria-label="Read article">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Article 4 -->
-        <article class="article-card">
-          <div class="article-image">
-            <img src="https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=500&h=350&fit=crop"
-              alt="Cybersecurity" loading="lazy">
-          </div>
-          <div class="article-content">
-            <span class="article-category">Security</span>
-            <h3 class="article-title">Zero Trust Architecture Explained</h3>
-            <p class="article-excerpt">
-              A comprehensive guide to implementing zero trust security in modern organizations.
-            </p>
-            <div class="article-footer">
-              <div class="article-meta">
-                <span class="meta-date">Jan 12, 2026</span>
-                <span class="meta-divider">•</span>
-                <span class="meta-read">8 min</span>
-              </div>
-              <a href="#" class="article-link" aria-label="Read article">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Article 5 -->
-        <article class="article-card">
-          <div class="article-image">
-            <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=500&h=350&fit=crop"
-              alt="Innovation" loading="lazy">
-          </div>
-          <div class="article-content">
-            <span class="article-category">Innovation</span>
-            <h3 class="article-title">The Future of Work: AI Collaboration</h3>
-            <p class="article-excerpt">
-              Exploring how humans and AI will work together to create unprecedented value.
-            </p>
-            <div class="article-footer">
-              <div class="article-meta">
-                <span class="meta-date">Jan 10, 2026</span>
-                <span class="meta-divider">•</span>
-                <span class="meta-read">10 min</span>
-              </div>
-              <a href="#" class="article-link" aria-label="Read article">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Article 6 -->
-        <article class="article-card">
-          <div class="article-image">
-            <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=500&h=350&fit=crop"
-              alt="Digital Transformation" loading="lazy">
-          </div>
-          <div class="article-content">
-            <span class="article-category">Strategy</span>
-            <h3 class="article-title">Digital Transformation: A Practical Guide</h3>
-            <p class="article-excerpt">
-              Strategic insights for organizations navigating the digital transformation journey.
-            </p>
-            <div class="article-footer">
-              <div class="article-meta">
-                <span class="meta-date">Jan 8, 2026</span>
-                <span class="meta-divider">•</span>
-                <span class="meta-read">12 min</span>
-              </div>
-              <a href="#" class="article-link" aria-label="Read article">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <div class="articles-cta">
-        <a href="#" class="btn btn-outline">
-          <span>View All Articles</span>
-          <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" />
-          </svg>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer" id="contact">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-brand">
-          <div class="footer-logo">
-            <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 5L35 15V25L20 35L5 25V15L20 5Z" stroke="currentColor" stroke-width="2"
-                stroke-linejoin="round" />
-              <circle cx="20" cy="20" r="5" fill="currentColor" />
-            </svg>
-            <span class="logo-text">Morrigan</span>
-          </div>
-          <p class="footer-description">
-            Delivering intelligent insights and editorial excellence at the intersection
-            of technology, innovation, and the future of digital transformation.
-          </p>
-          <div class="footer-social">
-            <a href="#" class="social-link" aria-label="Twitter">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path
-                  d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" />
-              </svg>
-            </a>
-            <a href="#" class="social-link" aria-label="LinkedIn">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
-                <circle cx="4" cy="4" r="2" />
-              </svg>
-            </a>
-            <a href="#" class="social-link" aria-label="GitHub">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path
-                  d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" />
-              </svg>
-            </a>
-          </div>
-        </div>
-
-        <div class="footer-links">
-          <div class="footer-column">
-            <h4 class="footer-heading">Content</h4>
-            <ul class="footer-list">
-              <li><a href="#" class="footer-link">Featured Articles</a></li>
-              <li><a href="#" class="footer-link">Latest Posts</a></li>
-              <li><a href="#" class="footer-link">Categories</a></li>
-              <li><a href="#" class="footer-link">Archives</a></li>
-            </ul>
-          </div>
-
-          <div class="footer-column">
-            <h4 class="footer-heading">Company</h4>
-            <ul class="footer-list">
-              <li><a href="#" class="footer-link">About Us</a></li>
-              <li><a href="#" class="footer-link">Our Team</a></li>
-              <li><a href="#" class="footer-link">Careers</a></li>
-              <li><a href="#" class="footer-link">Contact</a></li>
-            </ul>
-          </div>
-
-          <div class="footer-column">
-            <h4 class="footer-heading">Resources</h4>
-            <ul class="footer-list">
-              <li><a href="#" class="footer-link">Newsletter</a></li>
-              <li><a href="#" class="footer-link">RSS Feed</a></li>
-              <li><a href="#" class="footer-link">Privacy Policy</a></li>
-              <li><a href="#" class="footer-link">Terms of Service</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p class="footer-copyright">
-          © 2026 Morrigan. All rights reserved. Crafted with intelligence and care.
-        </p>
-      </div>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
+  <!-- Chatbot Button -->
+  <div class="chatbot-button">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
+        stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </div>
 </body>
 
 </html>

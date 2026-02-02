@@ -2,136 +2,214 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="The Morrigan - Your intelligent blog platform with AI-powered insights">
-  <title>The Morrigan | Journal</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morrigan | Perspectives on Modern Intelligence</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-  <!-- Navigation Bar -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <div class="nav-logo">
-        <div class="logo-circle">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="20" cy="20" r="18" stroke="white" stroke-width="2" />
-            <path d="M20 10 L20 30 M12 20 L28 20" stroke="white" stroke-width="2" stroke-linecap="round" />
-          </svg>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="logo.png" alt="Morrigan Logo" style="width: 40px; height: 40px; object-fit: contain;">
+                <h2>Morrigan</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link active">Home</a></li>
+                <li><a href="journal.html" class="nav-link">Journal</a></li>
+                <li><a href="about.html" class="nav-link">About</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-toggle">☰</button>
         </div>
-      </div>
-      <ul class="nav-menu">
-        <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
-        <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
-        <li class="nav-item"><a href="#journal" class="nav-link active">Journal</a></li>
-      </ul>
-    </div>
-  </nav>
+    </nav>
 
-  <!-- Hero Section -->
-  <header class="hero">
-    <div class="hero-content">
-      <h1 class="hero-title">THE MORRIGAN</h1>
-    </div>
-  </header>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">Editorial Excellence</span>
+            <h1 class="hero-title">Perspectives on Modern Intelligence</h1>
+            <p class="hero-description">
+                Thought-provoking insights for the contemporary leader, navigating the intersection of human wisdom and
+                artificial capability.
+            </p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary">Explore Articles</button>
+                <button class="btn btn-secondary">Our Philosophy</button>
+            </div>
+        </div>
+    </section>
 
-  <!-- Main Content -->
-  <main class="main-content">
-    <div class="content-container">
-      <!-- Section Header -->
-      <section class="section-header">
-        <h2 class="section-title">Stock Analysis</h2>
-      </section>
-      
-      <!-- Journal Layout -->
-<section class="journal-post-section">
-  <h2 class="section-title">Post New Journal</h2>
-  <div class="journal-form">
-    <div class="form-group">
-      <label>Date</label>
-      <input type="date" placeholder="DD / MM / YYYY">
-    </div>
-    <div class="form-group">
-      <label>Title</label>
-      <input type="text" placeholder="Enter journal title">
-    </div>
-    <div class="form-group">
-      <label>Category</label>
-      <select>
-        <option>Select category</option>
-        <option>Announcement</option>
-        <option>Update</option>
-        <option>Event</option>
-        <option>Notice</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Journal Content</label>
-      <textarea rows="5" placeholder="Write the journal or news content here..."></textarea>
-    </div>
-    <button class="post-button">Post Journal</button>
-  </div>
-</section>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <div class="section-header">
+                <h2 class="section-title">Latest Insights</h2>
+                <p class="section-subtitle">Curated deep dives into strategy and technology</p>
+            </div>
 
-      <!-- Blog Grid -->
-      <div class="blog-grid">
-        <!-- Blog Card 1 -->
-        <article class="blog-card">
-          <div class="blog-image">
-            <img src="https://via.placeholder.com/400x300/4A90E2/ffffff?text=ICICI+Bank" alt="ICICI Bank Analysis">
-          </div>
-          <div class="blog-content">
-            <h3 class="blog-title">ICICI Prudential AMC IPO: Evaluating</h3>
-          </div>
-        </article>
+            <div class="card-grid">
+                <!-- Card 1 -->
+                <article class="card">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800"
+                            alt="Modern office">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span>Strategy</span>
+                            <span class="card-meta-dot"></span>
+                            <span>5 min read</span>
+                        </div>
+                        <h3 class="card-title">The Future of Autonomous Strategy</h3>
+                        <p class="card-description">
+                            A deep dive into how machine intelligence reshapes corporate decision making and executive
+                            foresight.
+                        </p>
+                        <p class="card-date">Oct 12, 2023</p>
+                    </div>
+                </article>
 
-        <!-- Blog Card 2 -->
-        <article class="blog-card">
-          <div class="blog-image">
-            <img src="https://via.placeholder.com/400x300/D4A574/ffffff?text=Wakefit" alt="Wakefit Analysis">
-          </div>
-          <div class="blog-content">
-            <h3 class="blog-title">Wakefit Innovations: From Mattress</h3>
-          </div>
-        </article>
+                <!-- Card 2 -->
+                <article class="card">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800"
+                            alt="Mountain landscape">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span>Leadership</span>
+                            <span class="card-meta-dot"></span>
+                            <span>8 min read</span>
+                        </div>
+                        <h3 class="card-title">Calm Leadership in the AI Era</h3>
+                        <p class="card-description">
+                            How the world's most effective leaders maintain clarity and composure amid technological
+                            noise.
+                        </p>
+                        <p class="card-date">Oct 10, 2023</p>
+                    </div>
+                </article>
 
-        <!-- Blog Card 3 -->
-        <article class="blog-card">
-          <div class="blog-image">
-            <img src="https://via.placeholder.com/400x300/6B8CAE/ffffff?text=Market+Analysis" alt="Market Analysis">
-          </div>
-          <div class="blog-content">
-            <h3 class="blog-title">Market Trends and Insights</h3>
-          </div>
-        </article>
+                <!-- Card 3 -->
+                <article class="card">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1456324504439-367cee3b3c32?w=800" alt="Typography">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span>Design</span>
+                            <span class="card-meta-dot"></span>
+                            <span>4 min read</span>
+                        </div>
+                        <h3 class="card-title">Defining the Modern Editorial Standard</h3>
+                        <p class="card-description">
+                            Why typography and whitespace are the new indicators of digital authority and cognitive
+                            trust.
+                        </p>
+                        <p class="card-date">Oct 05, 2023</p>
+                    </div>
+                </article>
 
-        <!-- Blog Card 4 -->
-        <article class="blog-card">
-          <div class="blog-image">
-            <img src="https://via.placeholder.com/400x300/8B7355/ffffff?text=Investment+Guide" alt="Investment Guide">
-          </div>
-          <div class="blog-content">
-            <h3 class="blog-title">Investment Strategies for 2026</h3>
-          </div>
-        </article>
-      </div>
-    </div>
-  </main>
+                <!-- Card 4 -->
+                <article class="card">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800"
+                            alt="Neural network">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span>Cognition</span>
+                            <span class="card-meta-dot"></span>
+                            <span>6 min read</span>
+                        </div>
+                        <h3 class="card-title">Systems of Thought</h3>
+                        <p class="card-description">
+                            Mapping the cognitive frameworks required for the next decade of human-AI collaboration.
+                        </p>
+                        <p class="card-date">Sep 28, 2023</p>
+                    </div>
+                </article>
 
-  <!-- Chatbot Button -->
-  <div class="chatbot-button">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
-        stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-  </div>
+                <!-- Card 5 -->
+                <article class="card">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=800"
+                            alt="Sunset silhouette">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span>Culture</span>
+                            <span class="card-meta-dot"></span>
+                            <span>7 min read</span>
+                        </div>
+                        <h3 class="card-title">The Quiet Revolution</h3>
+                        <p class="card-description">
+                            Why the most powerful tools are often the ones we hear about the least in mainstream media.
+                        </p>
+                        <p class="card-date">Sep 22, 2023</p>
+                    </div>
+                </article>
+
+                <!-- Card 6 -->
+                <article class="card">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1549887534-1541e9326642?w=800" alt="Marble statue">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span>Autonomy</span>
+                            <span class="card-meta-dot"></span>
+                            <span>10 min read</span>
+                        </div>
+                        <h3 class="card-title">Digital Sovereignty</h3>
+                        <p class="card-description">
+                            Taking control of your intellectual output in an increasingly networked and automated world.
+                        </p>
+                        <p class="card-date">Sep 15, 2023</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="logo.png" alt="Morrigan Logo" style="width: 24px; height: 24px; object-fit: contain;">
+                <span>Morrigan</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">RSS Feed</a>
+            </div>
+            <p class="footer-copyright">© 2026 Morrigan Editorial. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Chatbot Button -->
+    <button class="chatbot-button" aria-label="Open chatbot">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
+        </svg>
+    </button>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
 </body>
 
 </html>

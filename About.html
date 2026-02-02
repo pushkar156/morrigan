@@ -1,83 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Morrigan</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        /* Page-specific styles */
+        .about-content {
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .about-content p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pillar-card {
+            background: var(--surface-light);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-light);
+        }
+
+        .pillar-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .pillar-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-dark);
+        }
+
+        .pillar-description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .quote-section {
+            background: linear-gradient(135deg, #0d121b 0%, #1a2332 100%);
+            padding: 4rem 2rem;
+            margin: 4rem 0;
+            text-align: center;
+            border-radius: 1rem;
+        }
+
+        .quote-text {
+            font-family: var(--font-serif);
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            color: var(--text-light);
+            font-style: italic;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+
 <body>
-  <!-- Hero Section -->
-  <header class="hero">
-    <div class="hero-content">
-      <h1 class="hero-title">THE MORRIGAN</h1>
-    </div>
-  </header>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="logo.png" alt="Morrigan Logo" style="width: 40px; height: 40px; object-fit: contain;">
+                <h2>Morrigan</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="journal.html" class="nav-link">Journal</a></li>
+                <li><a href="about.html" class="nav-link active">About</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-toggle">☰</button>
+        </div>
+    </nav>
 
-  <!-- Main Content -->
-  <main class="main-content">
-    <div class="content-container">
-      <!-- Section Header -->
-      <section class="section-header">
-        <h2 class="section-title">OUR STORY</h2>
-        <P> We are a student-led journal focused on Finance, Economics, and Accounting. What started as shared curiosity has grown into a platform for analysis, commentary, and reporting.
-            ​<br>
-          <br>
-          Our goal is to bring fresh student perspectives on financial and economic issues—making complex ideas clear, relevant, and thought-provoking.
-            ​<br>
-          <br>
-          Join us as we document and question the world of finance and economics, one article at a time.</P>
-      </section>
-        <!-- Section Header -->
-      <section class="section-header">
-        <h2 class="section-title">COFOUNDER'S SECTION</h2>
-        <P> </P>
-      </section>
-  
-      <!-- founder Grid -->
-      <div class="founder-grid">
-        <!-- founder Card 1 -->
-        <article class="founder-card">
-          <div class="founder-image">
-            <img src="https://static.wixstatic.com/media/f6c8f7_4d0c8274c68c46a9bebfb6e7545c6cbd~mv2.png/v1/fill/w_438,h_560,al_c,lg_1,q_85,enc_avif,quality_auto/f6c8f7_4d0c8274c68c46a9bebfb6e7545c6cbd~mv2.png" alt="Srikrishna ved kodakalla">
-          </div>
-          <div class="founder-content">
-            <h3 class="founder-title">Srikrishna Ved Kodakalla</h3>
-            <p>
-              Connect at: <a href="mailto:kodakalla@gmail.com">Srikrishna Ved Kodakalla</a>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content text-center">
+            <span class="hero-badge">Editorial Mission</span>
+            <h1 class="hero-title">Restoring the Depth of Digital Discourse</h1>
+            <p class="hero-description" style="max-width: 700px; margin: 0 auto;">
+                In an era of rapid-fire information and fleeting attention, Morrigan stands as a sanctuary for long-form
+                narrative, intellectual rigor, and calm authority.
             </p>
-            
-            
+        </div>
+    </section>
 
-          </div>
-        </article>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            <div class="section-header">
+                <h2 class="section-title">Our Philosophy</h2>
+                <p class="section-subtitle">The principles that guide our editorial process</p>
+            </div>
 
-        <!-- founder Card 2 -->
-        <article class="founder-card">
-          <div class="founder-image">
-            <img src="https://static.wixstatic.com/media/f6c8f7_0764dd7578824aca8d02c2275532a6df~mv2.png/v1/fill/w_523,h_560,al_c,lg_1,q_85,enc_avif,quality_auto/f6c8f7_0764dd7578824aca8d02c2275532a6df~mv2.png" alt="Laksh ranglani">
-          </div>
-          <div class="founder-content">
-            <h3 class="founder-title">Laksh Ranglani</h3>
-             <p>
-              Connect at: <a href="mailto:ranglanilaksh@gmail.com">Laksh Ranglani</a>
-            </p>
-          </div>
-        </article>
+            <div class="about-content">
+                <p>
+                    Morrigan was founded on the belief that the internet deserves better. We've moved away from the
+                    click-driven frenzy to cultivate a space where context matters more than speed.
+                </p>
+                <p>
+                    Every piece we publish undergoes a rigorous editorial process. We don't just report on what
+                    happened; we explore why it happened and what it means for our shared future.
+                </p>
+            </div>
 
-        <!-- founder Card 3 -->
-        <article class="founder-card">
-          <div class="founder-image">
-            <img src="https://via.placeholder.com/400x300/6B8CAE/ffffff?texhttps://static.wixstatic.com/media/f6c8f7_1ee830fbf8e84eeaafd821a6e3b2685e~mv2.png/v1/fill/w_484,h_550,al_c,lg_1,q_85,enc_avif,quality_auto/f6c8f7_1https://static.wixstatic.com/media/f6c8f7_1ee830fbf8e84eeaafd821a6e3b2685e~mv2.png/v1/fill/w_484,h_550,al_c,lg_1,q_85,enc_avif,quality_auto/f6c8f7_1ee830fbf8e84eeaafd821a6e3b2685e~mv2.pngee830fbf8e84eeaafd821a6e3b2685e~mv2.pngt=Market+Analysis" alt="Akshit tyagi">
-          </div>
-          <div class="founder-content">
-            <h3 class="founder-title">Akshit Tyagi</h3>
-             <p>
-              Connect at: <a href="mailto:tyagi.akshitt06@gmail.com">Akshit Tyagi</a>
-            </p>
-          </div>
-        </article>
+            <!-- Quote Section -->
+            <div class="quote-section">
+                <p class="quote-text">
+                    "Wisdom begins with the recognition of nuance."
+                </p>
+            </div>
 
-        
-      </div>
-    </div>
-  </main>
+            <!-- Core Pillars -->
+            <div class="section-header">
+                <h2 class="section-title">The Core Pillars</h2>
+                <p class="section-subtitle">Three foundational principles of our work</p>
+            </div>
 
-  
+            <div class="pillars-grid">
+                <div class="pillar-card">
+                    <div class="pillar-icon">📚</div>
+                    <h3 class="pillar-title">Slow Journalism</h3>
+                    <p class="pillar-description">
+                        Prioritizing accuracy and insight over the 24-hour news cycle. We take the time to get it right.
+                    </p>
+                </div>
+
+                <div class="pillar-card">
+                    <div class="pillar-icon">⚖️</div>
+                    <h3 class="pillar-title">Radical Nuance</h3>
+                    <p class="pillar-description">
+                        Resisting the pull of polarization through balanced, deep-form inquiry and thoughtful analysis.
+                    </p>
+                </div>
+
+                <div class="pillar-card">
+                    <div class="pillar-icon">✍️</div>
+                    <h3 class="pillar-title">Mythic Tone</h3>
+                    <p class="pillar-description">
+                        Pairing modern reporting with a timeless, authoritative narrative style that endures.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="text-center mt-5">
+                <h2 class="section-title">Join Us in Championing the Intellect</h2>
+                <p class="section-subtitle" style="margin-bottom: 2rem;">
+                    We are a community-supported publication. Your subscription allows us to remain independent.
+                </p>
+                <div class="hero-buttons" style="justify-content: center;">
+                    <button class="btn btn-primary">Support Our Mission</button>
+                    <button class="btn btn-secondary">Contact Editorial</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="logo.png" alt="Morrigan Logo" style="width: 24px; height: 24px; object-fit: contain;">
+                <span>Morrigan</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">RSS Feed</a>
+            </div>
+            <p class="footer-copyright">© 2026 Morrigan Editorial. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Chatbot Button -->
+    <button class="chatbot-button" aria-label="Open chatbot">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
+        </svg>
+    </button>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
 </body>
 
 </html>

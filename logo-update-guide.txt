@@ -1,0 +1,8 @@
+<!-- Add this line after the <title> tag in all HTML files -->
+<link rel="icon" type="image/png" href="logo.png">
+
+<!-- Replace the SVG logo with this in navbar -->
+<img src="logo.png" alt="Morrigan Logo" style="width: 40px; height: 40px; object-fit: contain;">
+
+<!-- Replace the SVG logo with this in footer -->
+<img src="logo.png" alt="Morrigan Logo" style="width: 24px; height: 24px; object-fit: contain;">

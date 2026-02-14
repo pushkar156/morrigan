@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Loading... | Morrigan</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .article-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 8rem 2rem 5rem;
+        }
+
+        .article-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .article-category {
+            color: #00d1ff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .article-title {
+            font-family: var(--font-serif);
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            line-height: 1.1;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .article-meta {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.875rem;
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .article-body {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .article-body p {
+            margin-bottom: 1.5rem;
+        }
+
+        .article-body h2 {
+            font-family: var(--font-serif);
+            margin-top: 3rem;
+            color: white;
+        }
+
+        .article-hero-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 1rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            background: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="logo.png" alt="Morrigan Logo">
+                <h2>Morrigan</h2>
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item dropdown">
+                    <a href="journal.html" class="nav-link">Journal</a>
+                    <div class="dropdown-menu">
+                        <a href="journal.html?category=back-to-basics" class="dropdown-item">Back to Basics</a>
+                        <a href="journal.html?category=case-studies" class="dropdown-item">Case Studies</a>
+                        <a href="journal.html?category=stock-analysis" class="dropdown-item">Stock Analysis</a>
+                        <a href="journal.html?category=100-days-challenge" class="dropdown-item">100 Days Challenge</a>
+                        <a href="journal.html?category=ma-diaries" class="dropdown-item">M&A Diaries</a>
+                    </div>
+                </li>
+                <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">☰</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div id="loadingState" style="text-align: center; padding: 10rem 2rem; color: white;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📖</div>
+            <p>Loading article...</p>
+        </div>
+
+        <div id="errorState" style="display:none; text-align:center; padding: 10rem 2rem; color: white;">
+            <h1 style="font-size: 4rem; margin-bottom: 1rem;">404</h1>
+            <p>Article not found.</p>
+        </div>
+
+        <article id="articleContent" class="article-content" style="display:none;">
+            <header class="article-header">
+                <span id="articleCategory" class="article-category"></span>
+                <h1 id="articleTitle" class="article-title"></h1>
+                <div class="article-meta">
+                    <span id="articleAuthor"></span> • <span id="articleDate"></span> • <span
+                        id="articleReadTime"></span>
+                </div>
+            </header>
+            <img id="articleImage" class="article-hero-image" src="" alt="Featured">
+            <div id="articleBody" class="article-body"></div>
+        </article>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const slug = new URLSearchParams(window.location.search).get('slug');
+            if (!slug) {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('errorState').style.display = 'block';
+                return;
+            }
+
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const API_BASE_URL = isLocal ? 'http://localhost:8000/api' : '/api';
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/blogs/${slug}`);
+                if (!res.ok) throw new Error();
+                const blog = await res.json();
+
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('articleContent').style.display = 'block';
+                document.title = `${blog.title} | Morrigan`;
+
+                document.getElementById('articleCategory').innerText = blog.category;
+                document.getElementById('articleTitle').innerText = blog.title;
+                document.getElementById('articleAuthor').innerText = blog.author || "Pushkar";
+                document.getElementById('articleDate').innerText = new Date(blog.published_at || blog.created_at).toLocaleDateString();
+                document.getElementById('articleReadTime').innerText = `${blog.read_time || 5} min read`;
+
+                const img = document.getElementById('articleImage');
+                img.src = blog.featured_image || 'logo.png';
+                if (!blog.featured_image) {
+                    img.style.objectFit = 'contain';
+                    img.style.maxHeight = '300px';
+                }
+
+                document.getElementById('articleBody').innerHTML = blog.content;
+                window.currentBlogId = blog.id;
+            } catch (e) {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('errorState').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morrigan | Home</title>
+
+
+    <link rel="icon" type="image/png" href="logo.png">
+
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="logo.png" alt="Morrigan Logo">
+                <h2>Morrigan</h2>
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link active">Home</a></li>
+                <li class="nav-item dropdown">
+                    <a href="journal.html" class="nav-link">Journal</a>
+                    <div class="dropdown-menu">
+                        <a href="journal.html?category=back-to-basics" class="dropdown-item">Back to Basics</a>
+                        <a href="journal.html?category=case-studies" class="dropdown-item">Case Studies</a>
+                        <a href="journal.html?category=stock-analysis" class="dropdown-item">Stock Analysis</a>
+                        <a href="journal.html?category=100-days-challenge" class="dropdown-item">100 Days Challenge</a>
+                        <a href="journal.html?category=ma-diaries" class="dropdown-item">M&A Diaries</a>
+                    </div>
+                </li>
+                <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">☰</button>
+        </div>
+    </nav>
+
+
+    <section class="hero hero-home">
+        <div class="hero-content">
+            <span class="hero-badge">Editorial Excellence</span>
+            <h1 class="hero-title">Perspectives on Finance & Business</h1>
+            <p class="hero-description">
+                Deep-dive analysis of IPOs, M&A deals, and market trends. Thought-provoking insights for the
+                contemporary leader navigating India's financial landscape.
+            </p>
+            <div class="hero-buttons">
+                <a href="journal.html" class="btn btn-primary">Explore Articles</a>
+                <a href="contact.html" class="btn btn-secondary">Contact Us</a>
+            </div>
+        </div>
+    </section>
+
+
+    <main class="main-content">
+        <div class="content-container">
+
+            <section class="category-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Back to Basics</h2>
+                        <p class="section-subtitle">Foundational concepts every investor should know</p>
+                    </div>
+                    <a href="journal.html?category=back-to-basics" class="view-all-btn">SHOW ALL →</a>
+                </div>
+                <div class="horizontal-scroll" id="back-to-basics-scroll">
+
+                </div>
+            </section>
+
+
+            <section class="category-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Case Studies</h2>
+                        <p class="section-subtitle">Deep dives into corporate strategies</p>
+                    </div>
+                    <a href="journal.html?category=case-studies" class="view-all-btn">SHOW ALL →</a>
+                </div>
+                <div class="horizontal-scroll" id="case-studies-scroll">
+
+                </div>
+            </section>
+
+
+            <section class="category-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Stock Analysis</h2>
+                        <p class="section-subtitle">In-depth company and market analysis</p>
+                    </div>
+                    <a href="journal.html?category=stock-analysis" class="view-all-btn">SHOW ALL →</a>
+                </div>
+                <div class="horizontal-scroll" id="stock-analysis-scroll">
+
+                </div>
+            </section>
+
+
+            <section class="category-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">100 Days Challenge</h2>
+                        <p class="section-subtitle">Your journey to financial literacy</p>
+                    </div>
+                    <a href="journal.html?category=100-days-challenge" class="view-all-btn">SHOW ALL →</a>
+                </div>
+                <div class="horizontal-scroll" id="100-days-challenge-scroll">
+
+                </div>
+            </section>
+
+
+            <section class="category-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">M&A Diaries</h2>
+                        <p class="section-subtitle">Mergers, acquisitions, and corporate restructuring</p>
+                    </div>
+                    <a href="journal.html?category=ma-diaries" class="view-all-btn">SHOW ALL →</a>
+                </div>
+                <div class="horizontal-scroll" id="ma-diaries-scroll">
+
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer" style="padding: 4rem 0; border-top: 1px solid var(--border-light); text-align: center;">
+        <div class="content-container">
+            <img src="logo.png" alt="Morrigan" style="height: 24px; margin-bottom: 1rem;">
+            <p style="font-size: 0.875rem; color: var(--text-muted);">© 2026 Morrigan Editorial. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+
+    <button class="chatbot-button"
+        style="position: fixed; bottom: 2rem; right: 2rem; background: var(--accent); color: white; border: none; padding: 1rem; border-radius: 50%; cursor: pointer; box-shadow: var(--shadow-lg);">
+        <img src="chatbot.svg" alt="Chatbot" width="24" height="24">
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="demo-data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

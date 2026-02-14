@@ -17,66 +17,196 @@ document.addEventListener('DOMContentLoaded', () => {
 function initMobileMenu() {
     const toggle = document.querySelector('.mobile-menu-toggle');
     const menu = document.querySelector('.nav-menu');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const dropdowns = document.querySelectorAll('.dropdown');
+
     if (toggle && menu) {
         toggle.addEventListener('click', () => {
             menu.classList.toggle('active');
-            toggle.classList.toggle('active');
+            toggle.innerHTML = menu.classList.contains('active') ? '✕' : '☰';
+        });
+
+        dropdowns.forEach(dropdown => {
+            const link = dropdown.querySelector('.nav-link');
+            if (link && window.innerWidth <= 768) {
+                link.addEventListener('click', (e) => {
+                    if (dropdown.querySelector('.dropdown-menu')) {
+                        e.preventDefault();
+                        dropdown.classList.toggle('open');
+                    }
+                });
+            }
+        });
+
+        const dropdownItems = document.querySelectorAll('.dropdown-item');
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', () => {
+                menu.classList.remove('active');
+                toggle.innerHTML = '☰';
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!menu.contains(e.target) && !toggle.contains(e.target) && menu.classList.contains('active')) {
+                menu.classList.remove('active');
+                toggle.innerHTML = '☰';
+            }
         });
     }
 }
 
 async function initHomepage() {
-    console.log("Initializing Homepage...");
-    const sections = document.querySelectorAll('.category-section');
-    for (const section of sections) {
-        const category = section.dataset.category;
-        const container = section.querySelector('.card-grid');
-        if (category && container) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/blogs?category=${category}&limit=3`);
-                if (response.ok) {
-                    const blogs = await response.json();
-                    renderBlogCards(blogs, container);
-                }
-            } catch (e) { console.error(`Failed to fetch ${category}`, e); }
+    const blogs = window.DEMO_BLOGS || [];
+    if (blogs.length > 0) {
+        loadCategorySection('back-to-basics', blogs);
+        loadCategorySection('case-studies', blogs);
+        loadCategorySection('stock-analysis', blogs);
+        loadCategorySection('100-days-challenge', blogs);
+        loadCategorySection('ma-diaries', blogs);
+    } else {
+        try {
+            const res = await fetch(`${API_BASE_URL}/blogs?limit=20`);
+            const apiBlogs = await res.json();
+            loadCategorySection('back-to-basics', apiBlogs);
+            loadCategorySection('case-studies', apiBlogs);
+            loadCategorySection('stock-analysis', apiBlogs);
+            loadCategorySection('100-days-challenge', apiBlogs);
+            loadCategorySection('ma-diaries', apiBlogs);
+        } catch (e) {
         }
     }
+}
+
+function loadCategorySection(category, allBlogs) {
+    const container = document.getElementById(`${category}-scroll`);
+    if (!container) return;
+    const categoryBlogs = allBlogs.filter(blog => blog.category === category);
+    if (categoryBlogs.length === 0) {
+        container.innerHTML = '<p style="color: #999; padding: 2rem 0;">No articles available yet.</p>';
+        return;
+    }
+    container.innerHTML = categoryBlogs.map(blog => {
+        const date = new Date(blog.published_at || blog.created_at || Date.now()).toLocaleDateString();
+        const imageUrl = blog.featured_image || 'logo.png';
+        const categoryDisplay = blog.category ? blog.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'General';
+        return `
+            <div class="horizontal-card" onclick="location.href='blog-detail.html?slug=${blog.slug}'">
+                <img src="${imageUrl}" alt="${blog.title}" class="horizontal-card-image" onerror="this.src='logo.png'">
+                <div class="horizontal-card-content">
+                    <div class="horizontal-card-category">${categoryDisplay}</div>
+                    <h3 class="horizontal-card-title">${blog.title}</h3>
+                    <p class="horizontal-card-excerpt">${blog.excerpt || ''}</p>
+                    <div class="horizontal-card-meta">
+                        <span>${date}</span>
+                        <span>•</span>
+                        <span>${blog.read_time || 5} min read</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 async function initJournal() {
     const grid = document.getElementById('journal-grid');
     const tabs = document.querySelectorAll('.tab-btn');
     const searchInput = document.getElementById('searchInput');
-
     const urlParams = new URLSearchParams(window.location.search);
     let currentCategory = urlParams.get('category') || 'all';
-
-    const fetchAndRender = async (cat = 'all') => {
-        grid.innerHTML = '<div class="loading">Loading insights...</div>';
-        try {
-            const url = cat === 'all' ? `${API_BASE_URL}/blogs` : `${API_BASE_URL}/blogs?category=${cat}`;
-            const res = await fetch(url);
-            const blogs = await res.json();
-            grid.innerHTML = '';
-            renderBlogCards(blogs, grid);
-            if (blogs.length === 0) document.getElementById('no-results').style.display = 'block';
-            else document.getElementById('no-results').style.display = 'none';
-        } catch (e) { grid.innerHTML = 'Failed to load journal.'; }
-    };
-
+    let allBlogs = [];
     tabs.forEach(tab => {
         if (tab.dataset.filter === currentCategory) {
             tabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
         }
+    });
+
+    const fetchAndRender = async (cat = 'all', searchTerm = '') => {
+        grid.innerHTML = '<div style="text-align: center; padding: 3rem; color: #999;">Loading...</div>';
+        try {
+            if (window.DEMO_BLOGS && window.DEMO_BLOGS.length > 0) {
+                allBlogs = window.DEMO_BLOGS;
+                let filteredBlogs = cat === 'all' ? allBlogs : allBlogs.filter(blog => blog.category === cat);
+                if (searchTerm) {
+                    filteredBlogs = filteredBlogs.filter(blog =>
+                        blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        (blog.excerpt && blog.excerpt.toLowerCase().includes(searchTerm.toLowerCase()))
+                    );
+                }
+                grid.innerHTML = '';
+                renderJournalCards(filteredBlogs, grid);
+                if (filteredBlogs.length === 0) {
+                    document.getElementById('no-results').style.display = 'block';
+                } else {
+                    document.getElementById('no-results').style.display = 'none';
+                }
+            } else {
+                const url = cat === 'all' ? `${API_BASE_URL}/blogs` : `${API_BASE_URL}/blogs?category=${cat}`;
+                const res = await fetch(url);
+                allBlogs = await res.json();
+                let filteredBlogs = allBlogs;
+                if (searchTerm) {
+                    filteredBlogs = allBlogs.filter(blog =>
+                        blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        (blog.excerpt && blog.excerpt.toLowerCase().includes(searchTerm.toLowerCase()))
+                    );
+                }
+                grid.innerHTML = '';
+                renderJournalCards(filteredBlogs, grid);
+                if (filteredBlogs.length === 0) {
+                    document.getElementById('no-results').style.display = 'block';
+                } else {
+                    document.getElementById('no-results').style.display = 'none';
+                }
+            }
+        } catch (e) {
+            grid.innerHTML = '<div style="text-align: center; padding: 3rem; color: #999;">Failed to load articles.</div>';
+        }
+    };
+
+    tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             tabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
-            fetchAndRender(tab.dataset.filter);
+            currentCategory = tab.dataset.filter;
+            fetchAndRender(currentCategory, searchInput.value);
         });
     });
 
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            fetchAndRender(currentCategory, e.target.value);
+        });
+    }
+
     fetchAndRender(currentCategory);
+}
+
+function renderJournalCards(blogs, container) {
+    if (!blogs.length) {
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 3rem;">No articles available yet.</p>';
+        return;
+    }
+    container.innerHTML = blogs.map(blog => {
+        const date = new Date(blog.published_at || blog.created_at).toLocaleDateString();
+        const imageUrl = blog.featured_image || 'logo.png';
+        const categoryDisplay = blog.category ? blog.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'General';
+        return `
+            <div class="blog-card" onclick="location.href='blog-detail.html?slug=${blog.slug}'">
+                <img src="${imageUrl}" alt="${blog.title}" class="blog-card-image" onerror="this.src='logo.png'">
+                <div class="blog-card-content">
+                    <div class="blog-card-category">${categoryDisplay}</div>
+                    <h3 class="blog-card-title">${blog.title}</h3>
+                    <p class="blog-card-excerpt">${blog.excerpt || ''}</p>
+                    <div class="blog-card-meta">
+                        <span>${date}</span>
+                        <span>•</span>
+                        <span>${blog.read_time || 5} min read</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 function renderBlogCards(blogs, container) {
@@ -110,7 +240,6 @@ function renderBlogCards(blogs, container) {
 function initChatbot() {
     const btn = document.querySelector('.chatbot-button');
     if (!btn) return;
-
     btn.onclick = () => {
         let chat = document.querySelector('.chatbot-container');
         if (chat) chat.classList.toggle('active');
@@ -135,20 +264,15 @@ function createChatElement() {
         </div>
     `;
     document.body.appendChild(chat);
-
     chat.querySelector('.chatbot-close').onclick = () => chat.classList.remove('active');
     const input = chat.querySelector('#chatInput');
     const send = chat.querySelector('#chatSend');
-
     const handleSend = async () => {
         const text = input.value.trim();
         if (!text) return;
         addMsg('user', text);
         input.value = '';
-
         const pageContent = document.body.innerText.slice(0, 5000);
-        const urlParams = new URLSearchParams(window.location.search);
-
         try {
             showLoading();
             const res = await fetch(`${API_BASE_URL}/chat`, {
@@ -169,7 +293,6 @@ function createChatElement() {
             addMsg('bot', "I'm having trouble connecting to my knowledge base.");
         }
     };
-
     send.onclick = handleSend;
     input.onkeypress = (e) => { if (e.key === 'Enter') handleSend(); };
 }
@@ -178,7 +301,6 @@ function addMsg(type, text) {
     const container = document.getElementById('chatMsgs');
     const div = document.createElement('div');
     div.className = `${type}-message`;
-
     div.innerHTML = window.marked ? marked.parse(text) : text;
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;

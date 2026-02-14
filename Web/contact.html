@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | Morrigan</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .contact-page {
+            background: #ffffff;
+            min-height: 100vh;
+        }
+
+        .contact-container {
+            max-width: 1200px;
+            margin: -5rem auto 0;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .contact-content {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .contact-info {
+            background: #f8f9fa;
+            padding: 3rem;
+            border-radius: 1.5rem;
+            border: 1px solid #e0e0e0;
+        }
+
+        .contact-info h2 {
+            font-size: 1.75rem;
+            font-family: var(--font-serif);
+            color: #000;
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-info-item {
+            margin-bottom: 2rem;
+        }
+
+        .contact-info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-info-label {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #1a73e8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-info-value {
+            font-size: 1.125rem;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .contact-form-wrapper {
+            background: #fff;
+            padding: 3rem;
+            border-radius: 1.5rem;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .contact-form-wrapper h2 {
+            font-size: 1.75rem;
+            font-family: var(--font-serif);
+            color: #000;
+            margin-bottom: 2rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 0.75rem;
+            background: #f8f9fa;
+            color: #000;
+            font-size: 1rem;
+            font-family: var(--font-sans);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #1a73e8;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: #1a73e8;
+            color: #fff;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-submit:hover {
+            background: #0d5bbd;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(26, 115, 232, 0.3);
+        }
+
+        .form-status {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-weight: 600;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: none;
+        }
+
+        .form-status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .form-status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .contact-header h1 {
+                font-size: 2rem;
+            }
+
+            .contact-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-info,
+            .contact-form-wrapper {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="logo.png" alt="Morrigan Logo">
+                <h2>Morrigan</h2>
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item dropdown">
+                    <a href="journal.html" class="nav-link">Journal</a>
+                    <div class="dropdown-menu">
+                        <a href="journal.html?category=back-to-basics" class="dropdown-item">Back to Basics</a>
+                        <a href="journal.html?category=case-studies" class="dropdown-item">Case Studies</a>
+                        <a href="journal.html?category=stock-analysis" class="dropdown-item">Stock Analysis</a>
+                        <a href="journal.html?category=100-days-challenge" class="dropdown-item">100 Days Challenge</a>
+                        <a href="journal.html?category=ma-diaries" class="dropdown-item">M&A Diaries</a>
+                    </div>
+                </li>
+                <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="contact.html" class="nav-link active">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">☰</button>
+        </div>
+    </nav>
+
+
+    <section class="hero hero-contact">
+        <div class="hero-content">
+            <span class="hero-badge">Connect</span>
+            <h1 class="hero-title">Get In Touch</h1>
+            <p class="hero-description">
+                Have a question or want to work together? We'd love to hear from you. Send us a message and we'll
+                respond as soon as possible.
+            </p>
+        </div>
+    </section>
+
+    <div class="contact-page">
+        <div class="contact-container">
+
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h2>Contact Information</h2>
+                    <div class="contact-info-item">
+                        <div class="contact-info-label">Email</div>
+                        <div class="contact-info-value">hello@morrigan.com</div>
+                    </div>
+                    <div class="contact-info-item">
+                        <div class="contact-info-label">Location</div>
+                        <div class="contact-info-value">Pune, India</div>
+                    </div>
+                    <div class="contact-info-item">
+                        <div class="contact-info-label">Response Time</div>
+                        <div class="contact-info-value">Within 24-48 hours</div>
+                    </div>
+                </div>
+
+                <div class="contact-form-wrapper">
+                    <h2>Send Us a Message</h2>
+                    <form id="contactForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="name">Your Name</label>
+                                <input type="text" id="name" class="form-input" placeholder="Pushkar Gangurde" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="email">Your Email</label>
+                                <input type="email" id="email" class="form-input" placeholder="morrigan@example.com"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="subject">Subject</label>
+                            <input type="text" id="subject" class="form-input" placeholder="How can we help you?"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="message">Message</label>
+                            <textarea id="message" class="form-textarea"
+                                placeholder="Tell us more about your inquiry..." required></textarea>
+                        </div>
+                        <button type="submit" class="form-submit">Send Message</button>
+                        <div id="contactStatus" class="form-status"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

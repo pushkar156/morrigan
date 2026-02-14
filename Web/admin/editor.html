@@ -6,119 +6,435 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editor | Morrigan Admin</title>
     <link rel="icon" type="image/png" href="../logo.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="../styles.css">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: var(--background);
+            background: #f8f9fa;
             display: flex;
             min-height: 100vh;
-            margin: 0;
+            font-family: var(--font-sans);
+        }
+
+        .hamburger {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 1001;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active {
+            left: 310px;
+        }
+
+        .hamburger:hover {
+            background: #f8f9fa;
+        }
+
+        .hamburger span {
+            width: 24px;
+            height: 2px;
+            background: #000;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(6px, 6px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
         }
 
         .sidebar {
-            width: 250px;
-            background: white;
-            border-right: 1px solid var(--border-light);
+            width: 280px;
+            background: #fff;
+            border-right: 1px solid #e0e0e0;
             padding: 2rem;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
             position: fixed;
-            height: 100%;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            display: none;
+            backdrop-filter: blur(2px);
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: #000;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .sidebar-logo img {
+            width: 36px;
+            height: 36px;
+        }
+
+        .sidebar-logo span {
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .nav-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #999;
+            margin-bottom: 1rem;
+            padding: 0 1rem;
         }
 
         .nav-item {
-            display: block;
-            padding: 0.75rem 1rem;
-            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            color: #666;
             text-decoration: none;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
 
-        .nav-item:hover,
+        .nav-item:hover {
+            background: #f8f9fa;
+            color: #000;
+        }
+
         .nav-item.active {
-            background: var(--surface-light);
-            color: var(--primary);
+            background: #1a73e8;
+            color: #fff;
+        }
+
+        .nav-item-icon {
+            font-size: 1.25rem;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            color: #dc3545;
+            cursor: pointer;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 2rem;
+        }
+
+        .logout-btn:hover {
+            background: #fff5f5;
         }
 
         .main-content {
-            margin-left: 250px;
             flex: 1;
-            padding: 3rem;
-            max-width: 1200px;
+            padding: 2.5rem 3rem;
+            padding-left: 6rem;
+            overflow-y: auto;
+            max-width: 1400px;
+            transition: padding-left 0.3s ease;
+        }
+
+        .main-content.sidebar-open {
+            padding-left: calc(280px + 3rem);
+        }
+
+        .editor-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 2.25rem;
+            font-family: var(--font-serif);
+            color: #000;
+            font-weight: 700;
+        }
+
+        .status-msg {
+            color: #10b981;
+            font-weight: 600;
         }
 
         .editor-container {
-            background: white;
-            padding: 2.5rem;
+            background: #fff;
+            padding: 3rem;
             border-radius: 1rem;
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e0e0e0;
         }
 
         .form-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
+            gap: 2.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .form-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e0e0e0;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.625rem;
             font-weight: 700;
-            color: var(--text-dark);
+            color: #000;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .form-control,
         .form-select {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-light);
-            border-radius: 0.5rem;
+            padding: 0.875rem 1.25rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 0.75rem;
             font-size: 1rem;
+            font-family: var(--font-sans);
+            background: #f8f9fa;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #1a73e8;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #999;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
         }
 
         #editor {
             height: 500px;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
+            background: #fff;
         }
 
-        .btn-success {
-            background: var(--primary);
-            color: white;
-            padding: 0.75rem 2rem;
-            border-radius: 0.5rem;
+        .ql-toolbar {
+            border-radius: 0.75rem 0.75rem 0 0 !important;
+            border: 1px solid #e0e0e0 !important;
+            background: #f8f9fa !important;
+        }
+
+        .ql-container {
+            border-radius: 0 0 0.75rem 0.75rem !important;
+            border: 1px solid #e0e0e0 !important;
+            border-top: none !important;
+            font-size: 1rem;
+            font-family: var(--font-sans);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 0.75rem;
             border: none;
             font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: #1a73e8;
+            color: white;
+            box-shadow: 0 2px 8px rgba(26, 115, 232, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: #0d5bbd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            color: #000;
+        }
+
+        .upload-container {
+            display: none;
+            margin-top: 0.75rem;
+            gap: 0.75rem;
+        }
+
+        .upload-container.active {
+            display: flex;
+        }
+
+        .btn-upload {
+            padding: 0.875rem 1.5rem;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-upload:hover {
+            background: #059669;
+        }
+
+        @media (max-width: 1024px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+
+            .editor-container {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <aside class="sidebar">
-        <a href="../index.html" class="sidebar-logo"><img src="../logo.png" style="width:32px;"><span
-                style="font-weight:700;">Admin</span></a>
-        <a href="dashboard.html" class="nav-item">Dashboard</a>
-        <a href="editor.html" class="nav-item active">New Article</a>
+    <div class="hamburger" onclick="toggleSidebar()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <aside class="sidebar hidden">
+        <a href="../index.html" class="sidebar-logo">
+            <img src="../logo.png" alt="Morrigan">
+            <span>MORRIGAN</span>
+        </a>
+        <nav>
+            <a href="dashboard.html" class="nav-item">
+                <span>Dashboard</span>
+            </a>
+            <a href="editor.html" class="nav-item active">
+                <span>New Article</span>
+            </a>
+        </nav>
+        <div class="nav-item logout-btn" onclick="logout()">
+            <span>Logout</span>
+        </div>
     </aside>
 
     <main class="main-content">
         <div class="editor-header">
-            <h1 id="pageTitle">New Article</h1><span id="statusMsg"></span>
+            <h1 class="page-title" id="pageTitle">New Article</h1>
+            <span class="status-msg" id="statusMsg"></span>
         </div>
+
         <div class="editor-container">
             <div class="form-grid">
                 <div>
-                    <div class="form-group"><label class="form-label">Title</label><input type="text" id="title"
-                            class="form-control" placeholder="Headline..."></div>
-                    <div class="form-group"><label class="form-label">Excerpt</label><textarea id="excerpt"
-                            class="form-control" rows="3"></textarea></div>
+                    <div class="form-section-title">Article Details</div>
+                    <div class="form-group">
+                        <label class="form-label">Title</label>
+                        <input type="text" id="title" class="form-control" placeholder="Enter article title...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Excerpt</label>
+                        <textarea id="excerpt" class="form-control" rows="4"
+                            placeholder="Brief summary of the article..."></textarea>
+                    </div>
                 </div>
                 <div>
+                    <div class="form-section-title">Settings</div>
                     <div class="form-group">
                         <label class="form-label">Category</label>
                         <select id="category" class="form-select">
@@ -136,27 +452,35 @@
                             <option value="published">Published</option>
                         </select>
                     </div>
-                    <div class="form-group"><label class="form-label">Publish Date</label><input type="datetime-local"
-                            id="publishedAt" class="form-control"></div>
                     <div class="form-group">
-                        <label class="form-label">Image Source</label>
+                        <label class="form-label">Publish Date</label>
+                        <input type="datetime-local" id="publishedAt" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Featured Image</label>
                         <select id="imgSource" class="form-select" onchange="toggleImgInput()">
-                            <option value="url">URL</option>
-                            <option value="upload">Local Upload</option>
+                            <option value="url">Image URL</option>
+                            <option value="upload">Upload Image</option>
                         </select>
-                        <input type="text" id="image" class="form-control" style="margin-top:0.5rem;"
-                            placeholder="https://...">
-                        <div id="uploadContainer" style="display:none; margin-top:0.5rem; display:flex; gap:0.5rem;">
-                            <input type="file" id="imgUpload" class="form-control">
-                            <button type="button" onclick="uploadFeatured()" class="btn-success">Upload</button>
+                        <input type="text" id="image" class="form-control" style="margin-top: 0.75rem;"
+                            placeholder="https://example.com/image.jpg">
+                        <div id="uploadContainer" class="upload-container">
+                            <input type="file" id="imgUpload" class="form-control" accept="image/*">
+                            <button type="button" onclick="uploadFeatured()" class="btn-upload">Upload</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="form-group"><label class="form-label">Content</label>
+
+            <div class="form-group">
+                <label class="form-label">Content</label>
                 <div id="editor"></div>
             </div>
-            <div style="text-align:right;"><button class="btn-success" onclick="saveBlog()">Save Article</button></div>
+
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="location.href='dashboard.html'">Cancel</button>
+                <button class="btn btn-primary" onclick="saveBlog()">Save Article</button>
+            </div>
         </div>
     </main>
 
@@ -173,17 +497,25 @@
         const quill = new Quill('#editor', {
             theme: 'snow',
             modules: {
-                toolbar: [[{ 'header': [2, 3, false] }], ['bold', 'italic'], ['link', 'image'], ['clean']],
+                toolbar: [
+                    [{ 'header': [2, 3, false] }],
+                    ['bold', 'italic', 'underline'],
+                    ['link', 'image', 'blockquote'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    ['clean']
+                ],
                 imageResize: { displaySize: true }
             }
         });
 
-        // Custom image upload from toolbar
         quill.getModule('toolbar').addHandler('image', () => {
             const input = document.createElement('input');
-            input.type = 'file'; input.accept = 'image/*'; input.click();
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.click();
             input.onchange = async () => {
-                const formData = new FormData(); formData.append('file', input.files[0]);
+                const formData = new FormData();
+                formData.append('file', input.files[0]);
                 const res = await fetch(`${API_BASE_URL}/upload`, { method: 'POST', body: formData });
                 const data = await res.json();
                 const range = quill.getSelection();
@@ -194,6 +526,24 @@
         const urlParams = new URLSearchParams(window.location.search);
         const slug = urlParams.get('slug');
         if (slug) loadBlog(slug);
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            const hamburger = document.querySelector('.hamburger');
+            const mainContent = document.querySelector('.main-content');
+
+            sidebar.classList.toggle('hidden');
+            overlay.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            mainContent.classList.toggle('sidebar-open');
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_token');
+            localStorage.removeItem('admin_user');
+            window.location.href = 'login.html';
+        }
 
         async function loadBlog(slug) {
             const res = await fetch(`${API_BASE_URL}/blogs/${slug}`);
@@ -211,22 +561,40 @@
 
         function toggleImgInput() {
             const isUpload = document.getElementById('imgSource').value === 'upload';
-            document.getElementById('uploadContainer').style.display = isUpload ? 'flex' : 'none';
+            const uploadContainer = document.getElementById('uploadContainer');
+            if (isUpload) {
+                uploadContainer.classList.add('active');
+            } else {
+                uploadContainer.classList.remove('active');
+            }
         }
 
         async function uploadFeatured() {
             const file = document.getElementById('imgUpload').files[0];
-            if (!file) return;
-            const formData = new FormData(); formData.append('file', file);
+            if (!file) {
+                alert('Please select a file first');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('file', file);
             const res = await fetch(`${API_BASE_URL}/upload`, { method: 'POST', body: formData });
             const data = await res.json();
             document.getElementById('image').value = data.url;
-            alert('Uploaded!');
+            document.getElementById('statusMsg').textContent = '✓ Image uploaded successfully!';
+            setTimeout(() => {
+                document.getElementById('statusMsg').textContent = '';
+            }, 3000);
         }
 
         async function saveBlog() {
+            const title = document.getElementById('title').value;
+            if (!title) {
+                alert('Please enter a title');
+                return;
+            }
+
             const data = {
-                title: document.getElementById('title').value,
+                title: title,
                 category: document.getElementById('category').value,
                 content: quill.root.innerHTML,
                 excerpt: document.getElementById('excerpt').value,
@@ -234,15 +602,31 @@
                 featured_image: document.getElementById('image').value,
                 published_at: document.getElementById('publishedAt').value || null
             };
+
             const method = currentBlogId ? 'PUT' : 'POST';
             const url = currentBlogId ? `${API_BASE_URL}/blogs/${currentBlogId}` : `${API_BASE_URL}/blogs`;
 
-            const res = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify(data)
-            });
-            if (res.ok) alert('Saved successfully!'); else alert('Save failed.');
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    document.getElementById('statusMsg').textContent = '✓ Saved successfully!';
+                    setTimeout(() => {
+                        location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
+                    alert('Save failed. Please try again.');
+                }
+            } catch (err) {
+                alert('Save failed. Please check your connection.');
+            }
         }
     </script>
 </body>

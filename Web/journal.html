@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal | Morrigan</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: #ffffff;
+            min-height: 100vh;
+        }
+
+        .journal-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 3rem;
+        }
+
+        .search-wrapper {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 2rem;
+            font-size: 1rem;
+            font-family: var(--font-sans);
+            background: #f8f9fa;
+            color: #000;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1a73e8;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15);
+            background: #fff;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            pointer-events: none;
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.75rem;
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            color: #555;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            border-color: #1a73e8;
+            color: #000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn.active {
+            background: #1a73e8;
+            color: #fff;
+            border-color: #1a73e8;
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+        }
+
+        /* Blog Grid */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .blog-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .blog-card:hover {
+            transform: translateY(-8px);
+            border-color: #1a73e8;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .blog-card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f8f9fa;
+        }
+
+        .blog-card-content {
+            padding: 1.5rem;
+        }
+
+        .blog-card-category {
+            color: #1a73e8;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: var(--font-sans);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .blog-card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-family: var(--font-serif);
+            margin-bottom: 0.75rem;
+            color: #000;
+            line-height: 1.4;
+        }
+
+        .blog-card-excerpt {
+            color: #555;
+            font-size: 0.9375rem;
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .blog-card-meta {
+            display: flex;
+            gap: 1rem;
+            color: #999;
+            font-size: 0.8125rem;
+            font-family: var(--font-sans);
+        }
+
+        #no-results {
+            text-align: center;
+            padding: 4rem 0;
+            color: #999;
+        }
+
+        #no-results h2 {
+            font-family: var(--font-serif);
+            color: #000;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="logo.png" alt="Morrigan Logo">
+                <h2>Morrigan</h2>
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item dropdown">
+                    <a href="journal.html" class="nav-link active">Journal</a>
+                    <div class="dropdown-menu">
+                        <a href="journal.html?category=back-to-basics" class="dropdown-item">Back to Basics</a>
+                        <a href="journal.html?category=case-studies" class="dropdown-item">Case Studies</a>
+                        <a href="journal.html?category=stock-analysis" class="dropdown-item">Stock Analysis</a>
+                        <a href="journal.html?category=100-days-challenge" class="dropdown-item">100 Days Challenge</a>
+                        <a href="journal.html?category=ma-diaries" class="dropdown-item">M&A Diaries</a>
+                    </div>
+                </li>
+                <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">☰</button>
+        </div>
+    </nav>
+
+    <main class="journal-container">
+
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search articles...">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
+        </div>
+
+
+        <div class="category-tabs">
+            <button class="tab-btn active" data-filter="all">All Posts</button>
+            <button class="tab-btn" data-filter="back-to-basics">Back to Basics</button>
+            <button class="tab-btn" data-filter="case-studies">Case Studies</button>
+            <button class="tab-btn" data-filter="stock-analysis">Stock Analysis</button>
+            <button class="tab-btn" data-filter="100-days-challenge">100 Days Challenge</button>
+            <button class="tab-btn" data-filter="ma-diaries">M&A Diaries</button>
+        </div>
+
+
+        <div id="journal-grid" class="blog-grid">
+
+        </div>
+
+        <div id="no-results" style="display: none;">
+            <h2>No articles found</h2>
+            <p>Try adjusting your search or filter.</p>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="demo-data.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

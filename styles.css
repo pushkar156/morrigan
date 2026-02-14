@@ -1,17 +1,11 @@
-/* ============================================
-   MORRIGAN - UNIFIED DESIGN SYSTEM
-   ============================================ */
-
-/* CSS RESET */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* ROOT VARIABLES */
 :root {
-    /* Colors */
+
     --primary: #1152d4;
     --primary-dark: #0d3da8;
     --background-light: #ffffff;
@@ -21,32 +15,27 @@
     --text-light: #f8f9fc;
     --text-muted: #4c669a;
     --border-light: #e7ebf3;
-    
-    /* Typography */
+
     --font-display: 'Manrope', sans-serif;
     --font-serif: 'Playfair Display', serif;
-    
-    /* Spacing */
+
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
     --spacing-md: 1.5rem;
     --spacing-lg: 2rem;
     --spacing-xl: 3rem;
     --spacing-2xl: 4rem;
-    
-    /* Transitions */
+
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
-    
-    /* Shadows */
+
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
     --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
     --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
-/* GLOBAL STYLES */
 body {
     font-family: var(--font-display);
     background-color: var(--background-light);
@@ -74,10 +63,6 @@ img {
     height: auto;
     display: block;
 }
-
-/* ============================================
-   NAVIGATION BAR (CONSISTENT ACROSS ALL PAGES)
-   ============================================ */
 
 .navbar {
     position: sticky;
@@ -170,7 +155,6 @@ img {
     background: var(--primary);
 }
 
-/* Mobile Menu Toggle */
 .mobile-menu-toggle {
     display: none;
     background: none;
@@ -189,10 +173,6 @@ img {
 .mobile-menu-toggle.active {
     transform: rotate(90deg);
 }
-
-/* ============================================
-   RESPONSIVE DESIGN - MOBILE MENU
-   ============================================ */
 
 @media (max-width: 768px) {
     .nav-menu {
@@ -213,42 +193,38 @@ img {
         border-left: 1px solid rgba(0, 0, 0, 0.1);
         z-index: 999;
     }
-    
+
     .nav-menu.active {
         right: 0;
     }
-    
+
     .nav-menu li {
         width: 100%;
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
-    
+
     .nav-link {
         display: block;
         padding: 1rem 2rem;
         width: 100%;
         text-align: left;
     }
-    
+
     .nav-link.active::after {
         display: none;
     }
-    
+
     .nav-link.active {
         background: rgba(17, 82, 212, 0.1);
     }
-    
+
     .mobile-menu-toggle {
         display: block;
     }
 }
 
-/* ============================================
-   HERO SECTION
-   ============================================ */
-
 .hero {
-    /* Deep Ocean Glow - Dark & Immersive */
+
     min-height: 100vh;
     width: 100%;
     background: #000000;
@@ -257,12 +233,11 @@ img {
     overflow: hidden;
 }
 
-/* Deep Ocean Glow Background */
 .hero::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: 
+    background:
         radial-gradient(70% 55% at 50% 50%, #2a5d77 0%, #184058 18%, #0f2a43 34%, #0a1b30 50%, #071226 66%, #040d1c 80%, #020814 92%, #01040d 97%, #000309 100%),
         radial-gradient(160% 130% at 10% 10%, rgba(0,0,0,0) 38%, #000309 76%, #000208 100%),
         radial-gradient(160% 130% at 90% 90%, rgba(0,0,0,0) 38%, #000309 76%, #000208 100%);
@@ -358,10 +333,6 @@ img {
     border-color: var(--primary);
 }
 
-/* ============================================
-   MAIN CONTENT AREA
-   ============================================ */
-
 .main-content {
     background: var(--background-light);
     padding: 4rem 2rem;
@@ -389,10 +360,6 @@ img {
     color: var(--text-muted);
     font-family: var(--font-display);
 }
-
-/* ============================================
-   CARD GRID
-   ============================================ */
 
 .card-grid {
     display: grid;
@@ -480,10 +447,6 @@ img {
     font-style: italic;
 }
 
-/* ============================================
-   FORM STYLES
-   ============================================ */
-
 .form-container {
     background: var(--surface-light);
     padding: 2.5rem;
@@ -530,10 +493,6 @@ img {
     min-height: 150px;
     resize: vertical;
 }
-
-/* ============================================
-   FOOTER
-   ============================================ */
 
 .footer {
     background: var(--background-dark);
@@ -603,10 +562,6 @@ img {
     letter-spacing: 0.1em;
 }
 
-/* ============================================
-   CHATBOT BUTTON
-   ============================================ */
-
 .chatbot-button {
     position: fixed;
     bottom: 2rem;
@@ -647,10 +602,6 @@ img {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-/* ============================================
-   CHATBOT CONTAINER
-   ============================================ */
-
 .chatbot-container {
     position: fixed;
     bottom: 2rem;
@@ -678,7 +629,6 @@ img {
     pointer-events: all;
 }
 
-/* Chatbot Header */
 .chatbot-header {
     background: linear-gradient(135deg, var(--primary) 0%, #64b5f6 100%);
     padding: 1.25rem 1.5rem;
@@ -782,7 +732,6 @@ img {
     fill: white;
 }
 
-/* Chatbot Messages */
 .chatbot-messages {
     flex: 1;
     overflow-y: auto;
@@ -810,7 +759,6 @@ img {
     background: rgba(17, 82, 212, 0.5);
 }
 
-/* Welcome Message */
 .chatbot-welcome {
     text-align: center;
     padding: 2rem 1rem;
@@ -859,7 +807,6 @@ img {
     margin: 0 auto;
 }
 
-/* Chat Messages */
 .chatbot-message {
     display: flex;
     gap: 0.75rem;
@@ -924,7 +871,6 @@ img {
     border-bottom-right-radius: 0.25rem;
 }
 
-/* Typing Indicator */
 .typing-indicator .message-content {
     padding: 1rem 1.25rem;
 }
@@ -960,7 +906,6 @@ img {
     }
 }
 
-/* Chatbot Input */
 .chatbot-input-container {
     padding: 1rem 1.5rem;
     background: white;
@@ -1013,7 +958,6 @@ img {
     fill: white;
 }
 
-/* Demo Trigger */
 .chatbot-demo-trigger {
     padding: 0 1.5rem 1rem;
     background: white;
@@ -1050,10 +994,6 @@ img {
     fill: currentColor;
 }
 
-/* ============================================
-   UTILITY CLASSES
-   ============================================ */
-
 .text-center {
     text-align: center;
 }
@@ -1076,42 +1016,38 @@ img {
 .mb-4 { margin-bottom: var(--spacing-lg); }
 .mb-5 { margin-bottom: var(--spacing-xl); }
 
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
-
 @media (max-width: 768px) {
-    
+
     .hero {
         padding: 4rem 1.5rem 3rem;
     }
-    
+
     .main-content {
         padding: 2rem 1.5rem;
     }
-    
+
     .card-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
-    
+
     .footer-content {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .chatbot-button {
         bottom: 1.5rem;
         right: 1.5rem;
         width: 56px;
         height: 56px;
     }
-    
+
     .chatbot-button svg {
         width: 24px;
         height: 24px;
     }
-    
+
     .chatbot-container {
         bottom: 1rem;
         right: 1rem;
@@ -1120,28 +1056,27 @@ img {
         max-width: none;
         height: 500px;
     }
-    
+
     .chatbot-avatar {
         width: 40px;
         height: 40px;
     }
-    
+
     .chatbot-avatar svg {
         width: 24px;
         height: 24px;
     }
 }
 
-
 @media (max-width: 480px) {
     .nav-container {
         padding: 1rem 1.5rem;
     }
-    
+
     .hero-title {
         font-size: 2rem;
     }
-    
+
     .section-title {
         font-size: 1.5rem;
     }

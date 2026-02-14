@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor | Morrigan Admin</title>
+    <link rel="icon" type="image/png" href="../logo.png">
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: var(--background);
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-right: 1px solid var(--border-light);
+            padding: 2rem;
+            position: fixed;
+            height: 100%;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--surface-light);
+            color: var(--primary);
+        }
+
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 3rem;
+            max-width: 1200px;
+        }
+
+        .editor-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .form-control,
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-light);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        #editor {
+            height: 500px;
+            border-radius: 0.5rem;
+        }
+
+        .btn-success {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <a href="../index.html" class="sidebar-logo"><img src="../logo.png" style="width:32px;"><span
+                style="font-weight:700;">Admin</span></a>
+        <a href="dashboard.html" class="nav-item">Dashboard</a>
+        <a href="editor.html" class="nav-item active">New Article</a>
+    </aside>
+
+    <main class="main-content">
+        <div class="editor-header">
+            <h1 id="pageTitle">New Article</h1><span id="statusMsg"></span>
+        </div>
+        <div class="editor-container">
+            <div class="form-grid">
+                <div>
+                    <div class="form-group"><label class="form-label">Title</label><input type="text" id="title"
+                            class="form-control" placeholder="Headline..."></div>
+                    <div class="form-group"><label class="form-label">Excerpt</label><textarea id="excerpt"
+                            class="form-control" rows="3"></textarea></div>
+                </div>
+                <div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select id="category" class="form-select">
+                            <option value="back-to-basics">Back to Basics</option>
+                            <option value="case-studies">Case Studies</option>
+                            <option value="stock-analysis">Stock Analysis</option>
+                            <option value="100-days-challenge">100 Days Challenge</option>
+                            <option value="ma-diaries">M&A Diaries</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select id="status" class="form-select">
+                            <option value="draft">Draft</option>
+                            <option value="published">Published</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label">Publish Date</label><input type="datetime-local"
+                            id="publishedAt" class="form-control"></div>
+                    <div class="form-group">
+                        <label class="form-label">Image Source</label>
+                        <select id="imgSource" class="form-select" onchange="toggleImgInput()">
+                            <option value="url">URL</option>
+                            <option value="upload">Local Upload</option>
+                        </select>
+                        <input type="text" id="image" class="form-control" style="margin-top:0.5rem;"
+                            placeholder="https://...">
+                        <div id="uploadContainer" style="display:none; margin-top:0.5rem; display:flex; gap:0.5rem;">
+                            <input type="file" id="imgUpload" class="form-control">
+                            <button type="button" onclick="uploadFeatured()" class="btn-success">Upload</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group"><label class="form-label">Content</label>
+                <div id="editor"></div>
+            </div>
+            <div style="text-align:right;"><button class="btn-success" onclick="saveBlog()">Save Article</button></div>
+        </div>
+    </main>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill-image-resize-module@3.0.0/image-resize.min.js"></script>
+    <script>
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+        const API_BASE_URL = isLocal ? 'http://localhost:8000/api' : '/api';
+        const token = localStorage.getItem('admin_token');
+        let currentBlogId = null;
+
+        if (typeof ImageResize !== 'undefined') Quill.register('modules/imageResize', ImageResize);
+
+        const quill = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [[{ 'header': [2, 3, false] }], ['bold', 'italic'], ['link', 'image'], ['clean']],
+                imageResize: { displaySize: true }
+            }
+        });
+
+        // Custom image upload from toolbar
+        quill.getModule('toolbar').addHandler('image', () => {
+            const input = document.createElement('input');
+            input.type = 'file'; input.accept = 'image/*'; input.click();
+            input.onchange = async () => {
+                const formData = new FormData(); formData.append('file', input.files[0]);
+                const res = await fetch(`${API_BASE_URL}/upload`, { method: 'POST', body: formData });
+                const data = await res.json();
+                const range = quill.getSelection();
+                quill.insertEmbed(range.index, 'image', data.url);
+            };
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('slug');
+        if (slug) loadBlog(slug);
+
+        async function loadBlog(slug) {
+            const res = await fetch(`${API_BASE_URL}/blogs/${slug}`);
+            const blog = await res.json();
+            currentBlogId = blog.id;
+            document.getElementById('title').value = blog.title;
+            document.getElementById('category').value = blog.category;
+            document.getElementById('status').value = blog.status;
+            document.getElementById('image').value = blog.featured_image || '';
+            document.getElementById('excerpt').value = blog.excerpt || '';
+            if (blog.published_at) document.getElementById('publishedAt').value = blog.published_at.slice(0, 16);
+            quill.root.innerHTML = blog.content;
+            document.getElementById('pageTitle').innerText = 'Edit Article';
+        }
+
+        function toggleImgInput() {
+            const isUpload = document.getElementById('imgSource').value === 'upload';
+            document.getElementById('uploadContainer').style.display = isUpload ? 'flex' : 'none';
+        }
+
+        async function uploadFeatured() {
+            const file = document.getElementById('imgUpload').files[0];
+            if (!file) return;
+            const formData = new FormData(); formData.append('file', file);
+            const res = await fetch(`${API_BASE_URL}/upload`, { method: 'POST', body: formData });
+            const data = await res.json();
+            document.getElementById('image').value = data.url;
+            alert('Uploaded!');
+        }
+
+        async function saveBlog() {
+            const data = {
+                title: document.getElementById('title').value,
+                category: document.getElementById('category').value,
+                content: quill.root.innerHTML,
+                excerpt: document.getElementById('excerpt').value,
+                status: document.getElementById('status').value,
+                featured_image: document.getElementById('image').value,
+                published_at: document.getElementById('publishedAt').value || null
+            };
+            const method = currentBlogId ? 'PUT' : 'POST';
+            const url = currentBlogId ? `${API_BASE_URL}/blogs/${currentBlogId}` : `${API_BASE_URL}/blogs`;
+
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) alert('Saved successfully!'); else alert('Save failed.');
+        }
+    </script>
+</body>
+
+</html>

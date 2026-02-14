@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Admin | Morrigan</title>
+    <link rel="icon" type="image/png" href="../logo.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        body {
+            background: var(--surface-light);
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: white;
+            border-right: 1px solid var(--border-light);
+            padding: 2rem;
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-dark);
+            margin-bottom: 3rem;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 3rem;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.875rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: var(--surface-light);
+            color: var(--primary);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-family: var(--font-serif);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .blog-table {
+            width: 100%;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+            border-collapse: collapse;
+            overflow: hidden;
+        }
+
+        .blog-table th {
+            background: var(--surface-light);
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+        }
+
+        .blog-table td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-published {
+            background: #e6f7ef;
+            color: #10b981;
+        }
+
+        .status-draft {
+            background: #fffbeb;
+            color: #f59e0b;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            font-size: 1.125rem;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            color: var(--accent);
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <a href="../index.html" class="sidebar-logo">
+            <img src="../logo.png" alt="Morrigan" style="width: 32px;">
+            <span style="font-weight: 700;">Admin</span>
+        </a>
+        <nav>
+            <a href="dashboard.html" class="nav-item active">Dashboard</a>
+            <a href="editor.html" class="nav-item">New Article</a>
+            <div class="nav-item logout-btn" onclick="logout()" style="margin-top: 2rem;">Logout</div>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1 class="page-title">Articles</h1>
+            <a href="editor.html" class="btn-primary">+ New Article</a>
+        </div>
+
+        <table class="blog-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="blogList">
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 3rem;">Loading articles...</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+
+    <script>
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+        const API_BASE_URL = isLocal ? 'http://localhost:8000/api' : '/api';
+        const token = localStorage.getItem('admin_token');
+
+        if (!token) window.location.href = 'login.html';
+
+        function logout() {
+            localStorage.removeItem('admin_token');
+            localStorage.removeItem('admin_user');
+            window.location.href = 'login.html';
+        }
+
+        async function fetchBlogs() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/blogs/admin/all`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) {
+                    if (res.status === 401) logout();
+                    throw new Error('Unauthorized');
+                }
+                const blogs = await res.json();
+                renderBlogs(blogs);
+            } catch (err) {
+                document.getElementById('blogList').innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Failed to load data</td></tr>`;
+            }
+        }
+
+        function renderBlogs(blogs) {
+            const tbody = document.getElementById('blogList');
+            tbody.innerHTML = blogs.length ? '' : '<tr><td colspan="5" style="text-align: center;">No articles found.</td></tr>';
+
+            blogs.forEach(blog => {
+                const tr = document.createElement('tr');
+                const date = new Date(blog.published_at || blog.created_at).toLocaleDateString();
+                const statusClass = blog.status === 'published' ? 'status-published' : 'status-draft';
+
+                tr.innerHTML = `
+                    <td style="font-weight: 600;">${blog.title}</td>
+                    <td><span class="status-badge ${statusClass}">${blog.status}</span></td>
+                    <td>${blog.category || '-'}</td>
+                    <td>${date}</td>
+                    <td>
+                        <button class="action-btn" onclick="location.href='editor.html?slug=${blog.slug}'" title="Edit">✏️</button>
+                        <button class="action-btn" onclick="deleteBlog(${blog.id})" title="Delete" style="color: var(--accent);">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function deleteBlog(id) {
+            if (!confirm('Are you sure you want to delete this article?')) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/blogs/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) fetchBlogs();
+            } catch (err) { alert('Delete failed'); }
+        }
+
+        fetchBlogs();
+    </script>
+</body>
+
+</html>

@@ -1,24 +1,15 @@
-// ============================================
-// MORRIGAN - INTERACTIVE FUNCTIONALITY
-// ============================================
-
-// ============================================
-// MOBILE MENU TOGGLE
-// ============================================
-
 document.addEventListener('DOMContentLoaded', function() {
     const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
     const navMenu = document.querySelector('.nav-menu');
-    
+
     if (mobileMenuToggle && navMenu) {
         mobileMenuToggle.addEventListener('click', function() {
-            // Toggle active class on menu
+
             navMenu.classList.toggle('active');
-            // Toggle active class on button for animation
+
             mobileMenuToggle.classList.toggle('active');
         });
-        
-        // Close menu when clicking on a nav link
+
         const navLinks = document.querySelectorAll('.nav-link');
         navLinks.forEach(link => {
             link.addEventListener('click', function() {
@@ -26,12 +17,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 mobileMenuToggle.classList.remove('active');
             });
         });
-        
-        // Close menu when clicking outside
+
         document.addEventListener('click', function(event) {
             const isClickInsideMenu = navMenu.contains(event.target);
             const isClickOnToggle = mobileMenuToggle.contains(event.target);
-            
+
             if (!isClickInsideMenu && !isClickOnToggle && navMenu.classList.contains('active')) {
                 navMenu.classList.remove('active');
                 mobileMenuToggle.classList.remove('active');
@@ -40,13 +30,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ============================================
-// CHATBOT FUNCTIONALITY
-// ============================================
-
 document.addEventListener('DOMContentLoaded', function() {
     const chatbotButton = document.querySelector('.chatbot-button');
-    
+
     if (chatbotButton) {
         chatbotButton.addEventListener('click', function() {
             openChatbot();
@@ -54,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Demo messages for the chatbot
 const demoMessages = [
     {
         type: 'bot',
@@ -81,19 +66,18 @@ const demoMessages = [
 let currentDemoIndex = 0;
 
 function openChatbot() {
-    // Check if chatbot already exists
+
     let chatbotContainer = document.querySelector('.chatbot-container');
-    
+
     if (chatbotContainer) {
-        // If it exists, just toggle visibility
+
         chatbotContainer.classList.toggle('active');
         return;
     }
-    
-    // Create chatbot container
+
     chatbotContainer = document.createElement('div');
     chatbotContainer.className = 'chatbot-container active';
-    
+
     chatbotContainer.innerHTML = `
         <div class="chatbot-header">
             <div class="chatbot-header-info">
@@ -123,7 +107,7 @@ function openChatbot() {
                 </svg>
             </button>
         </div>
-        
+
         <div class="chatbot-messages" id="chatbotMessages">
             <div class="chatbot-welcome">
                 <div class="welcome-avatar">
@@ -141,11 +125,11 @@ function openChatbot() {
                 <p>Ask me anything about our articles, insights, or how we can help you navigate modern intelligence.</p>
             </div>
         </div>
-        
+
         <div class="chatbot-input-container">
-            <input 
-                type="text" 
-                class="chatbot-input" 
+            <input
+                type="text"
+                class="chatbot-input"
                 placeholder="Type your message..."
                 id="chatbotInput"
             />
@@ -155,7 +139,7 @@ function openChatbot() {
                 </svg>
             </button>
         </div>
-        
+
         <div class="chatbot-demo-trigger">
             <button class="demo-button" id="demoButton">
                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; margin-right: 6px;">
@@ -165,29 +149,28 @@ function openChatbot() {
             </button>
         </div>
     `;
-    
+
     document.body.appendChild(chatbotContainer);
-    
-    // Add event listeners
+
     const closeButton = chatbotContainer.querySelector('.chatbot-close');
     const sendButton = chatbotContainer.querySelector('#chatbotSend');
     const input = chatbotContainer.querySelector('#chatbotInput');
     const demoButton = chatbotContainer.querySelector('#demoButton');
-    
+
     closeButton.addEventListener('click', function() {
         chatbotContainer.classList.remove('active');
     });
-    
+
     sendButton.addEventListener('click', function() {
         sendMessage();
     });
-    
+
     input.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             sendMessage();
         }
     });
-    
+
     demoButton.addEventListener('click', function() {
         startDemoConversation();
     });
@@ -196,13 +179,12 @@ function openChatbot() {
 function sendMessage() {
     const input = document.querySelector('#chatbotInput');
     const message = input.value.trim();
-    
+
     if (message === '') return;
-    
+
     addMessage('user', message);
     input.value = '';
-    
-    // Simulate bot response
+
     setTimeout(function() {
         showTypingIndicator();
         setTimeout(function() {
@@ -215,15 +197,14 @@ function sendMessage() {
 function addMessage(type, text) {
     const messagesContainer = document.querySelector('#chatbotMessages');
     const welcomeMessage = messagesContainer.querySelector('.chatbot-welcome');
-    
-    // Remove welcome message if it exists
+
     if (welcomeMessage) {
         welcomeMessage.remove();
     }
-    
+
     const messageDiv = document.createElement('div');
     messageDiv.className = `chatbot-message ${type}-message`;
-    
+
     if (type === 'bot') {
         messageDiv.innerHTML = `
             <div class="message-avatar">
@@ -244,18 +225,18 @@ function addMessage(type, text) {
             <div class="message-content">${text}</div>
         `;
     }
-    
+
     messagesContainer.appendChild(messageDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
 function showTypingIndicator() {
     const messagesContainer = document.querySelector('#chatbotMessages');
-    
+
     const typingDiv = document.createElement('div');
     typingDiv.className = 'chatbot-message bot-message typing-indicator';
     typingDiv.id = 'typingIndicator';
-    
+
     typingDiv.innerHTML = `
         <div class="message-avatar">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -276,7 +257,7 @@ function showTypingIndicator() {
             </div>
         </div>
     `;
-    
+
     messagesContainer.appendChild(typingDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
@@ -293,7 +274,7 @@ function startDemoConversation() {
     if (demoTrigger) {
         demoTrigger.style.display = 'none';
     }
-    
+
     currentDemoIndex = 0;
     showNextDemoMessage();
 }
@@ -302,9 +283,9 @@ function showNextDemoMessage() {
     if (currentDemoIndex >= demoMessages.length) {
         return;
     }
-    
+
     const message = demoMessages[currentDemoIndex];
-    
+
     if (message.type === 'bot') {
         showTypingIndicator();
         setTimeout(function() {

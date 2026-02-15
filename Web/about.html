@@ -50,21 +50,124 @@
         </div>
     </section>
 
-    <main class="main-content">
-        <div class="content-container">
-            <div style="max-width: 800px; margin: 0 auto; padding: 4rem 0;">
-                <h2 style="font-size: 2.5rem; margin-bottom: 2rem;">Depth over Velocity</h2>
-                <p style="font-size: 1.125rem; margin-bottom: 2rem;">
-                    In an age of instant information, the value of context has never been higher. Morrigan provides the
-                    space for contemporary leaders to pause and digest complex shifts in finance and technology.
+    <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Morrigan</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="logo.png" alt="Morrigan Logo">
+                <h2>Morrigan</h2>
+            </a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item dropdown">
+                    <a href="journal.html" class="nav-link">Journal</a>
+                    <div class="dropdown-menu">
+                        <a href="journal.html?category=back-to-basics" class="dropdown-item">Back to Basics</a>
+                        <a href="journal.html?category=case-studies" class="dropdown-item">Case Studies</a>
+                        <a href="journal.html?category=stock-analysis" class="dropdown-item">Stock Analysis</a>
+                        <a href="journal.html?category=100-days-challenge" class="dropdown-item">100 Days Challenge</a>
+                        <a href="journal.html?category=ma-diaries" class="dropdown-item">M&A Diaries</a>
+                    </div>
+                </li>
+                <li class="nav-item"><a href="about.html" class="nav-link active">About</a></li>
+                <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">☰</button>
+        </div>
+    </nav>
+
+
+    <section class="hero hero-about">
+        <div class="hero-content">
+            <span class="hero-badge">Our Philosophy</span>
+            <h1 class="hero-title" style="font-style: normal;">Restoring the Depth of Financial Discourse</h1>
+            <p class="hero-description">
+                Morrigan is an editorial platform dedicated to the thoughtful analysis of our rapidly evolving digital
+                and financial landscape.
+            </p>
+        </div>
+    </section>
+
+    <main class="about-main">
+
+    <!--Intro Section -->
+    <section class="about-section">
+        <div class="about-container">
+
+            <div class="about-text">
+                <h2>Depth Over Velocity</h2>
+                <p>
+                    In an age of instant information, the value of context has never been higher.
+                    Morrigan provides space for contemporary leaders to pause and digest
+                    complex shifts in finance and technology.
                 </p>
-                <p style="font-size: 1.125rem;">
-                    Based in the intersection of Indian growth and global strategy, we bring a unique perspective to
-                    every case study and stock analysis we publish.
+                <p>
+                    Based at the intersection of Indian growth and global strategy,
+                    we bring a refined perspective to every case study and stock analysis we publish.
                 </p>
             </div>
+
+            <div class="about-image">
+                <img src="images/about-finance.jpg" alt="Financial Analysis">
+            </div>
+
         </div>
-    </main>
+    </section>
+
+
+    <!-- Core Values Section -->
+    <section class="values-section">
+        <div class="values-container">
+
+            <div class="value-card">
+                <h3>Integrity</h3>
+                <p>
+                    We deliver unbiased and research-driven financial insights,
+                    grounded in clarity and intellectual honesty.
+                </p>
+            </div>
+
+            <div class="value-card">
+                <h3>Clarity</h3>
+                <p>
+                    Complex financial systems demand thoughtful simplification.
+                    We translate depth into accessible understanding.
+                </p>
+            </div>
+
+            <div class="value-card">
+                <h3>Perspective</h3>
+                <p>
+                    We approach every narrative through the lens of long-term
+                    structural change and strategic foresight.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="script.js"></script>

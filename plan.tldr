@@ -198,26 +198,6 @@
 											"content": [
 												{
 													"type": "text",
-													"text": "remove all comments containing '=='"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
 													"text": "about us page"
 												}
 											]
@@ -554,37 +534,6 @@
 			"typeName": "shape"
 		},
 		{
-			"x": 0,
-			"y": 0,
-			"lastActivityTimestamp": 0,
-			"meta": {},
-			"id": "pointer:pointer",
-			"typeName": "pointer"
-		},
-		{
-			"x": -180.35096125779484,
-			"y": 74.12735022674454,
-			"z": 0.4670883185562335,
-			"meta": {},
-			"id": "camera:page:page",
-			"typeName": "camera"
-		},
-		{
-			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
-			"croppingShapeId": null,
-			"selectedShapeIds": [
-				"shape:LnL7WgtCHXucFLuKWC5AW"
-			],
-			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
-			"erasingShapeIds": [],
-			"hintingShapeIds": [],
-			"focusedGroupId": null,
-			"meta": {},
-			"id": "instance_page_state:page:page",
-			"pageId": "page:page",
-			"typeName": "instance_page_state"
-		},
-		{
 			"meta": {},
 			"id": "page:page",
 			"name": "todos",
@@ -597,6 +546,14 @@
 			"meta": {},
 			"id": "document:document",
 			"typeName": "document"
+		},
+		{
+			"x": 0,
+			"y": 0,
+			"lastActivityTimestamp": 0,
+			"meta": {},
+			"id": "pointer:pointer",
+			"typeName": "pointer"
 		},
 		{
 			"followingUserId": null,
@@ -643,6 +600,29 @@
 			"id": "instance:instance",
 			"currentPageId": "page:page",
 			"typeName": "instance"
+		},
+		{
+			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
+			"croppingShapeId": null,
+			"selectedShapeIds": [
+				"shape:LnL7WgtCHXucFLuKWC5AW"
+			],
+			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
+			"erasingShapeIds": [],
+			"hintingShapeIds": [],
+			"focusedGroupId": null,
+			"meta": {},
+			"id": "instance_page_state:page:page",
+			"pageId": "page:page",
+			"typeName": "instance_page_state"
+		},
+		{
+			"x": -177.81661066848986,
+			"y": -11.734720354958938,
+			"z": 0.5836236571034427,
+			"meta": {},
+			"id": "camera:page:page",
+			"typeName": "camera"
 		}
 	]
 }

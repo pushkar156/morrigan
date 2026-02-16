@@ -5,5 +5,7 @@ README.md
 *.pyc
 node_modules/
 .DS_Store
-Backend/db_test_log.txt
-Backend/db_test_output.txt
+
+# Private Folders
+Backend/
+Chatbot/

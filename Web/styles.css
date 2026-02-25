@@ -867,7 +867,7 @@ a {
 
 .search-icon {
     position: absolute;
-    left: 1.25rem;
+    right: 1.5rem;/*moving the icon to right*/
     top: 50%;
     transform: translateY(-50%);
     color: #999;

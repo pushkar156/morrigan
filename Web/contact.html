@@ -49,57 +49,45 @@
         </div>
     </section>
 
-    <div class="contact-page">
-        <div class="contact-container">
-            <div class="contact-content">
-                <div class="contact-info">
-                    <h2>Contact Information</h2>
-                    <div class="contact-info-item">
-                        <div class="contact-info-label">Email</div>
-                        <div class="contact-info-value">the.morrigan.news@gmail.com</div>
-                    </div>
-                    <div class="contact-info-item">
-                        <div class="contact-info-label">Location</div>
-                        <div class="contact-info-value">Pune, India</div>
-                    </div>
-                    <div class="contact-info-item">
-                        <div class="contact-info-label">Response Time</div>
-                        <div class="contact-info-value">Within 24-48 hours</div>
-                    </div>
-                </div>
+   <section class="contact-section">
+    <div class="contact-card">
 
-                <div class="contact-form-wrapper">
-                    <h2>Send Us a Message</h2>
-                    <form id="contactForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label" for="name">Your Name</label>
-                                <input type="text" id="name" class="form-input" placeholder="Pushkar Gangurde" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="email">Your Email</label>
-                                <input type="email" id="email" class="form-input" placeholder="morrigan@example.com"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="subject">Subject</label>
-                            <input type="text" id="subject" class="form-input" placeholder="How can we help you?"
-                                required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="message">Message</label>
-                            <textarea id="message" class="form-textarea"
-                                placeholder="Tell us more about your inquiry..." required></textarea>
-                        </div>
-                        <button type="submit" class="form-submit">Send Message</button>
-                        <div id="contactStatus" class="form-status"></div>
-                    </form>
-                </div>
+        <div class="contact-left">
+            <h2>Contact Information</h2>
+
+            <div class="contact-item">
+                <h3>Email</h3>
+                <p>the.morrigan.news@gmail.com</p>
+            </div>
+
+            <div class="contact-item">
+                <h3>Location</h3>
+                <p>Mumbai, India</p>
             </div>
         </div>
-    </div>
 
+        <div class="contact-right">
+            <h2>Send Us a Message</h2>
+
+            <form class="contact-form">
+                <div class="form-row">
+                    <input type="text" placeholder="Your Name" required>
+                    <input type="email" placeholder="Your Email" required>
+                </div>
+
+                <input type="text" placeholder="Subject" required>
+
+                <textarea placeholder="Tell us more about your inquiry..." rows="5" required></textarea>
+
+                <button type="submit" class="btn btn-primary">
+                    Send Message
+                </button>
+            </form>
+        </div>
+
+    </div>
+</section>
+    
     <footer>
         <div class="footer-container">
             <div class="footer-content">

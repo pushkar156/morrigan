@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BACK TO BASICS| Morrigan</title>
+  <link rel="stylesheet" href="styles.css">
+  
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="Morrigan Logo">
+        <h2>Morrigan</h2>
+      </a>
+      <ul class="nav-menu" id="navMenu">
+        <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+        <li class="nav-item dropdown">
+          <a href="journal.html" class="nav-link active">Journal</a>
+          <div class="dropdown-menu">
+            <a href="journal.html?category=back-to-basics" class="dropdown-item">Back to Basics</a>
+            <a href="journal.html?category=case-studies" class="dropdown-item">Case Studies</a>
+            <a href="journal.html?category=stock-analysis" class="dropdown-item">Stock Analysis</a>
+            <a href="journal.html?category=100-days-challenge" class="dropdown-item">100 Days Challenge</a>
+            <a href="journal.html?category=ma-diaries" class="dropdown-item">M&A Diaries</a>
+          </div>
+        </li>
+        <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+        <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+      </ul>
+      <button class="mobile-menu-toggle" aria-label="Toggle menu" onclick="document.getElementById('navMenu').classList.toggle('open')">☰</button>
+    </div>
+  </nav>
+
+  <!-- ARTICLE -->
+  <article>
+
+    <h1>Advanced Derivatives: Swaps & Option Exercise Styles</h1>
+
+    <div class="meta">
+      <img src="https://i.pravatar.cc/80?img=12" alt="Author"/>
+      <div>
+        <div class="meta-author">Aryaveer Batra</div>
+        <div>March 12, 2025 &nbsp;·&nbsp; 6 min read</div>
+      </div>
+    </div>
+
+    <img class="cover-img" src="https://images.unsplash.com/photo-1558655146-364adaf1fcc9?w=900&q=80" alt="Cover"/>
+
+   <div class="content">
+
+    
+    <h1>Understanding Financial Derivatives: Swaps, Options, and Risks</h1>
+
+    <p>A <strong>swap claim</strong> refers to the contractual right to receive net payments under a swap agreement. It is more of a legal concept that describes the enforceable obligation owed by a counterparty during the life of the swap or upon default or early termination.</p>
+
+    <h2>Interest Rate Swap Example:</h2>
+    <p>A company with a $100 million floating-rate loan (SOFR + 1.5%) wants stable interest costs, so it enters into a swap in which it pays 4% fixed and receives SOFR.</p>
+    <p>If SOFR for a payment period is 3.8%, the company:</p>
+    <ul>
+        <li>receives 3.8% × 100M</li>
+        <li>pays 4.0% × 100M</li>
+        <li><strong>Net settlement</strong> = 0.2% × 100M = $200,000 owed by the company.</li>
+    </ul>
+    <p>Here, the company has a claim on the floating payment, and the bank has a claim on the fixed fee. The swap claim is the net difference.</p>
+
+    
+
+    <h2>Cross-Currency Swap Example:</h2>
+    <p>A European firm enters a EUR/USD swap, trading €46M for $50M and reversing it at maturity. Each quarter, both sides make interest payments. For example, the company pays $625,000 while receiving €425,500. Each party holds a claim against the other, and net settlement may require currency conversion.</p>
+
+    <h2>Option Claims</h2>
+    <p>An option claim is a <strong>contingent claim</strong>, meaning it has value only if certain price conditions are met. Options give a right, not an obligation, which is why buyers pay a premium.</p>
+    <ul>
+        <li>A <strong>call option</strong> grants the right to buy the asset at the strike price and gains value when the asset price rises.</li>
+        <li>A <strong>put option</strong> grants the right to sell and gains value when the price falls.</li>
+    </ul>
+    <p>The premium compensates the seller for taking on this obligation.</p>
+
+    
+
+    <h2>Why is there no premium in futures, forwards, and swaps?</h2>
+    
+    <h3>Forwards</h3>
+    <ul>
+        <li>Both parties are obligated to transact at maturity at the set price.</li>
+        <li>Since no one has a unilateral advantage, no premium is required.</li>
+    </ul>
+
+    <h3>Futures</h3>
+    <ul>
+        <li>Also involves mutual obligations, and contracts are marked-to-market daily.</li>
+        <li>No upfront payment (other than margin) is needed.</li>
+    </ul>
+
+    <h3>Swaps</h3>
+    <ul>
+        <li>They are essentially a series of forward contracts.</li>
+        <li>Each side agrees to pay one cash flow in exchange for another.</li>
+        <li>Both have obligations &rarr; no premium.</li>
+    </ul>
+
+    <h2>American and European Options</h2>
+
+    <h3>American-Style Option</h3>
+    <ul>
+        <li>Can be exercised at any time up to and including the expiration date.</li>
+        <li>Gives the holder more flexibility.</li>
+        <li>Because of this flexibility, American options are usually worth more than European options.</li>
+    </ul>
+    <p><strong>Example:</strong> You buy an American call option on Apple stock expiring in 3 months. If the stock price jumps tomorrow, you can exercise immediately.</p>
+
+    <h3>European-Style Option</h3>
+    <ul>
+        <li>It can be exercised only at the expiration date, not before.</li>
+        <li>Less flexible than American options.</li>
+        <li>Often used in index options and some OTC derivatives.</li>
+    </ul>
+    <p><strong>Example:</strong> You buy a European call option on an index. Even if the index rises sharply before expiration, you cannot exercise early—you must wait until expiry.</p>
+
+    <h2>Advantages and Disadvantages of Derivatives</h2>
+
+    <h3>Advantages</h3>
+    <p>As the above examples illustrate, derivatives can be a valuable tool for businesses and investors alike. They provide a way to:</p>
+    <ul>
+        <li>Lock in prices</li>
+        <li>Hedge against unfavourable movements in rates</li>
+        <li>Mitigate risks. These pluses can often be obtained at a low cost.</li>
+    </ul>
+
+    <h3>Disadvantages</h3>
+    <p>Derivatives can be challenging to value because they're based on the price of another asset. OTC derivatives also include counterparty risks that are difficult to predict. Additionally, most derivatives are sensitive to the following:</p>
+    <ul>
+        <li>Changes in the amount of time until expiration</li>
+        <li>Any costs associated with holding the underlying assets</li>
+        <li>Interest rates</li>
+    </ul>
+    <p>These variables make it difficult to perfectly match the value of a derivative with the underlying asset. Because the derivative has no intrinsic value, its value comes only from the underlying asset; it’s vulnerable to market sentiment and market risks.</p>
+    <p>Supply and demand factors can cause a derivative’s price and liquidity to rise and fall, regardless of the underlying asset’s price. Finally, derivatives are usually leveraged instruments and using leverage cuts both ways. While it can increase potential returns, it also makes losses mount quickly.</p>
+  </div>
+  </article>
+  <footer>
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section logo-section">
+                    <img src="logo.png" alt="Morrigan Logo" class="logo-image">
+                    <p class="logo-tagline">
+                        Quality news, where you want it, when you want it. Restoring depth to financial discourse.
+                    </p>
+                </div>
+                <div class="footer-section connect-section">
+                    <h3>Connect</h3>
+                    <ul>
+                        <li>
+                            <a href="mailto:the.morrigan.news@gmail.com">
+                                <svg class="social-icon" viewBox="0 0 24 24">
+                                    <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.548l8.073-6.055C21.69 2.28 24 3.434 24 5.457z"/>
+                                </svg>
+                                Gmail
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.linkedin.com/company/education-the-morrigan" target="_blank">
+                                <svg class="social-icon" viewBox="0 0 24 24">
+                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                                </svg>
+                                LinkedIn
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-section association-section">
+                    <h3>In Association With</h3>
+                    <div class="partner-logo">
+                        <img src="partner.png" alt="Partner Logo">
+                        <span>Official Partner</span>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 The Morrigan. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+<button class="chatbot-button"
+        style="position: fixed; bottom: 2rem; right: 2rem; background: var(--accent); color: white; border: none; padding: 1rem; border-radius: 50%; cursor: pointer; box-shadow: var(--shadow-lg);">
+        <img src="chatbot.svg" alt="Chatbot" width="24" height="24">
+    </button>
+    <script src="script.js"></script>
+
+</body>
+</html>

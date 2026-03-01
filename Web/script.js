@@ -252,7 +252,7 @@ function createChatElement() {
     chat.className = 'chatbot-container active';
     chat.innerHTML = `
         <div class="chatbot-header">
-            <h3>Morrigan AI</h3>
+            <h3>Morrigan</h3>
             <button class="chatbot-close">×</button>
         </div>
         <div class="chatbot-messages" id="chatMsgs">

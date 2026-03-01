@@ -1016,48 +1016,6 @@ a {
     box-shadow: var(--shadow-lg);
 }
 
-/* Values Section */
-.values-section {
-    padding: 8rem 0;
-    background: #142c53;
-    color: white;
-}
-
-.values-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 3rem;
-}
-
-.value-card {
-    padding: 3rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1.5rem;
-    backdrop-filter: blur(10px);
-    transition: var(--transition);
-}
-
-.value-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-10px);
-    border-color: var(--accent);
-}
-
-.value-card h3 {
-    color: white;
-    font-size: 1.75rem;
-    margin-bottom: 1.25rem;
-}
-
-.value-card p {
-    color: rgba(255, 255, 255, 0.7);
-    line-height: 1.7;
-}
-
 /* Founders Section */
 .founders-section {
     padding: 8rem 0;

@@ -13,6 +13,18 @@ const DEMO_BLOGS = [
     },
     {
         id: 2,
+        title: "Understanding Financial Statements",
+        slug: "understanding-financial-statements",
+        category: "back-to-basics",
+        excerpt: "A comprehensive guide to reading and interpreting balance sheets, income statements, and cash flow statements.",
+        featured_image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=600&fit=crop",
+        author: "Pushkar",
+        published_at: "2024-02-10",
+        read_time: 5,
+        content: "<h2>Introduction to Financial Statements</h2><p>Financial statements are the backbone of financial analysis...</p>"
+    },
+    {
+        id: 3,
         title: "What is Market Capitalization?",
         slug: "what-is-market-capitalization",
         category: "back-to-basics",
@@ -24,7 +36,7 @@ const DEMO_BLOGS = [
         content: "<h2>Market Capitalization Explained</h2><p>Market capitalization is a key metric...</p>"
     },
     {
-        id: 3,
+        id: 4,
         title: "IPO Basics: What Every Investor Should Know",
         slug: "ipo-basics",
         category: "back-to-basics",
@@ -36,7 +48,7 @@ const DEMO_BLOGS = [
         content: "<h2>IPO Fundamentals</h2><p>An Initial Public Offering is when a company...</p>"
     },
     {
-        id: 4,
+        id: 5,
         title: "Tata Motors' Turnaround Strategy",
         slug: "tata-motors-turnaround",
         category: "case-studies",
@@ -48,7 +60,7 @@ const DEMO_BLOGS = [
         content: "<h2>The Tata Motors Story</h2><p>In 2019, Tata Motors faced significant challenges...</p>"
     },
     {
-        id: 5,
+        id: 6,
         title: "Reliance Jio: Disrupting Indian Telecom",
         slug: "reliance-jio-disruption",
         category: "case-studies",
@@ -60,7 +72,7 @@ const DEMO_BLOGS = [
         content: "<h2>Jio's Market Entry</h2><p>When Reliance Jio launched in 2016...</p>"
     },
     {
-        id: 6,
+        id: 7,
         title: "Zomato's IPO Journey",
         slug: "zomato-ipo-journey",
         category: "case-studies",
@@ -72,7 +84,7 @@ const DEMO_BLOGS = [
         content: "<h2>Zomato Goes Public</h2><p>Zomato's IPO in July 2021 marked a milestone...</p>"
     },
     {
-        id: 7,
+        id: 8,
         title: "HDFC Bank: A Banking Giant Analysis",
         slug: "hdfc-bank-analysis",
         category: "stock-analysis",
@@ -84,7 +96,7 @@ const DEMO_BLOGS = [
         content: "<h2>HDFC Bank Overview</h2><p>HDFC Bank is India's largest private sector bank...</p>"
     },
     {
-        id: 8,
+        id: 9,
         title: "Infosys Q4 Results Breakdown",
         slug: "infosys-q4-results",
         category: "stock-analysis",
@@ -96,7 +108,7 @@ const DEMO_BLOGS = [
         content: "<h2>Q4 Performance</h2><p>Infosys reported strong Q4 results...</p>"
     },
     {
-        id: 9,
+        id: 10,
         title: "Asian Paints: Valuation Check",
         slug: "asian-paints-valuation",
         category: "stock-analysis",
@@ -108,7 +120,7 @@ const DEMO_BLOGS = [
         content: "<h2>Valuation Analysis</h2><p>Asian Paints has been a market favorite...</p>"
     },
     {
-        id: 10,
+        id: 11,
         title: "Day 1: Setting Investment Goals",
         slug: "day-1-investment-goals",
         category: "100-days-challenge",
@@ -120,7 +132,7 @@ const DEMO_BLOGS = [
         content: "<h2>Day 1 Challenge</h2><p>Welcome to the 100 Days Challenge...</p>"
     },
     {
-        id: 11,
+        id: 12,
         title: "Day 15: Understanding Risk Tolerance",
         slug: "day-15-risk-tolerance",
         category: "100-days-challenge",
@@ -132,7 +144,7 @@ const DEMO_BLOGS = [
         content: "<h2>Risk Assessment</h2><p>Understanding risk is crucial...</p>"
     },
     {
-        id: 12,
+        id: 13,
         title: "Day 30: Portfolio Diversification",
         slug: "day-30-portfolio-diversification",
         category: "100-days-challenge",
@@ -144,7 +156,7 @@ const DEMO_BLOGS = [
         content: "<h2>Diversification Matters</h2><p>Don't put all your eggs in one basket...</p>"
     },
     {
-        id: 13,
+        id: 14,
         title: "Walmart-Flipkart Deal: $16B Acquisition",
         slug: "walmart-flipkart-deal",
         category: "ma-diaries",
@@ -156,7 +168,7 @@ const DEMO_BLOGS = [
         content: "<h2>The Deal</h2><p>In 2018, Walmart acquired 77% stake in Flipkart...</p>"
     },
     {
-        id: 14,
+        id: 15,
         title: "Tata-Air India Merger Analysis",
         slug: "tata-air-india-merger",
         category: "ma-diaries",
@@ -168,8 +180,20 @@ const DEMO_BLOGS = [
         content: "<h2>Air India Returns Home</h2><p>After 69 years, Air India returns to Tata...</p>"
     },
     {
-        id: 15,
+        id: 16,
         title: "HDFC-HDFC Bank Merger: Creating a Giant",
+        slug: "hdfc-merger",
+        category: "ma-diaries",
+        excerpt: "The largest merger in Indian corporate history. What it means for stakeholders.",
+        featured_image: "https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=800&h=600&fit=crop",
+        author: "Pushkar",
+        published_at: "2024-02-05",
+        read_time: 10,
+        content: "<h2>Historic Merger</h2><p>HDFC Ltd and HDFC Bank announced their merger...</p>"
+    },
+    {
+        id: 17,
+        title: "blah",
         slug: "hdfc-merger",
         category: "ma-diaries",
         excerpt: "The largest merger in Indian corporate history. What it means for stakeholders.",

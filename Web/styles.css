@@ -56,13 +56,13 @@ a {
     position: sticky;
     top: 0;
     width: 100%;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(15px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     z-index: 1000;
     padding: 1rem 0;
-    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    transition: background 200ms ease, backdrop-filter 200ms ease;
 }
 
 .nav-container {

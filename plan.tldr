@@ -34,8 +34,8 @@
 	},
 	"records": [
 		{
-			"x": 287.4763189771556,
-			"y": 57.461306675462566,
+			"x": 273.08363651662313,
+			"y": -291.05090411768174,
 			"rotation": 5.551115123125783e-16,
 			"isLocked": false,
 			"opacity": 1,
@@ -45,7 +45,7 @@
 			"props": {
 				"color": "black",
 				"size": "m",
-				"w": 1313.175048828125,
+				"w": 309.2375183105469,
 				"font": "draw",
 				"textAlign": "start",
 				"autoSize": true,
@@ -78,7 +78,7 @@
 											"content": [
 												{
 													"type": "text",
-													"text": "rebuild the frotend, backend, chatbot base"
+													"text": "Shifting to next.js"
 												}
 											]
 										}
@@ -98,7 +98,7 @@
 											"content": [
 												{
 													"type": "text",
-													"text": "home page (tabs sliding)"
+													"text": "lenis + 3d objects ?"
 												}
 											]
 										}
@@ -118,407 +118,7 @@
 											"content": [
 												{
 													"type": "text",
-													"text": "journal page tabs"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "journal hover"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "tabs and hover connection"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "remove git from all the files, and commit once"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "about us page"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "contact us page"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "hero sections of all pages (neaT)"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "make admin mode (idea - chatbotchat enter text \"enter admin mode\"then it'll ask for the pasword"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "latest posted blog first in journal"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "latest posted blog on left (hom)"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "footer update"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "chatbot UI"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "Polish website"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "animations"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "security threats ?"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "SEO"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "Backend hosting"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "Datacleaning modules"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "api calling in script.js"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "admin panel writter fix !"
-												}
-											]
-										}
-									]
-								},
-								{
-									"type": "listItem",
-									"attrs": {
-										"dir": "auto"
-									},
-									"content": [
-										{
-											"type": "paragraph",
-											"attrs": {
-												"dir": "auto"
-											},
-											"content": [
-												{
-													"type": "text",
-													"text": "save from admin panel  not working."
+													"text": "admin panel rebuild."
 												}
 											]
 										}
@@ -558,7 +158,11 @@
 		{
 			"followingUserId": null,
 			"opacityForNextShape": 1,
-			"stylesForNextShape": {},
+			"stylesForNextShape": {
+				"tldraw:dash": "dashed",
+				"tldraw:fill": "pattern",
+				"tldraw:geo": "rectangle"
+			},
 			"brush": null,
 			"scribbles": [],
 			"cursor": {
@@ -602,7 +206,7 @@
 			"typeName": "instance"
 		},
 		{
-			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
+			"editingShapeId": null,
 			"croppingShapeId": null,
 			"selectedShapeIds": [
 				"shape:LnL7WgtCHXucFLuKWC5AW"
@@ -617,8 +221,8 @@
 			"typeName": "instance_page_state"
 		},
 		{
-			"x": -177.81661066848986,
-			"y": -11.734720354958938,
+			"x": -177.81661066848991,
+			"y": 435.78540116725924,
 			"z": 0.5836236571034427,
 			"meta": {},
 			"id": "camera:page:page",

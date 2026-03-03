@@ -1,0 +1,148 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --primary: #000309;
+    --accent: #00d1ff;
+    --accent-deep: #1152d4;
+    --text-white: #ffffff;
+    --text-dim: rgba(255, 255, 255, 0.6);
+    --surface: rgba(255, 255, 255, 0.03);
+    
+    --font-serif: var(--font-serif);
+    --font-sans: var(--font-sans);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #000309;
+    color: var(--text-white);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* Remove all forced white backgrounds from the old migration */
+.hero-home, .main-content, .content-container, .category-section, .about-section, .contact-page {
+    background: transparent !important;
+}
+
+.hero-home::before {
+    display: none !important;
+}
+
+/* Premium Glass Navbar */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 1.5rem 0;
+    background: rgba(0, 3, 9, 0.2);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.navbar.scrolled {
+    padding: 0.8rem 0;
+    background: rgba(0, 3, 9, 0.8);
+    border-bottom: 1px solid rgba(0, 209, 255, 0.2);
+}
+
+.nav-link {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(0, 209, 255, 0.5);
+}
+
+/* Typography */
+h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+}
+
+.hero-title {
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+/* Blog Cards - Ultra Modern Glass */
+.horizontal-card {
+    background: rgba(255, 255, 255, 0.02) !important;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 1.5rem;
+    padding: 1rem;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.horizontal-card:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: var(--accent) !important;
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 209, 255, 0.1);
+}
+
+/* Interactive Canvas Positioning */
+canvas {
+    pointer-events: none !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: #000309;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 209, 255, 0.3);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+}
+
+/* Hide horizontal scrollbar for the tracks */
+.horizontal-scroll {
+    display: flex;
+    gap: 2rem;
+    overflow-x: auto;
+    padding: 2rem 0;
+    scrollbar-width: none;
+}
+.horizontal-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hero Badge */
+.hero-badge {
+    background: rgba(0, 209, 255, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(0, 209, 255, 0.3);
+    box-shadow: 0 0 20px rgba(0, 209, 255, 0.1);
+}
+
+/* Section Gaps */
+.category-section {
+    padding: 4rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}

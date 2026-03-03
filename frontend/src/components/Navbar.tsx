@@ -75,7 +75,7 @@ export default function Navbar() {
                                 objectFit: 'contain',
                                 borderRadius: '6px',
                                 transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-                                filter: 'brightness(0.2)' /* Make logo darker for light theme */
+                                filter: 'brightness(1)' /* Make logo darker for light theme */
                             }}
                         />
                         <span
@@ -88,7 +88,7 @@ export default function Navbar() {
                                 transition: 'font-size 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
                             }}
                         >
-                            Morrigan
+                            The Morrigan
                         </span>
                     </Link>
 

@@ -31,7 +31,7 @@ function BackgroundBubbles() {
             {points.map((p, i) => (
                 <mesh key={i} position={p.position as any}>
                     <sphereGeometry args={[p.size, 16, 16]} />
-                    <meshStandardMaterial color="#00d1ff" transparent opacity={0.15} />
+                    <meshStandardMaterial color="#00d1ff" transparent opacity={0.3} />
                 </mesh>
             ))}
         </group>
@@ -60,7 +60,7 @@ function HeroObject() {
             // Rotation and float based on scroll
             groupRef.current.rotation.y = progress * Math.PI
             groupRef.current.position.y = -progress * 10
-            groupRef.current.scale.setScalar(1 - progress * 0.5)
+            groupRef.current.scale.setScalar(1 - progress * 0.2)
         }
     })
 
@@ -95,22 +95,22 @@ function HeroObject() {
                             speed={hovered ? 4 : 1.5}
                             distort={0.45}
                             radius={1}
-                            metalness={0.9}
-                            roughness={0.1}
+                            metalness={0.7}
+                            roughness={0.2}
                             emissive="#1152d4"
-                            emissiveIntensity={0.4}
+                            emissiveIntensity={0.2}
                         />
                     </mesh>
                 </Float>
 
                 {/* Orbital rings */}
                 <mesh rotation={[Math.PI / 2, 0, 0]}>
-                    <torusGeometry args={[4, 0.02, 16, 100]} />
-                    <meshStandardMaterial color="#00d1ff" transparent opacity={0.2} />
+                    <torusGeometry args={[4, 0.015, 16, 100]} />
+                    <meshStandardMaterial color="#00d1ff" transparent opacity={0.3} />
                 </mesh>
                 <mesh rotation={[Math.PI / 1.5, Math.PI / 4, 0]}>
-                    <torusGeometry args={[4.5, 0.015, 16, 100]} />
-                    <meshStandardMaterial color="#1152d4" transparent opacity={0.1} />
+                    <torusGeometry args={[4.5, 0.01, 16, 100]} />
+                    <meshStandardMaterial color="#1152d4" transparent opacity={0.2} />
                 </mesh>
             </Center>
         </group>
@@ -127,13 +127,13 @@ export default function Global3D() {
     if (!mounted) return null
 
     return (
-        <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none overflow-hidden bg-[#000309]">
-            {/* Deep Background Gradient */}
+        <div className="fixed inset-0 w-full h-full -z-10 pointer-events-none overflow-hidden bg-[#f8f9fa]">
+            {/* Soft Background Gradient */}
             <div
                 className="absolute inset-0 z-0 bg-no-repeat bg-center bg-cover"
                 style={{
-                    background: 'radial-gradient(circle at 50% 50%, #142c53 0%, #000309 80%)',
-                    opacity: 0.6
+                    background: 'radial-gradient(circle at 50% 50%, #e0f7fa 0%, #f8f9fa 80%)',
+                    opacity: 0.5
                 }}
             />
 
@@ -145,20 +145,20 @@ export default function Global3D() {
             >
                 <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
 
-                <ambientLight intensity={0.4} />
-                <pointLight position={[10, 10, 10]} intensity={1.5} color="#00d1ff" />
-                <spotLight position={[-10, 20, 10]} angle={0.12} penumbra={1} intensity={2} color="#1152d4" />
+                <ambientLight intensity={0.8} />
+                <pointLight position={[10, 10, 10]} intensity={1} color="#00d1ff" />
+                <spotLight position={[-10, 20, 10]} angle={0.12} penumbra={1} intensity={1} color="#1152d4" />
 
-                <Stars radius={100} depth={50} count={2000} factor={4} saturation={0} fade speed={1} />
+                {/* Stars replaced with soft blue particles for light theme */}
                 <BackgroundBubbles />
                 <HeroObject />
 
-                <Environment preset="night" />
-                <ContactShadows position={[0, -5, 0]} opacity={0.3} scale={20} blur={2.5} far={4} />
+                <Environment preset="apartment" />
+                <ContactShadows position={[0, -5, 0]} opacity={0.15} scale={20} blur={3} far={4} />
             </Canvas>
 
-            {/* Light Scan Interaction */}
-            <div className="absolute inset-0 pointer-events-none z-20 bg-[radial-gradient(circle_at_var(--mouse-x)_var(--mouse-y),_rgba(0,209,255,0.05)_0%,_transparent_50%)]" />
+            {/* Subtle Light Interaction */}
+            <div className="absolute inset-0 pointer-events-none z-20 bg-[radial-gradient(circle_at_var(--mouse-x)_var(--mouse-y),_rgba(0,209,255,0.03)_0%,_transparent_50%)]" />
         </div>
     )
 }

@@ -26,7 +26,6 @@ export default function Navbar() {
 
     return (
         <>
-            {/* Outer wrapper for centering the pill */}
             <div
                 style={{
                     position: 'fixed',
@@ -41,7 +40,6 @@ export default function Navbar() {
                     pointerEvents: 'none',
                 }}
             >
-                {/* Pill Container */}
                 <nav
                     style={{
                         pointerEvents: 'auto',
@@ -54,20 +52,19 @@ export default function Navbar() {
                         padding: isScrolled ? '0 24px' : '0 32px',
                         borderRadius: '100px',
                         background: isScrolled
-                            ? 'rgba(8, 12, 24, 0.75)'
-                            : 'rgba(8, 12, 24, 0.45)',
+                            ? 'rgba(255, 255, 255, 0.85)'
+                            : 'rgba(255, 255, 255, 0.6)',
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
                         border: isScrolled
-                            ? '1px solid rgba(0, 209, 255, 0.12)'
-                            : '1px solid rgba(255, 255, 255, 0.06)',
+                            ? '1px solid rgba(0, 209, 255, 0.3)'
+                            : '1px solid rgba(0, 0, 0, 0.05)',
                         boxShadow: isScrolled
-                            ? '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 209, 255, 0.05), inset 0 1px 0 rgba(255,255,255,0.03)'
-                            : '0 4px 20px rgba(0, 0, 0, 0.2)',
+                            ? '0 8px 32px rgba(0, 0, 0, 0.08)'
+                            : '0 4px 20px rgba(0, 0, 0, 0.04)',
                         transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
                     }}
                 >
-                    {/* Logo */}
                     <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', flexShrink: 0 }}>
                         <img
                             src="/logo.png"
@@ -78,11 +75,12 @@ export default function Navbar() {
                                 objectFit: 'contain',
                                 borderRadius: '6px',
                                 transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                                filter: 'brightness(0.2)' /* Make logo darker for light theme */
                             }}
                         />
                         <span
                             style={{
-                                color: '#fff',
+                                color: '#000',
                                 fontSize: isScrolled ? '15px' : '16px',
                                 fontWeight: 700,
                                 letterSpacing: '0.06em',
@@ -94,7 +92,6 @@ export default function Navbar() {
                         </span>
                     </Link>
 
-                    {/* Desktop Nav Links + Login */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: isScrolled ? '28px' : '34px', transition: 'gap 0.5s ease' }} className="desktop-nav">
                         {navLinks.map((link) => {
                             const isActive = pathname === link.href
@@ -105,7 +102,7 @@ export default function Navbar() {
                                     className="nav-glow-link"
                                     style={{
                                         position: 'relative',
-                                        color: isActive ? '#00d1ff' : 'rgba(255, 255, 255, 0.6)',
+                                        color: isActive ? '#00d1ff' : 'rgba(0, 0, 0, 0.6)',
                                         fontSize: '13px',
                                         fontWeight: 500,
                                         textDecoration: 'none',
@@ -120,10 +117,8 @@ export default function Navbar() {
                             )
                         })}
 
-                        {/* Divider */}
-                        <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
+                        <div style={{ width: '1px', height: '20px', background: 'rgba(0,0,0,0.08)', flexShrink: 0 }} />
 
-                        {/* Login */}
                         <Link
                             href="/login"
                             className="nav-glow-link"
@@ -131,7 +126,7 @@ export default function Navbar() {
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '7px',
-                                color: 'rgba(255, 255, 255, 0.6)',
+                                color: 'rgba(0, 0, 0, 0.6)',
                                 fontSize: '13px',
                                 fontWeight: 500,
                                 textDecoration: 'none',
@@ -148,7 +143,6 @@ export default function Navbar() {
                         </Link>
                     </div>
 
-                    {/* Mobile Hamburger */}
                     <button
                         className="mobile-only"
                         onClick={() => setIsMenuOpen(true)}
@@ -159,7 +153,7 @@ export default function Navbar() {
                             border: 'none',
                             cursor: 'pointer',
                             padding: '8px',
-                            color: '#fff',
+                            color: '#000',
                         }}
                     >
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -170,7 +164,6 @@ export default function Navbar() {
                 </nav>
             </div>
 
-            {/* Mobile Full-screen Menu */}
             <AnimatePresence>
                 {isMenuOpen && (
                     <motion.div
@@ -181,7 +174,7 @@ export default function Navbar() {
                         style={{
                             position: 'fixed',
                             inset: 0,
-                            background: 'rgba(8, 12, 24, 0.98)',
+                            background: 'rgba(255, 255, 255, 0.98)',
                             backdropFilter: 'blur(30px)',
                             zIndex: 1100,
                             display: 'flex',
@@ -198,7 +191,7 @@ export default function Navbar() {
                                 right: '24px',
                                 background: 'none',
                                 border: 'none',
-                                color: 'rgba(255,255,255,0.5)',
+                                color: 'rgba(0,0,0,0.5)',
                                 cursor: 'pointer',
                                 padding: '8px',
                             }}
@@ -225,12 +218,12 @@ export default function Navbar() {
                                             style={{
                                                 display: 'block',
                                                 padding: '18px 0',
-                                                color: isActive ? '#00d1ff' : '#fff',
+                                                color: isActive ? '#00d1ff' : '#000',
                                                 fontSize: '22px',
                                                 fontWeight: 600,
                                                 fontFamily: 'var(--font-sans)',
                                                 textDecoration: 'none',
-                                                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                                borderBottom: '1px solid rgba(0,0,0,0.05)',
                                             }}
                                         >
                                             {link.name}
@@ -250,12 +243,13 @@ export default function Navbar() {
                                     gap: '8px',
                                     padding: '14px 28px',
                                     background: '#00d1ff',
-                                    color: '#000',
+                                    color: '#fff',
                                     fontSize: '14px',
                                     fontWeight: 700,
                                     borderRadius: '50px',
                                     textDecoration: 'none',
                                     fontFamily: 'var(--font-sans)',
+                                    boxShadow: '0 4px 12px rgba(0, 209, 255, 0.3)'
                                 }}
                             >
                                 Log in
@@ -265,7 +259,6 @@ export default function Navbar() {
                 )}
             </AnimatePresence>
 
-            {/* Styles */}
             <style jsx global>{`
         .desktop-nav {
           display: flex !important;
@@ -274,10 +267,9 @@ export default function Navbar() {
           display: none !important;
         }
 
-        /* Soft glow on hover */
         .nav-glow-link:hover {
-          color: #fff !important;
-          text-shadow: 0 0 12px rgba(0, 209, 255, 0.5), 0 0 4px rgba(0, 209, 255, 0.3);
+          color: #000 !important;
+          text-shadow: 0 0 12px rgba(0, 209, 255, 0.2);
         }
 
         @media (max-width: 768px) {

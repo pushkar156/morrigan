@@ -10,7 +10,7 @@ export default function Home() {
     { title: "Strategy Series", subtitle: "Analyzing corporate maneuvers and M&A trends", id: "case-studies" },
     { title: "Market Insights", subtitle: "Data-driven stock analysis and market psychology", id: "stock-analysis" },
     { title: "Financial Literacy", subtitle: "Advanced concepts simplified for contemporary leaders", id: "100-days-challenge" },
-    { title: "Corporate restructuring", subtitle: "The mechanics of mergers, acquisitions, and deals", id: "ma-diaries" }
+    { title: "Corporate Restructuring", subtitle: "The mechanics of mergers, acquisitions, and deals", id: "ma-diaries" }
   ];
 
   return (
@@ -49,17 +49,17 @@ export default function Home() {
 
       {/* Decorative mid-page break Section */}
       <section className="py-40 md:py-60 relative overflow-hidden flex items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00d1ff08] to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00d1ff04] to-transparent pointer-events-none" />
         <div className="container-custom text-center relative z-20">
           <motion.h2
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 2, ease: "easeOut" }}
-            className="text-5xl md:text-8xl font-serif text-white/10 select-none tracking-tighter uppercase font-black"
+            className="text-5xl md:text-8xl font-serif text-black/5 select-none tracking-tighter uppercase font-black"
           >
             RESTORING DEPTH TO <br /> DISCOURSE
           </motion.h2>
-          <div className="mt-12 h-[1px] w-40 bg-white/5 mx-auto" />
+          <div className="mt-12 h-[1px] w-40 bg-black/5 mx-auto" />
         </div>
       </section>
     </main>

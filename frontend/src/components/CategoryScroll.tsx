@@ -22,7 +22,7 @@ export default function CategoryScroll({ title, subtitle, category, blogs }: Cat
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
-                        className="text-4xl md:text-5xl font-serif text-white mb-4 leading-tight"
+                        className="text-4xl md:text-5xl font-serif text-black mb-4 leading-tight"
                     >
                         {title}
                     </motion.h2>
@@ -30,15 +30,15 @@ export default function CategoryScroll({ title, subtitle, category, blogs }: Cat
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2, duration: 0.8 }}
-                        className="text-white/40 font-sans tracking-tight text-sm md:text-lg leading-relaxed"
+                        className="text-black/40 font-sans tracking-tight text-sm md:text-lg leading-relaxed"
                     >
                         {subtitle}
                     </motion.p>
                 </div>
 
-                <Link href={`/journal?category=${category}`} className="group flex items-center gap-6 text-[10px] font-black tracking-[0.4em] text-white/30 hover:text-[#00d1ff] transition-all whitespace-nowrap pb-2">
+                <Link href={`/journal?category=${category}`} className="group flex items-center gap-6 text-[10px] font-black tracking-[0.4em] text-black/30 hover:text-[#00d1ff] transition-all whitespace-nowrap pb-2">
                     <span>EXPLORE SERIES</span>
-                    <div className="w-16 h-[1px] bg-white/10 group-hover:w-24 group-hover:bg-[#00d1ff] transition-all" />
+                    <div className="w-16 h-[1px] bg-black/10 group-hover:w-24 group-hover:bg-[#00d1ff] transition-all" />
                 </Link>
             </div>
 
@@ -50,7 +50,7 @@ export default function CategoryScroll({ title, subtitle, category, blogs }: Cat
                         ))}
                     </div>
                 ) : (
-                    <div className="h-[400px] w-full rounded-3xl border border-dashed border-white/5 flex flex-col items-center justify-center text-white/10 gap-4">
+                    <div className="h-[400px] w-full rounded-3xl border border-dashed border-black/10 flex flex-col items-center justify-center text-black/10 gap-4">
                         <div className="w-12 h-12 rounded-full border border-current opacity-20 flex items-center justify-center">?</div>
                         <span className="text-[10px] font-black tracking-widest">PENDING EDITORIAL RELEASE</span>
                     </div>

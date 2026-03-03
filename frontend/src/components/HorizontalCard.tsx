@@ -16,27 +16,27 @@ export default function HorizontalCard({ blog, index }: { blog: Blog, index: num
             className="group relative w-[380px] shrink-0"
         >
             <Link href={`/blog/${blog.slug}`}>
-                <div className="relative h-[480px] w-full overflow-hidden rounded-2xl mb-6 bg-white/5 border border-white/10 ring-1 ring-white/5 group-hover:ring-white/20 transition-all duration-700">
+                <div className="relative h-[480px] w-full overflow-hidden rounded-3xl mb-6 bg-white border border-black/5 shadow-md group-hover:shadow-xl group-hover:border-[#00d1ff20] transition-all duration-700">
                     <img
                         src={blog.featured_image || '/logo.png'}
                         alt={blog.title}
-                        className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 group-hover:scale-105 transition-all duration-1000"
+                        className="w-full h-full object-cover grayscale brightness-110 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000"
                     />
 
                     {/* Overlay Content */}
-                    <div className="absolute inset-0 p-8 flex flex-col justify-end bg-gradient-to-t from-black via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute inset-0 p-8 flex flex-col justify-end bg-gradient-to-t from-white via-white/40 to-transparent opacity-90 group-hover:opacity-100 transition-opacity">
                         <div className="flex justify-between items-center mb-4">
-                            <span className="text-[10px] font-black tracking-[0.2em] text-[#00d1ff] bg-[#00d1ff20] px-3 py-1 rounded">
+                            <span className="text-[10px] font-black tracking-[0.2em] text-[#00d1ff] bg-black/5 px-3 py-1 rounded">
                                 {categoryDisplay}
                             </span>
-                            <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{date}</span>
+                            <span className="text-[10px] text-black/40 font-bold uppercase tracking-widest">{date}</span>
                         </div>
 
-                        <h3 className="text-2xl font-serif text-white leading-tight mb-4 group-hover:text-[#00d1ff] transition-colors">
+                        <h3 className="text-2xl font-serif text-black leading-tight mb-4 group-hover:text-[#00d1ff] transition-colors">
                             {blog.title}
                         </h3>
 
-                        <p className="text-sm text-white/50 line-clamp-2 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                        <p className="text-sm text-black/60 line-clamp-2 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
                             {blog.excerpt}
                         </p>
                     </div>

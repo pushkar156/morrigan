@@ -3,14 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --primary: #000309;
+  --primary: #f8f9fa; /* Off-white background */
+  --secondary: #000309; /* Deep black for text/contrast */
   --accent: #00d1ff;
   --accent-deep: #1152d4;
-  --text-white: #ffffff;
-  --text-dim: rgba(255, 255, 255, 0.6);
-  --surface: rgba(255, 255, 255, 0.03);
-  --glass-bg: rgba(0, 3, 9, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --text-main: #000309;
+  --text-dim: rgba(0, 3, 9, 0.6);
+  --surface: rgba(0, 0, 0, 0.03);
+  --glass-bg: rgba(248, 249, 250, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -21,7 +22,7 @@
 
 body {
   background-color: var(--primary);
-  color: var(--text-white);
+  color: var(--text-main);
   font-family: var(--font-sans);
   overflow-x: hidden;
   min-height: 100vh;
@@ -31,6 +32,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif);
   font-weight: 700;
+  color: var(--secondary);
 }
 
 /* Helper Classes */
@@ -46,10 +48,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .nav-pill.scrolled {
-  background: rgba(0, 3, 9, 0.85);
+  background: rgba(248, 249, 250, 0.85);
   backdrop-filter: blur(20px);
   border-color: rgba(0, 209, 255, 0.3);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
 }
 
 /* Footer Styling */
@@ -87,7 +89,7 @@ footer {
 }
 
 .footer-section h3 {
-  color: var(--text-white);
+  color: var(--secondary);
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.2em;
@@ -127,7 +129,7 @@ footer {
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: var(--surface);
+  background: white;
   border-radius: 12px;
   border: 1px solid var(--glass-border);
 }
@@ -149,7 +151,7 @@ footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(0, 0, 0, 0.3);
   font-size: 0.8rem;
 }
 
@@ -164,13 +166,13 @@ footer {
 }
 
 .footer-links a:hover {
-  color: var(--text-white);
+  color: var(--secondary);
 }
 
 /* Hero Enhancements */
 .hero-badge {
   background: rgba(0, 209, 255, 0.1);
-  color: var(--accent);
+  color: var(--accent-deep);
   border: 1px solid rgba(0, 209, 255, 0.2);
   backdrop-filter: blur(10px);
 }
@@ -206,5 +208,5 @@ canvas {
 /* Selection color */
 ::selection {
   background: var(--accent);
-  color: var(--primary);
+  color: white;
 }

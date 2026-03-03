@@ -1,55 +1,87 @@
 import Link from 'next/link'
 
 export default function Footer() {
+    const currentYear = new Date().getFullYear()
+
     return (
-        <footer>
-            <div className="footer-container">
-                <div className="footer-content">
-                    <div className="footer-section logo-section">
-                        <img src="/logo.png" alt="Morrigan Logo" className="logo-image" />
-                        <p className="logo-tagline">
-                            Quality news, where you want it, when you want it. Restoring depth to financial discourse.
+        <footer className="w-full relative overflow-hidden">
+            {/* Decorative gradient blur */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-[#00d1ff20] to-transparent" />
+
+            <div className="container-custom py-24 md:py-32">
+                <div className="footer-content gap-12 md:gap-24">
+
+                    {/* Brand Identity */}
+                    <div className="logo-section flex flex-col gap-8">
+                        <Link href="/" className="flex items-center gap-4 group">
+                            <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 group-hover:bg-[#00d1ff] group-hover:border-[#00d1ff] transition-all duration-700">
+                                <img src="/logo.png" alt="Morrigan Logo" className="h-7 brightness-0 invert" />
+                            </div>
+                            <h2 className="text-2xl font-serif font-black tracking-widest text-white">THE MORRIGAN</h2>
+                        </Link>
+                        <p className="logo-tagline text-white/50 leading-relaxed font-sans text-sm md:text-base max-w-sm">
+                            Morrigan is an independent editorial platform decoding capital flows, market shifts, and institutional strategy for the modern era.
                         </p>
                     </div>
 
-                    <div className="footer-section connect-section">
-                        <h3>Connect</h3>
-                        <ul>
-                            <li>
-                                <a href="mailto:the.morrigan.news@gmail.com">
-                                    <svg className="social-icon" viewBox="0 0 24 24">
-                                        <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 9.548l8.073-6.055C21.69 2.28 24 3.434 24 5.457z" />
-                                    </svg>
-                                    Gmail
-                                </a>
-                            </li>
-                            <li>
-                                <a href="https://www.linkedin.com/company/education-the-morrigan" target="_blank" rel="noopener noreferrer">
-                                    <svg className="social-icon" viewBox="0 0 24 24">
-                                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                                    </svg>
-                                    LinkedIn
-                                </a>
-                            </li>
-                        </ul>
+                    {/* Navigation Links */}
+                    <div className="grid grid-cols-2 gap-12">
+                        <div className="footer-section">
+                            <h3>Intelligence</h3>
+                            <ul className="flex flex-col gap-6">
+                                <li><Link href="/journal?category=back-to-basics">Back to Basics</Link></li>
+                                <li><Link href="/journal?category=case-studies">Strategy Series</Link></li>
+                                <li><Link href="/journal?category=stock-analysis">Market Insights</Link></li>
+                            </ul>
+                        </div>
+                        <div className="footer-section">
+                            <h3>Connect</h3>
+                            <ul className="flex flex-col gap-6">
+                                <li>
+                                    <a href="mailto:the.morrigan.news@gmail.com" className="group">
+                                        <span className="group-hover:translate-x-1 transition-transform">Gmail</span>
+                                        <span className="text-[#00d1ff] opacity-40">↗</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://linkedin.com" target="_blank" className="group">
+                                        <span className="group-hover:translate-x-1 transition-transform">LinkedIn</span>
+                                        <span className="text-[#00d1ff] opacity-40">↗</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
-                    <div className="footer-section association-section">
-                        <h3>In Association With</h3>
-                        <div className="partner-logo">
-                            <img src="/partner.png" alt="Partner Logo" />
-                            <span>Official Partner</span>
+                    {/* Partnership/Institutional Section */}
+                    <div className="association-section flex flex-col gap-8">
+                        <h3 className="text-white/40">In Association With</h3>
+                        <div className="partner-logo flex items-center gap-6 p-6 bg-white/[0.03] border border-white/10 rounded-3xl backdrop-blur-md group hover:border-[#00d1ff30] transition-all duration-700">
+                            <img src="/partner.png" alt="Partner Logo" className="h-10 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000" />
+                            <div className="flex flex-col">
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#00d1ff]">Strategic Partner</span>
+                                <span className="text-xs text-white/30 font-bold uppercase tracking-widest mt-1 italic">Institutional Access</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="footer-bottom">
-                    <p>&copy; {new Date().getFullYear()} The Morrigan. All rights reserved.</p>
-                    <div className="footer-links">
-                        <Link href="/privacy">Privacy Policy</Link> | <Link href="/terms">Terms of Service</Link>
+                {/* Legal Bottom Bar */}
+                <div className="footer-bottom flex flex-col md:flex-row gap-8 py-12 border-t border-white/5">
+                    <div className="flex flex-col gap-2">
+                        <span className="text-white font-bold tracking-widest text-[10px] uppercase">All Rights Reserved &copy; {currentYear}</span>
+                        <span className="text-white/20 text-[9px] font-bold uppercase tracking-[0.3em]">Restoring depth to financial discourse</span>
+                    </div>
+
+                    <div className="footer-links flex gap-10 items-center ml-auto">
+                        <Link href="/privacy" className="text-[10px] uppercase tracking-widest font-black text-white/30 hover:text-[#00d1ff] transition-all">Privacy Policy</Link>
+                        <Link href="/terms" className="text-[10px] uppercase tracking-widest font-black text-white/30 hover:text-[#00d1ff] transition-all">Terms of Service</Link>
                     </div>
                 </div>
             </div>
+
+            {/* Subtle bottom glow */}
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-1/2 bg-[#00d1ff05] blur-[150px] rounded-full pointer-events-none" />
         </footer>
     )
 }

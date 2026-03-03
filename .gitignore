@@ -7,5 +7,5 @@ node_modules/
 .DS_Store
 
 # Private Folders
-Backend/
-Chatbot/
+# Backend/
+# Chatbot/

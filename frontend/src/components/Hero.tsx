@@ -74,9 +74,9 @@ export default function Hero() {
                     transition={{ duration: 1.4, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 >
                     <Link href="/journal" className="group relative px-12 py-5 bg-[#000309] text-white font-black text-xs uppercase tracking-[0.2em] rounded-full overflow-hidden transition-all duration-500 hover:scale-105 active:scale-95 shadow-[0_15px_40px_rgba(0,0,0,0.15)]">
-                        <span className="relative z-10">Access Intelligence</span>
+                        <span className="relative z-10" style={{ color: 'white' }}>Access Intelligence</span>
                         <div className="absolute inset-0 bg-[#00d1ff] opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <span className="absolute inset-0 bg-[#00d1ff] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-black z-20">Access Intelligence</span>
+                        <span className="absolute inset-0 bg-[#00d1ff] opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center font-black z-20" style={{ color: 'white' }}>Access Intelligence</span>
                     </Link>
 
                     <Link href="/about" className="group flex items-center gap-4 text-black p-4 font-bold text-xs uppercase tracking-[0.2em] transition-all border-b border-black/5 hover:border-[#00d1ff] pb-1">

@@ -198,6 +198,26 @@
 											"content": [
 												{
 													"type": "text",
+													"text": "footer links and images"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
 													"text": "home page blog sections"
 												}
 											]

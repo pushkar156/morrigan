@@ -150,15 +150,14 @@ export default function Navbar() {
                                         <AnimatePresence>
                                             {isDropdownOpen && (
                                                 <motion.div
-                                                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                                                    initial={{ opacity: 0, y: 8, x: '-50%', scale: 0.96 }}
+                                                    animate={{ opacity: 1, y: 0, x: '-50%', scale: 1 }}
+                                                    exit={{ opacity: 0, y: 8, x: '-50%', scale: 0.96 }}
                                                     transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                                                     style={{
                                                         position: 'absolute',
                                                         top: '100%',
                                                         left: '50%',
-                                                        transform: 'translateX(-50%)',
                                                         marginTop: '12px',
                                                         minWidth: '200px',
                                                         background: 'rgba(255, 255, 255, 0.92)',

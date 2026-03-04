@@ -84,7 +84,7 @@ export default function CustomCursor() {
                 width: isHovering ? 64 : 16,
                 height: isHovering ? 64 : 16,
                 backgroundColor: isHovering ? 'rgba(0, 209, 255, 0.15)' : 'rgba(0, 3, 9, 0.8)',
-                backdropFilter: isHovering ? 'blur(4px)' : 'blur(0px)',
+                backdropFilter: isHovering ? 'blur(1.5px)' : 'blur(0px)',
                 border: isHovering ? '1px solid rgba(0, 209, 255, 0.4)' : '1px solid transparent',
             }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}

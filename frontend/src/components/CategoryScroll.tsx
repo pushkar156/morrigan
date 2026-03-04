@@ -34,7 +34,7 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
     return (
         <section
             ref={targetRef}
-            className={`relative py-20 md:py-32 w-full overflow-hidden transition-colors duration-700 border-t ${isDark ? 'bg-[#1a2b3c] text-white border-white/5' : 'bg-[#f8f9fa] text-black border-black/5'}`}
+            className={`relative py-24 md:py-36 w-full overflow-hidden transition-colors duration-700 border-t ${isDark ? 'bg-[#0b1724] text-white border-white/[0.02] shadow-[inset_0_20px_40px_rgba(0,0,0,0.2)]' : 'bg-[#f2f4f7] text-black border-black/[0.03] shadow-[inset_0_20px_40px_rgba(0,0,0,0.02)]'}`}
         >
             <div className="container-custom relative z-10 w-full mb-16">
                 <div className="flex flex-col md:flex-row justify-between items-end gap-8">
@@ -82,17 +82,20 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
                             <HorizontalCard key={blog.id} blog={blog} index={idx} isDark={isDark} />
                         ))
                     ) : (
-                        <div className={`h-[400px] md:h-[500px] w-[300px] md:w-[400px] rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-6 ${isDark ? 'border-white/10 text-white/30' : 'border-black/10 text-black/30'}`}>
-                            <div className="w-16 h-16 rounded-full border border-current flex items-center justify-center text-xl font-serif">?</div>
-                            <span className="text-[10px] font-black tracking-[0.3em] uppercase">Pending Release</span>
+                        <div className={`h-[400px] md:h-[500px] w-[340px] md:w-[440px] rounded-[32px] border border-dashed flex flex-col items-center justify-center gap-8 ${isDark ? 'border-white/10 text-white/20 bg-white/[0.02]' : 'border-black/10 text-black/20 bg-black/[0.02]'}`}>
+                            <div className="w-20 h-20 rounded-full border border-current flex items-center justify-center text-3xl font-serif opacity-50">?</div>
+                            <div className="flex flex-col items-center gap-2">
+                                <span className={`text-[10px] font-black tracking-[0.4em] uppercase ${isDark ? 'text-[#00d1ff]/50' : 'text-[#1152d4]/50'}`}>Pending</span>
+                                <span className="text-xs uppercase tracking-widest opacity-60">Editorial Release</span>
+                            </div>
                         </div>
                     )}
                 </motion.div>
             </div>
 
             {/* Soft edge gradients to blend the horizontal carousels smoothly on wide screens */}
-            <div className={`hidden md:block absolute top-0 left-0 w-[15vw] h-full z-20 bg-gradient-to-r ${isDark ? 'from-[#1a2b3c] to-transparent' : 'from-[#f8f9fa] to-transparent'} pointer-events-none`} />
-            <div className={`hidden md:block absolute top-0 right-0 w-[15vw] h-full z-20 bg-gradient-to-l ${isDark ? 'from-[#1a2b3c] to-transparent' : 'from-[#f8f9fa] to-transparent'} pointer-events-none`} />
+            <div className={`hidden md:block absolute top-0 left-0 w-[15vw] h-full z-20 bg-gradient-to-r ${isDark ? 'from-[#0b1724] to-transparent' : 'from-[#f2f4f7] to-transparent'} pointer-events-none`} />
+            <div className={`hidden md:block absolute top-0 right-0 w-[15vw] h-full z-20 bg-gradient-to-l ${isDark ? 'from-[#0b1724] to-transparent' : 'from-[#f2f4f7] to-transparent'} pointer-events-none`} />
         </section>
     )
 }

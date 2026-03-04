@@ -1,5 +1,6 @@
 "use client"
 import Link from 'next/link'
+import { MagneticButton } from './CustomCursor'
 
 export default function Footer() {
     const currentYear = new Date().getFullYear()
@@ -116,16 +117,18 @@ export default function Footer() {
                             <Link href="/terms">Terms</Link>
                         </div>
 
-                        <button
-                            onClick={scrollToTop}
-                            className="m-footer-top-btn"
-                            aria-label="Back to top"
-                        >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M12 19V5" />
-                                <path d="M5 12l7-7 7 7" />
-                            </svg>
-                        </button>
+                        <MagneticButton strength={0.6}>
+                            <button
+                                onClick={scrollToTop}
+                                className="m-footer-top-btn"
+                                aria-label="Back to top"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M12 19V5" />
+                                    <path d="M5 12l7-7 7 7" />
+                                </svg>
+                            </button>
+                        </MagneticButton>
                     </div>
                 </div>
             </div>

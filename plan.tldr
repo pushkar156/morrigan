@@ -238,6 +238,26 @@
 											"content": [
 												{
 													"type": "text",
+													"text": "magnetic cursor working"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
 													"text": "admin panel connections"
 												}
 											]
@@ -398,7 +418,7 @@
 		},
 		{
 			"x": 654.8595628676944,
-			"y": 583.9285889353027,
+			"y": 554.9285889353027,
 			"z": 1,
 			"meta": {},
 			"id": "camera:page:page",

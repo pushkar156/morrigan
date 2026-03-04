@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import { useRef } from 'react'
 import dynamic from 'next/dynamic'
+import { MagneticButton } from './CustomCursor'
 
 // Dynamic import to avoid SSR issues with WebGL
 const LiquidEther = dynamic(() => import('./LiquidEther'), { ssr: false })
@@ -156,68 +157,72 @@ export default function Hero() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1.4, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
                     >
-                        <Link
-                            href="/journal"
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: '14px 36px',
-                                background: 'linear-gradient(135deg, #00d1ff, #00b8e6)',
-                                color: '#000309',
-                                fontWeight: 900,
-                                fontSize: '11px',
-                                letterSpacing: '0.15em',
-                                textTransform: 'uppercase' as const,
-                                borderRadius: '100px',
-                                textDecoration: 'none',
-                                boxShadow: '0 6px 20px rgba(0, 209, 255, 0.35)',
-                                transition: 'all 0.3s ease',
-                                border: 'none',
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-2px)'
-                                e.currentTarget.style.boxShadow = '0 10px 28px rgba(0, 209, 255, 0.5)'
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)'
-                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 209, 255, 0.35)'
-                            }}
-                        >
-                            Explore Articles
-                        </Link>
+                        <MagneticButton strength={0.4}>
+                            <Link
+                                href="/journal"
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: '14px 36px',
+                                    background: 'linear-gradient(135deg, #00d1ff, #00b8e6)',
+                                    color: '#000309',
+                                    fontWeight: 900,
+                                    fontSize: '11px',
+                                    letterSpacing: '0.15em',
+                                    textTransform: 'uppercase' as const,
+                                    borderRadius: '100px',
+                                    textDecoration: 'none',
+                                    boxShadow: '0 6px 20px rgba(0, 209, 255, 0.35)',
+                                    transition: 'all 0.3s ease',
+                                    border: 'none',
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)'
+                                    e.currentTarget.style.boxShadow = '0 10px 28px rgba(0, 209, 255, 0.5)'
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)'
+                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 209, 255, 0.35)'
+                                }}
+                            >
+                                Explore Articles
+                            </Link>
+                        </MagneticButton>
 
-                        <Link
-                            href="/contact"
-                            style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: '14px 36px',
-                                background: 'rgba(255, 255, 255, 0.3)',
-                                color: '#000309',
-                                fontWeight: 900,
-                                fontSize: '11px',
-                                letterSpacing: '0.15em',
-                                textTransform: 'uppercase' as const,
-                                borderRadius: '100px',
-                                textDecoration: 'none',
-                                border: '1px solid rgba(0, 3, 9, 0.15)',
-                                transition: 'all 0.3s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.transform = 'translateY(-2px)'
-                                e.currentTarget.style.background = 'rgba(0, 3, 9, 0.05)'
-                                e.currentTarget.style.borderColor = 'rgba(0, 3, 9, 0.3)'
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)'
-                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)'
-                                e.currentTarget.style.borderColor = 'rgba(0, 3, 9, 0.15)'
-                            }}
-                        >
-                            Contact Us
-                        </Link>
+                        <MagneticButton strength={0.4}>
+                            <Link
+                                href="/contact"
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: '14px 36px',
+                                    background: 'rgba(255, 255, 255, 0.3)',
+                                    color: '#000309',
+                                    fontWeight: 900,
+                                    fontSize: '11px',
+                                    letterSpacing: '0.15em',
+                                    textTransform: 'uppercase' as const,
+                                    borderRadius: '100px',
+                                    textDecoration: 'none',
+                                    border: '1px solid rgba(0, 3, 9, 0.15)',
+                                    transition: 'all 0.3s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-2px)'
+                                    e.currentTarget.style.background = 'rgba(0, 3, 9, 0.05)'
+                                    e.currentTarget.style.borderColor = 'rgba(0, 3, 9, 0.3)'
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)'
+                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)'
+                                    e.currentTarget.style.borderColor = 'rgba(0, 3, 9, 0.15)'
+                                }}
+                            >
+                                Contact Us
+                            </Link>
+                        </MagneticButton>
                     </motion.div>
                 </div>
             </motion.div>

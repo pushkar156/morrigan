@@ -45,7 +45,7 @@
 			"props": {
 				"color": "black",
 				"size": "m",
-				"w": 343.76076691606886,
+				"w": 629.7060500386082,
 				"font": "draw",
 				"textAlign": "start",
 				"autoSize": true,
@@ -238,6 +238,26 @@
 											"content": [
 												{
 													"type": "text",
+													"text": "Remove the files dont need (Cleaning codebase)"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
 													"text": "Security "
 												}
 											]
@@ -302,7 +322,7 @@
 			"brush": null,
 			"scribbles": [],
 			"cursor": {
-				"type": "move",
+				"type": "default",
 				"rotation": 0
 			},
 			"isFocusMode": false,
@@ -342,12 +362,12 @@
 			"typeName": "instance"
 		},
 		{
-			"editingShapeId": null,
+			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
 			"croppingShapeId": null,
 			"selectedShapeIds": [
 				"shape:LnL7WgtCHXucFLuKWC5AW"
 			],
-			"hoveredShapeId": null,
+			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
 			"erasingShapeIds": [],
 			"hintingShapeIds": [],
 			"focusedGroupId": null,

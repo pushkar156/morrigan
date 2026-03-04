@@ -34,8 +34,8 @@
 	},
 	"records": [
 		{
-			"x": 273.08363651662313,
-			"y": -291.05090411768174,
+			"x": -190.91636348337687,
+			"y": -454.6508949624083,
 			"rotation": 5.551115123125783e-16,
 			"isLocked": false,
 			"opacity": 1,
@@ -45,7 +45,7 @@
 			"props": {
 				"color": "black",
 				"size": "m",
-				"w": 309.2375183105469,
+				"w": 361.9875183105469,
 				"font": "draw",
 				"textAlign": "start",
 				"autoSize": true,
@@ -118,7 +118,127 @@
 											"content": [
 												{
 													"type": "text",
-													"text": "admin panel rebuild."
+													"text": "nav bar"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "hero section"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "footer"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "home page blog sections"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "admin panel connections"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "Security "
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "SEO"
 												}
 											]
 										}
@@ -158,11 +278,7 @@
 		{
 			"followingUserId": null,
 			"opacityForNextShape": 1,
-			"stylesForNextShape": {
-				"tldraw:dash": "dashed",
-				"tldraw:fill": "pattern",
-				"tldraw:geo": "rectangle"
-			},
+			"stylesForNextShape": {},
 			"brush": null,
 			"scribbles": [],
 			"cursor": {
@@ -206,7 +322,7 @@
 			"typeName": "instance"
 		},
 		{
-			"editingShapeId": null,
+			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
 			"croppingShapeId": null,
 			"selectedShapeIds": [
 				"shape:LnL7WgtCHXucFLuKWC5AW"
@@ -221,9 +337,9 @@
 			"typeName": "instance_page_state"
 		},
 		{
-			"x": -177.81661066848991,
-			"y": 435.78540116725924,
-			"z": 0.5836236571034427,
+			"x": 232.72262263865036,
+			"y": 526.6508987771055,
+			"z": 1,
 			"meta": {},
 			"id": "camera:page:page",
 			"typeName": "camera"

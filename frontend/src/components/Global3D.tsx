@@ -1,12 +1,16 @@
 "use client"
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Float, Sphere, MeshDistortMaterial, Stars, PerspectiveCamera, Environment, ContactShadows, Center, Sparkles } from '@react-three/drei'
+import { Float, MeshDistortMaterial, PerspectiveCamera, Environment, Sparkles } from '@react-three/drei'
 import { useLenis } from 'lenis/react'
 import { useRef, useState, useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 
+// Shared scroll state
+const scrollState = { progress: 0 }
+
+// ─── Floating Bubbles (reduced count for performance) ───────────────
 function BackgroundBubbles() {
-    const count = 40
+    const count = 20
     const points = useMemo(() => {
         return new Array(count).fill(0).map(() => ({
             position: [Math.random() * 40 - 20, Math.random() * 40 - 20, Math.random() * 20 - 10],
@@ -30,7 +34,7 @@ function BackgroundBubbles() {
         <group ref={group}>
             {points.map((p, i) => (
                 <mesh key={i} position={p.position as any}>
-                    <sphereGeometry args={[p.size, 16, 16]} />
+                    <sphereGeometry args={[p.size, 8, 8]} />
                     <meshStandardMaterial color="#00d1ff" transparent opacity={0.2} emissive="#00d1ff" emissiveIntensity={0.5} />
                 </mesh>
             ))}
@@ -38,47 +42,8 @@ function BackgroundBubbles() {
     )
 }
 
-function OrbitalRings() {
-    const parentRef = useRef<THREE.Group>(null)
-    const ring1Ref = useRef<THREE.Mesh>(null)
-    const ring2Ref = useRef<THREE.Mesh>(null)
-
-    useFrame((state) => {
-        const t = state.clock.getElapsedTime()
-
-        // Shared stable drift
-        if (parentRef.current) {
-            parentRef.current.rotation.z = t * 0.05
-        }
-
-        if (ring1Ref.current) {
-            // Horizontal revolution
-            ring1Ref.current.rotation.y = t * 0.6
-        }
-        if (ring2Ref.current) {
-            // Vertical revolution - different speed to ensure path crossing
-            ring2Ref.current.rotation.x = t * 0.4
-        }
-    })
-
-    return (
-        <group ref={parentRef}>
-            {/* Ring 1 - Vertical Initial */}
-            <mesh ref={ring1Ref} rotation={[0, 0, 0]}>
-                <torusGeometry args={[4.2, 0.012, 16, 100]} />
-                <meshStandardMaterial color="#00d1ff" transparent opacity={0.3} emissive="#00d1ff" emissiveIntensity={1} />
-            </mesh>
-
-            {/* Ring 2 - Horizontal Initial */}
-            <mesh ref={ring2Ref} rotation={[Math.PI / 2, 0, 0]}>
-                <torusGeometry args={[4.5, 0.008, 16, 100]} />
-                <meshStandardMaterial color="#1152d4" transparent opacity={0.2} emissive="#1152d4" emissiveIntensity={0.5} />
-            </mesh>
-        </group>
-    )
-}
-
-function HeroObject() {
+// ─── Hero Blob → Cursor Drop ────────────────────────────────────────
+function HeroBlob() {
     const meshRef = useRef<THREE.Mesh>(null)
     const groupRef = useRef<THREE.Group>(null)
     const [hovered, setHovered] = useState(false)
@@ -95,61 +60,80 @@ function HeroObject() {
         return () => window.removeEventListener('mousemove', handleMouseMove)
     }, [])
 
-    useLenis(({ scroll, progress }) => {
-        if (groupRef.current) {
-            groupRef.current.rotation.y = progress * Math.PI
-            groupRef.current.position.y = -progress * 10
-            groupRef.current.scale.setScalar(1 - progress * 0.3)
-        }
+    // Sync Lenis scroll → shared state
+    useLenis(({ progress }) => {
+        scrollState.progress = progress
     })
 
     useFrame((state) => {
         const t = state.clock.getElapsedTime()
-        if (meshRef.current) {
-            // Mouse follow
-            const targetX = mouse.current.x * (viewport.width / 5)
-            const targetY = mouse.current.y * (viewport.height / 5)
+        if (!meshRef.current || !groupRef.current) return
 
-            meshRef.current.position.x = THREE.MathUtils.lerp(meshRef.current.position.x, targetX, 0.05)
-            meshRef.current.position.y = THREE.MathUtils.lerp(meshRef.current.position.y, targetY + Math.sin(t) * 0.2, 0.05)
+        const progress = scrollState.progress
 
-            meshRef.current.rotation.x = t * 0.1
-            meshRef.current.rotation.y = t * 0.15
-        }
+        // Transition: hero blob → small cursor drop
+        const transStart = 0.08
+        const transEnd = 0.3
+        const transT = THREE.MathUtils.clamp(
+            (progress - transStart) / (transEnd - transStart),
+            0, 1
+        )
+        const eased = transT * transT * (3 - 2 * transT)
+
+        // Scale: 1 (hero) → 0.22 (cursor drop)
+        const targetScale = THREE.MathUtils.lerp(1, 0.22, eased)
+        groupRef.current.scale.setScalar(
+            THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.08)
+        )
+
+        // Follow strength: loose in hero, tight as cursor drop
+        const followStrength = THREE.MathUtils.lerp(0.04, 0.09, eased)
+        const moveRange = THREE.MathUtils.lerp(viewport.width / 5, viewport.width / 2.5, eased)
+
+        const targetX = mouse.current.x * moveRange
+        const targetY = mouse.current.y * (viewport.height / 3)
+
+        meshRef.current.position.x = THREE.MathUtils.lerp(meshRef.current.position.x, targetX, followStrength)
+        meshRef.current.position.y = THREE.MathUtils.lerp(
+            meshRef.current.position.y,
+            targetY + Math.sin(t) * (0.2 * (1 - eased)),
+            followStrength
+        )
+
+        // In hero: scroll pushes blob down. After transition: stays with cursor
+        groupRef.current.position.y = -progress * 10 * (1 - eased)
+
+        meshRef.current.rotation.x = t * 0.1
+        meshRef.current.rotation.y = t * 0.15
     })
 
     return (
         <group ref={groupRef}>
-            <Center>
-                <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-                    {/* The "Inconsistent" Distorted Icosahedron you liked (Lining removed) */}
-                    <mesh
-                        ref={meshRef}
-                        onPointerOver={() => setHovered(true)}
-                        onPointerOut={() => setHovered(false)}
-                        scale={hovered ? 1.15 : 1}
-                    >
-                        <icosahedronGeometry args={[2.5, 12]} />
-                        <MeshDistortMaterial
-                            color="#00d1ff"
-                            speed={hovered ? 4 : 1.5}
-                            distort={0.45}
-                            radius={1}
-                            metalness={1}
-                            roughness={0.05}
-                            emissive="#1152d4"
-                            emissiveIntensity={0.6}
-                        />
-                    </mesh>
-                </Float>
-
-                <OrbitalRings />
-                <Sparkles count={40} scale={12} size={2} speed={0.4} color="#00d1ff" />
-            </Center>
+            <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
+                <mesh
+                    ref={meshRef}
+                    onPointerOver={() => setHovered(true)}
+                    onPointerOut={() => setHovered(false)}
+                    scale={hovered ? 1.15 : 1}
+                >
+                    <icosahedronGeometry args={[2.5, 8]} />
+                    <MeshDistortMaterial
+                        color="#00d1ff"
+                        speed={hovered ? 4 : 1.5}
+                        distort={0.45}
+                        radius={1}
+                        metalness={1}
+                        roughness={0.05}
+                        emissive="#1152d4"
+                        emissiveIntensity={0.6}
+                    />
+                </mesh>
+            </Float>
         </group>
     )
 }
 
+// ─── Main Scene ─────────────────────────────────────────────────────
 export default function Global3D() {
     const [mounted, setMounted] = useState(false)
 
@@ -172,25 +156,22 @@ export default function Global3D() {
             <Canvas
                 className="w-full h-full"
                 style={{ position: 'absolute', top: 0, left: 0 }}
-                dpr={[1, 2]}
-                gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+                dpr={[1, 1.5]}
+                gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}
+                frameloop="always"
             >
                 <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={45} />
 
-                <ambientLight intensity={0.4} />
+                <ambientLight intensity={0.5} />
                 <pointLight position={[10, 10, 10]} intensity={2.5} color="#00d1ff" />
                 <pointLight position={[-10, -10, -10]} intensity={1.5} color="#1152d4" />
-                <spotLight position={[0, 20, 10]} angle={0.2} penumbra={1} intensity={4} color="#fff" />
 
-                <Stars radius={100} depth={50} count={1200} factor={4} saturation={0} fade speed={1} />
                 <BackgroundBubbles />
-                <HeroObject />
+                <HeroBlob />
 
                 <Environment preset="night" />
-                <ContactShadows position={[0, -6, 0]} opacity={0.2} scale={20} blur={3} far={10} />
+                <Sparkles count={20} scale={12} size={1.5} speed={0.4} color="#00d1ff" />
             </Canvas>
-
-            <div className="absolute inset-0 pointer-events-none z-20 bg-[radial-gradient(circle_at_var(--mouse-x)_var(--mouse-y),_rgba(0,209,255,0.04)_0%,_transparent_60%)]" />
         </div>
     )
 }

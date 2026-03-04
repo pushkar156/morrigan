@@ -2,6 +2,10 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import { useRef } from 'react'
+import dynamic from 'next/dynamic'
+
+// Dynamic import to avoid SSR issues with WebGL
+const LiquidEther = dynamic(() => import('./LiquidEther'), { ssr: false })
 
 export default function Hero() {
     const containerRef = useRef<HTMLElement>(null)
@@ -11,7 +15,6 @@ export default function Hero() {
         offset: ["start start", "end start"]
     })
 
-    // Better Parallax Control
     const y = useTransform(scrollYProgress, [0, 1], ["0%", "40%"])
     const opacity = useTransform(scrollYProgress, [0, 0.4, 0.7], [1, 0.5, 0])
     const scale = useTransform(scrollYProgress, [0, 1], [1, 0.95])
@@ -22,6 +25,28 @@ export default function Hero() {
             ref={containerRef}
             className="relative min-h-[105vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden pt-20"
         >
+            {/* LiquidEther Fluid Background */}
+            <div className="absolute inset-0 z-0" style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}>
+                <LiquidEther
+                    colors={['#00d1ff', '#1152d4', '#87CEEB']}
+                    mouseForce={15}
+                    cursorSize={80}
+                    isViscous
+                    viscous={30}
+                    iterationsViscous={16}
+                    iterationsPoisson={16}
+                    resolution={0.35}
+                    isBounce={false}
+                    autoDemo
+                    autoSpeed={0.4}
+                    autoIntensity={2.0}
+                    takeoverDuration={0.3}
+                    autoResumeDelay={3000}
+                    autoRampDuration={0.6}
+                    style={{ width: '100%', height: '100%' }}
+                />
+            </div>
+
             <motion.div
                 style={{ y, opacity, scale, filter: `blur(${blur}px)` }}
                 className="relative z-20 max-w-6xl w-full"

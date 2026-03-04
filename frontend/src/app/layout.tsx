@@ -28,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-[#000309]">
-      <body className={`${manrope.variable} ${playfair.variable} antialiased bg-transparent selection:bg-[#00d1ff] selection:text-black`}>
+    <html lang="en" className="bg-[#f8f9fa]" suppressHydrationWarning>
+      <body className={`${manrope.variable} ${playfair.variable} antialiased bg-transparent selection:bg-[#00d1ff] selection:text-black`} suppressHydrationWarning>
         <SmoothScrolling>
           <Global3D />
           <Navbar />

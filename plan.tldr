@@ -34,8 +34,8 @@
 	},
 	"records": [
 		{
-			"x": -190.91636348337687,
-			"y": -454.6508949624083,
+			"x": -355.39726456655,
+			"y": -458.0744270888511,
 			"rotation": 5.551115123125783e-16,
 			"isLocked": false,
 			"opacity": 1,
@@ -49,7 +49,7 @@
 				"font": "draw",
 				"textAlign": "start",
 				"autoSize": true,
-				"scale": 1,
+				"scale": 0.9086987847668442,
 				"richText": {
 					"type": "doc",
 					"attrs": {
@@ -254,6 +254,66 @@
 			"typeName": "shape"
 		},
 		{
+			"x": 0,
+			"y": 0,
+			"lastActivityTimestamp": 0,
+			"meta": {},
+			"id": "pointer:pointer",
+			"typeName": "pointer"
+		},
+		{
+			"x": 429.48531125319096,
+			"y": 630.3669481598215,
+			"z": 0.7290000000000001,
+			"meta": {},
+			"id": "camera:page:page",
+			"typeName": "camera"
+		},
+		{
+			"editingShapeId": null,
+			"croppingShapeId": null,
+			"selectedShapeIds": [],
+			"hoveredShapeId": null,
+			"erasingShapeIds": [],
+			"hintingShapeIds": [],
+			"focusedGroupId": null,
+			"meta": {},
+			"id": "instance_page_state:page:page",
+			"pageId": "page:page",
+			"typeName": "instance_page_state"
+		},
+		{
+			"x": -75.57584623261488,
+			"y": -175.77162045545344,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:VI0g8dg9_ymQ-6lyuAm43",
+			"type": "draw",
+			"props": {
+				"segments": [
+					{
+						"type": "free",
+						"path": "AAAAAAAAAAAAAAA/"
+					}
+				],
+				"color": "violet",
+				"fill": "none",
+				"dash": "draw",
+				"size": "s",
+				"isComplete": true,
+				"isClosed": false,
+				"isPen": false,
+				"scale": 1,
+				"scaleX": 1,
+				"scaleY": 1
+			},
+			"parentId": "page:page",
+			"index": "a4UXHycG",
+			"typeName": "shape"
+		},
+		{
 			"meta": {},
 			"id": "page:page",
 			"name": "todos",
@@ -268,21 +328,16 @@
 			"typeName": "document"
 		},
 		{
-			"x": 0,
-			"y": 0,
-			"lastActivityTimestamp": 0,
-			"meta": {},
-			"id": "pointer:pointer",
-			"typeName": "pointer"
-		},
-		{
 			"followingUserId": null,
 			"opacityForNextShape": 1,
-			"stylesForNextShape": {},
+			"stylesForNextShape": {
+				"tldraw:color": "violet",
+				"tldraw:size": "s"
+			},
 			"brush": null,
 			"scribbles": [],
 			"cursor": {
-				"type": "default",
+				"type": "cross",
 				"rotation": 0
 			},
 			"isFocusMode": false,
@@ -322,27 +377,66 @@
 			"typeName": "instance"
 		},
 		{
-			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
-			"croppingShapeId": null,
-			"selectedShapeIds": [
-				"shape:LnL7WgtCHXucFLuKWC5AW"
-			],
-			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
-			"erasingShapeIds": [],
-			"hintingShapeIds": [],
-			"focusedGroupId": null,
+			"x": -351.0216613726156,
+			"y": -390.86076694786595,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
 			"meta": {},
-			"id": "instance_page_state:page:page",
-			"pageId": "page:page",
-			"typeName": "instance_page_state"
+			"id": "shape:D4zlCcVoHvcjaKRvZayZz",
+			"type": "draw",
+			"props": {
+				"segments": [
+					{
+						"type": "free",
+						"path": "AAAAAAAAAAAAAAA/ZriuPwAAAABmPAAAZjxhQAAAAABmPAAAAABmPAAAAABhQAAAZjwAAAAAYUAAAAAAlEJmPAAAfUUAAAAAlEIAAAAAZEQAAAAAZjxmwAAAZjxcvAAAYUBmwAAAZjxcvAAAYUAAAAAAZjwAAAAAZkBmvAAAlEIAAAAAZjxmwAAAXDxcvAAAlEIAAAAAZkBmwAAAZjwAAAAAYUBmvAAAZjwAAAAAYUBhwAAA"
+					}
+				],
+				"color": "violet",
+				"fill": "none",
+				"dash": "draw",
+				"size": "s",
+				"isComplete": true,
+				"isClosed": false,
+				"isPen": false,
+				"scale": 1,
+				"scaleX": 1,
+				"scaleY": 1
+			},
+			"parentId": "page:page",
+			"index": "a374D5Ul",
+			"typeName": "shape"
 		},
 		{
-			"x": 232.72262263865036,
-			"y": 526.6508987771055,
-			"z": 1,
+			"x": -346.63208556611426,
+			"y": -415.00343650001355,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
 			"meta": {},
-			"id": "camera:page:page",
-			"typeName": "camera"
+			"id": "shape:CSrzCjAbdwG1UIwKtaW4e",
+			"type": "draw",
+			"props": {
+				"segments": [
+					{
+						"type": "free",
+						"path": "AAAAAAAAAAAAAAA/ZriuPwAAAABmPAAAAABmPAAAAABhQAAAAABmPAAAZjxhQAAAZjxmPAAAXDwAAAAAZERmvAAAmkKUwgAAlEZhwAAAlEJmwAAArkeUwgAAZjwAAAAAZkBmvAAAXDxhwAAAZkAAAAAAZjwAAAAAXDxmvAAAZkBmwAAAXDxcvAAA"
+					}
+				],
+				"color": "violet",
+				"fill": "none",
+				"dash": "draw",
+				"size": "s",
+				"isComplete": true,
+				"isClosed": false,
+				"isPen": false,
+				"scale": 1,
+				"scaleX": 1,
+				"scaleY": 1
+			},
+			"parentId": "page:page",
+			"index": "a2rNxYiV",
+			"typeName": "shape"
 		}
 	]
 }

@@ -1,6 +1,6 @@
 "use client"
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Float, MeshDistortMaterial, PerspectiveCamera, Environment, Sparkles } from '@react-three/drei'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { PerspectiveCamera, Environment, Sparkles } from '@react-three/drei'
 import { useLenis } from 'lenis/react'
 import { useRef, useState, useEffect, useMemo } from 'react'
 import * as THREE from 'three'
@@ -8,7 +8,7 @@ import * as THREE from 'three'
 // Shared scroll state
 const scrollState = { progress: 0 }
 
-// ─── Floating Bubbles (reduced count for performance) ───────────────
+// ─── Floating Bubbles ───────────────────────────────────────────────
 function BackgroundBubbles() {
     const count = 20
     const points = useMemo(() => {
@@ -42,14 +42,11 @@ function BackgroundBubbles() {
     )
 }
 
-// ─── Hero Blob → Cursor Drop ────────────────────────────────────────
-function HeroBlob() {
+// ─── Cursor Glow Trail (premium replacement for blob) ───────────────
+function CursorGlow() {
     const meshRef = useRef<THREE.Mesh>(null)
-    const groupRef = useRef<THREE.Group>(null)
-    const [hovered, setHovered] = useState(false)
-    const { viewport } = useThree()
-
     const mouse = useRef({ x: 0, y: 0 })
+    const smoothPos = useRef({ x: 0, y: 0 })
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -60,76 +57,40 @@ function HeroBlob() {
         return () => window.removeEventListener('mousemove', handleMouseMove)
     }, [])
 
-    // Sync Lenis scroll → shared state
     useLenis(({ progress }) => {
         scrollState.progress = progress
     })
 
     useFrame((state) => {
+        if (!meshRef.current) return
+
+        const { viewport } = state
+
+        // Smooth follow
+        smoothPos.current.x = THREE.MathUtils.lerp(smoothPos.current.x, mouse.current.x * viewport.width / 2, 0.06)
+        smoothPos.current.y = THREE.MathUtils.lerp(smoothPos.current.y, mouse.current.y * viewport.height / 2, 0.06)
+
+        meshRef.current.position.x = smoothPos.current.x
+        meshRef.current.position.y = smoothPos.current.y
+        meshRef.current.position.z = -2
+
+        // Subtle pulse
         const t = state.clock.getElapsedTime()
-        if (!meshRef.current || !groupRef.current) return
-
-        const progress = scrollState.progress
-
-        // Transition: hero blob → small cursor drop
-        const transStart = 0.08
-        const transEnd = 0.3
-        const transT = THREE.MathUtils.clamp(
-            (progress - transStart) / (transEnd - transStart),
-            0, 1
-        )
-        const eased = transT * transT * (3 - 2 * transT)
-
-        // Scale: 1 (hero) → 0.22 (cursor drop)
-        const targetScale = THREE.MathUtils.lerp(1, 0.22, eased)
-        groupRef.current.scale.setScalar(
-            THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.08)
-        )
-
-        // Follow strength: loose in hero, tight as cursor drop
-        const followStrength = THREE.MathUtils.lerp(0.04, 0.09, eased)
-        const moveRange = THREE.MathUtils.lerp(viewport.width / 5, viewport.width / 2.5, eased)
-
-        const targetX = mouse.current.x * moveRange
-        const targetY = mouse.current.y * (viewport.height / 3)
-
-        meshRef.current.position.x = THREE.MathUtils.lerp(meshRef.current.position.x, targetX, followStrength)
-        meshRef.current.position.y = THREE.MathUtils.lerp(
-            meshRef.current.position.y,
-            targetY + Math.sin(t) * (0.2 * (1 - eased)),
-            followStrength
-        )
-
-        // In hero: scroll pushes blob down. After transition: stays with cursor
-        groupRef.current.position.y = -progress * 10 * (1 - eased)
-
-        meshRef.current.rotation.x = t * 0.1
-        meshRef.current.rotation.y = t * 0.15
+        const scale = 1.8 + Math.sin(t * 0.8) * 0.2
+        meshRef.current.scale.setScalar(scale)
     })
 
     return (
-        <group ref={groupRef}>
-            <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-                <mesh
-                    ref={meshRef}
-                    onPointerOver={() => setHovered(true)}
-                    onPointerOut={() => setHovered(false)}
-                    scale={hovered ? 1.15 : 1}
-                >
-                    <icosahedronGeometry args={[2.5, 8]} />
-                    <MeshDistortMaterial
-                        color="#00d1ff"
-                        speed={hovered ? 4 : 1.5}
-                        distort={0.45}
-                        radius={1}
-                        metalness={1}
-                        roughness={0.05}
-                        emissive="#1152d4"
-                        emissiveIntensity={0.6}
-                    />
-                </mesh>
-            </Float>
-        </group>
+        <mesh ref={meshRef}>
+            <circleGeometry args={[1, 32]} />
+            <meshBasicMaterial
+                color="#00d1ff"
+                transparent
+                opacity={0.04}
+                blending={THREE.AdditiveBlending}
+                depthWrite={false}
+            />
+        </mesh>
     )
 }
 
@@ -167,7 +128,7 @@ export default function Global3D() {
                 <pointLight position={[-10, -10, -10]} intensity={1.5} color="#1152d4" />
 
                 <BackgroundBubbles />
-                <HeroBlob />
+                <CursorGlow />
 
                 <Environment preset="night" />
                 <Sparkles count={20} scale={12} size={1.5} speed={0.4} color="#00d1ff" />

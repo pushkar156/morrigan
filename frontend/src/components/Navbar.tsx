@@ -1,12 +1,22 @@
 "use client"
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+
+const journalCategories = [
+    { name: 'Back to Basics', href: '/journal?category=back-to-basics' },
+    { name: 'Case Studies', href: '/journal?category=case-studies' },
+    { name: 'Stock Analysis', href: '/journal?category=stock-analysis' },
+    { name: '100 Days Challenge', href: '/journal?category=100-days-challenge' },
+    { name: 'M&A Diaries', href: '/journal?category=ma-diaries' },
+]
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null)
     const pathname = usePathname()
 
     useEffect(() => {
@@ -17,12 +27,46 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
+    const handleDropdownEnter = () => {
+        if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current)
+        setIsDropdownOpen(true)
+    }
+
+    const handleDropdownLeave = () => {
+        dropdownTimeoutRef.current = setTimeout(() => {
+            setIsDropdownOpen(false)
+        }, 200)
+    }
+
     const navLinks = [
         { name: 'Home', href: '/' },
-        { name: 'Journal', href: '/journal' },
+        { name: 'Journal', href: '/journal', hasDropdown: true },
         { name: 'About', href: '/about' },
         { name: 'Contact', href: '/contact' },
     ]
+
+    // Consistent blur styles for both states
+    const navStyle = {
+        pointerEvents: 'auto' as const,
+        maxWidth: isScrolled ? '860px' : '1100px',
+        width: '100%',
+        height: isScrolled ? '52px' : '60px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: isScrolled ? '0 24px' : '0 32px',
+        borderRadius: '100px',
+        background: 'rgba(255, 255, 255, 0.7)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: isScrolled
+            ? '1px solid rgba(0, 209, 255, 0.2)'
+            : '1px solid rgba(0, 0, 0, 0.06)',
+        boxShadow: isScrolled
+            ? '0 8px 32px rgba(0, 0, 0, 0.08)'
+            : '0 4px 20px rgba(0, 0, 0, 0.04)',
+        transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+    }
 
     return (
         <>
@@ -40,31 +84,7 @@ export default function Navbar() {
                     pointerEvents: 'none',
                 }}
             >
-                <nav
-                    style={{
-                        pointerEvents: 'auto',
-                        maxWidth: isScrolled ? '860px' : '1100px',
-                        width: '100%',
-                        height: isScrolled ? '52px' : '60px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: isScrolled ? '0 24px' : '0 32px',
-                        borderRadius: '100px',
-                        background: isScrolled
-                            ? 'rgba(255, 255, 255, 0.85)'
-                            : 'rgba(255, 255, 255, 0.6)',
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
-                        border: isScrolled
-                            ? '1px solid rgba(0, 209, 255, 0.3)'
-                            : '1px solid rgba(0, 0, 0, 0.05)',
-                        boxShadow: isScrolled
-                            ? '0 8px 32px rgba(0, 0, 0, 0.08)'
-                            : '0 4px 20px rgba(0, 0, 0, 0.04)',
-                        transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-                    }}
-                >
+                <nav style={navStyle}>
                     <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', flexShrink: 0 }}>
                         <img
                             src="/logo.png"
@@ -75,7 +95,6 @@ export default function Navbar() {
                                 objectFit: 'contain',
                                 borderRadius: '6px',
                                 transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-                                filter: 'brightness(1)' /* Make logo darker for light theme */
                             }}
                         />
                         <span
@@ -95,6 +114,110 @@ export default function Navbar() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: isScrolled ? '28px' : '34px', transition: 'gap 0.5s ease' }} className="desktop-nav">
                         {navLinks.map((link) => {
                             const isActive = pathname === link.href
+
+                            if (link.hasDropdown) {
+                                return (
+                                    <div
+                                        key={link.name}
+                                        style={{ position: 'relative' }}
+                                        onMouseEnter={handleDropdownEnter}
+                                        onMouseLeave={handleDropdownLeave}
+                                    >
+                                        <Link
+                                            href={link.href}
+                                            className="nav-glow-link"
+                                            style={{
+                                                position: 'relative',
+                                                color: isActive ? '#00d1ff' : 'rgba(0, 0, 0, 0.6)',
+                                                fontSize: '13px',
+                                                fontWeight: 500,
+                                                textDecoration: 'none',
+                                                fontFamily: 'var(--font-sans)',
+                                                letterSpacing: '0.02em',
+                                                padding: '6px 2px',
+                                                transition: 'color 0.3s ease',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '4px',
+                                            }}
+                                        >
+                                            {link.name}
+                                            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ opacity: 0.4, transition: 'transform 0.3s', transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                                                <path d="M2 4L5 7L8 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        </Link>
+
+                                        <AnimatePresence>
+                                            {isDropdownOpen && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                                                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '100%',
+                                                        left: '50%',
+                                                        transform: 'translateX(-50%)',
+                                                        marginTop: '12px',
+                                                        minWidth: '200px',
+                                                        background: 'rgba(255, 255, 255, 0.92)',
+                                                        backdropFilter: 'blur(24px)',
+                                                        WebkitBackdropFilter: 'blur(24px)',
+                                                        borderRadius: '16px',
+                                                        border: '1px solid rgba(0, 0, 0, 0.06)',
+                                                        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.1)',
+                                                        padding: '8px',
+                                                        zIndex: 100,
+                                                    }}
+                                                >
+                                                    {/* Small arrow */}
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        top: '-6px',
+                                                        left: '50%',
+                                                        transform: 'translateX(-50%) rotate(45deg)',
+                                                        width: '12px',
+                                                        height: '12px',
+                                                        background: 'rgba(255, 255, 255, 0.92)',
+                                                        border: '1px solid rgba(0, 0, 0, 0.06)',
+                                                        borderBottom: 'none',
+                                                        borderRight: 'none',
+                                                    }} />
+                                                    {journalCategories.map((cat) => (
+                                                        <Link
+                                                            key={cat.name}
+                                                            href={cat.href}
+                                                            style={{
+                                                                display: 'block',
+                                                                padding: '10px 16px',
+                                                                fontSize: '13px',
+                                                                fontWeight: 500,
+                                                                color: 'rgba(0, 0, 0, 0.6)',
+                                                                textDecoration: 'none',
+                                                                fontFamily: 'var(--font-sans)',
+                                                                borderRadius: '10px',
+                                                                transition: 'all 0.2s ease',
+                                                            }}
+                                                            onMouseEnter={(e) => {
+                                                                e.currentTarget.style.background = 'rgba(0, 209, 255, 0.08)'
+                                                                e.currentTarget.style.color = '#00d1ff'
+                                                            }}
+                                                            onMouseLeave={(e) => {
+                                                                e.currentTarget.style.background = 'transparent'
+                                                                e.currentTarget.style.color = 'rgba(0, 0, 0, 0.6)'
+                                                            }}
+                                                        >
+                                                            {cat.name}
+                                                        </Link>
+                                                    ))}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                )
+                            }
+
                             return (
                                 <Link
                                     key={link.name}
@@ -116,31 +239,6 @@ export default function Navbar() {
                                 </Link>
                             )
                         })}
-
-                        <div style={{ width: '1px', height: '20px', background: 'rgba(0,0,0,0.08)', flexShrink: 0 }} />
-
-                        <Link
-                            href="/login"
-                            className="nav-glow-link"
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '7px',
-                                color: 'rgba(0, 0, 0, 0.6)',
-                                fontSize: '13px',
-                                fontWeight: 500,
-                                textDecoration: 'none',
-                                fontFamily: 'var(--font-sans)',
-                                padding: '6px 2px',
-                                transition: 'color 0.3s ease',
-                            }}
-                        >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                <circle cx="12" cy="7" r="4" />
-                            </svg>
-                            Log in
-                        </Link>
                     </div>
 
                     <button
@@ -228,33 +326,33 @@ export default function Navbar() {
                                         >
                                             {link.name}
                                         </Link>
+                                        {/* Mobile sub-categories for Journal */}
+                                        {link.hasDropdown && (
+                                            <div style={{ paddingLeft: '16px', paddingBottom: '8px' }}>
+                                                {journalCategories.map((cat) => (
+                                                    <Link
+                                                        key={cat.name}
+                                                        href={cat.href}
+                                                        onClick={() => setIsMenuOpen(false)}
+                                                        style={{
+                                                            display: 'block',
+                                                            padding: '10px 0',
+                                                            color: 'rgba(0,0,0,0.45)',
+                                                            fontSize: '15px',
+                                                            fontWeight: 500,
+                                                            fontFamily: 'var(--font-sans)',
+                                                            textDecoration: 'none',
+                                                        }}
+                                                    >
+                                                        {cat.name}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
                                     </motion.div>
                                 )
                             })}
                         </div>
-
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} style={{ marginTop: '28px' }}>
-                            <Link
-                                href="/login"
-                                onClick={() => setIsMenuOpen(false)}
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '8px',
-                                    padding: '14px 28px',
-                                    background: '#00d1ff',
-                                    color: '#fff',
-                                    fontSize: '14px',
-                                    fontWeight: 700,
-                                    borderRadius: '50px',
-                                    textDecoration: 'none',
-                                    fontFamily: 'var(--font-sans)',
-                                    boxShadow: '0 4px 12px rgba(0, 209, 255, 0.3)'
-                                }}
-                            >
-                                Log in
-                            </Link>
-                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>

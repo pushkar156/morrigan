@@ -1,10 +1,10 @@
-﻿@tailwind base;
-@tailwind components;
-@tailwind utilities;
+﻿@import "tailwindcss";
 
 :root {
-  --primary: #f8f9fa; /* Off-white background */
-  --secondary: #000309; /* Deep black for text/contrast */
+  --primary: #f8f9fa;
+  /* Off-white background */
+  --secondary: #000309;
+  /* Deep black for text/contrast */
   --accent: #00d1ff;
   --accent-deep: #1152d4;
   --text-main: #000309;
@@ -29,7 +29,12 @@ body {
 }
 
 /* Typography base */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-serif);
   font-weight: 700;
   color: var(--secondary);
@@ -79,13 +84,55 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Animations */
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 .floating {
   animation: float 4s ease-in-out infinite;
+}
+
+/* Infinite Marquee 
+   We translate precisely -33.333% because the track contains exactly 3 identical clones. 
+   -33.333% shifts the track exactly one clone's width to the left.
+*/
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-33.333333%);
+  }
+}
+
+@keyframes marquee-reverse {
+  0% {
+    transform: translateX(-33.333333%);
+  }
+
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse linear infinite;
+  will-change: transform;
 }
 
 canvas {

@@ -25,21 +25,22 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
 
     return (
         <section
-            className={`relative py-24 md:py-36 w-full overflow-hidden transition-colors duration-700 ${isDark
+            data-theme={isDark ? 'dark' : 'light'}
+            className={`relative py-32 md:py-40 w-full overflow-hidden transition-colors duration-700 ${isDark
                 ? 'bg-[#0b1724] text-white'
                 : 'bg-[#f2f4f7] text-black'
                 }`}
         >
             {/* Section Header */}
             <div className="container-custom relative z-10 w-full mb-16">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                     <div className="max-w-2xl">
                         <motion.h2
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                             viewport={{ once: true }}
-                            className={`text-3xl md:text-5xl lg:text-6xl font-serif font-semibold mb-4 tracking-tight leading-[1.1] ${isDark ? 'text-white' : 'text-[#000309]'
+                            className={`text-3xl md:text-4xl lg:text-5xl font-serif font-semibold mb-3 tracking-tight leading-[1.1] ${isDark ? 'text-white' : 'text-[#000309]'
                                 }`}
                         >
                             {title}
@@ -74,41 +75,20 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
             {/* Infinite Marquee Carousel — pure CSS animation */}
             {filteredBlogs.length > 0 ? (
                 <div className="relative w-full overflow-hidden group/carousel">
-                    {/* The track translating infinitely. We translate -50% to cycle one full set perfectly. */}
+                    {/* The track translating infinitely. We translate precisely -33.333%. */}
                     <div
-                        className={`flex w-max ${isReversed ? 'animate-marquee-reverse' : 'animate-marquee'} group-hover/carousel:[animation-play-state:paused]`}
+                        className={`flex w-max ${isReversed ? 'animate-marquee-reverse' : 'animate-marquee'} hover:[animation-play-state:paused]`}
                         style={{ animationDuration: `${baseDuration}s` }}
                     >
-                        {/* SET 1 */}
-                        <div className="flex gap-6 md:gap-10 pr-6 md:pr-10">
-                            {filteredBlogs.map((blog, idx) => (
+                        {/* We duplicate the array 3x. Each item provides its own right-padding to guarantee mathematical perfection for the loop without flex-gap drift. */}
+                        {[...filteredBlogs, ...filteredBlogs, ...filteredBlogs].map((blog, idx) => (
+                            <div key={`blog-wrap-${idx}`} className="shrink-0 pr-6 md:pr-10">
                                 <HorizontalCard
-                                    key={`set1-${blog.id}-${idx}`}
                                     blog={blog}
                                     isDark={isDark}
                                 />
-                            ))}
-                        </div>
-                        {/* SET 2 (Seamless clone) */}
-                        <div className="flex gap-6 md:gap-10 pr-6 md:pr-10">
-                            {filteredBlogs.map((blog, idx) => (
-                                <HorizontalCard
-                                    key={`set2-${blog.id}-${idx}`}
-                                    blog={blog}
-                                    isDark={isDark}
-                                />
-                            ))}
-                        </div>
-                        {/* SET 3 (Safety clone for ultra-wide screens) */}
-                        <div className="flex gap-6 md:gap-10 pr-6 md:pr-10">
-                            {filteredBlogs.map((blog, idx) => (
-                                <HorizontalCard
-                                    key={`set3-${blog.id}-${idx}`}
-                                    blog={blog}
-                                    isDark={isDark}
-                                />
-                            ))}
-                        </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             ) : (

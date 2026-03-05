@@ -62,8 +62,8 @@ export default function Hero() {
                     resolution={0.35}
                     isBounce={false}
                     autoDemo
-                    autoSpeed={0.4}
-                    autoIntensity={2.0}
+                    autoSpeed={1.2}
+                    autoIntensity={20.0}
                     takeoverDuration={0.3}
                     autoResumeDelay={3000}
                     autoRampDuration={0.6}
@@ -79,37 +79,27 @@ export default function Hero() {
                 }}
             />
 
-            {/* Frosted glass text container */}
+            {/* Naked Typography Container */}
             <motion.div
                 style={{ y, opacity, scale }}
-                className="relative z-20 max-w-5xl w-full"
+                className="relative z-20 max-w-7xl w-full mt-16 md:mt-24"
             >
-                <div
-                    style={{
-                        background: 'rgba(248, 249, 250, 0.55)',
-                        backdropFilter: 'blur(24px)',
-                        WebkitBackdropFilter: 'blur(24px)',
-                        borderRadius: '32px',
-                        border: '1px solid rgba(0, 0, 0, 0.06)',
-                        padding: '60px 48px 56px',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.04)',
-                    }}
-                >
+                <div className="flex flex-col items-center justify-center pt-32 lg:pt-40">
                     {/* Staggered Headline */}
                     <h1
                         style={{
                             fontFamily: 'var(--font-serif)',
-                            fontSize: 'clamp(2.2rem, 7vw, 6rem)',
+                            fontSize: 'clamp(2.5rem, 6.5vw, 6.5rem)',
                             lineHeight: 1.05,
                             letterSpacing: '-0.02em',
                             color: '#000309',
                             fontWeight: 700,
-                            marginBottom: '24px',
+                            marginBottom: '32px',
                         }}
                     >
-                        <StaggeredText text="Perspectives on Finance" delay={0.2} />
+                        <StaggeredText text="Perspectives on" delay={0.2} />
                         <br />
-                        <StaggeredText text="& Business" delay={0.7} />
+                        <StaggeredText text="Finance & Business" delay={0.7} />
                     </h1>
 
                     {/* Separator */}
@@ -118,9 +108,9 @@ export default function Hero() {
                         animate={{ width: 100 }}
                         transition={{ duration: 2, delay: 1.2, ease: "circOut" }}
                         style={{
-                            height: '1px',
-                            background: 'linear-gradient(to right, transparent, #00d1ff, transparent)',
-                            margin: '0 auto 32px',
+                            height: '2px',
+                            background: '#000309',
+                            margin: '0 auto 40px',
                             opacity: 0.5,
                         }}
                     />
@@ -128,10 +118,10 @@ export default function Hero() {
                     {/* Body Copy */}
                     <motion.p
                         style={{
-                            fontSize: 'clamp(0.95rem, 1.5vw, 1.25rem)',
-                            color: 'rgba(0, 3, 9, 0.55)',
+                            fontSize: 'clamp(1rem, 1.5vw, 1.35rem)',
+                            color: 'rgba(0, 3, 9, 0.7)',
                             maxWidth: '640px',
-                            margin: '0 auto 40px',
+                            margin: '0 auto 50px',
                             lineHeight: 1.7,
                             fontFamily: 'var(--font-sans)',
                             fontWeight: 500,

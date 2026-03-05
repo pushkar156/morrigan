@@ -71,7 +71,7 @@ export default function CustomCursor() {
 
     return (
         <motion.div
-            className="pointer-events-none fixed left-0 top-0 z-[9999] flex items-center justify-center rounded-full"
+            className="pointer-events-none fixed left-0 top-0 z-[9999] flex items-center justify-center rounded-full mix-blend-difference"
             style={{
                 x,
                 y,
@@ -83,9 +83,9 @@ export default function CustomCursor() {
             animate={{
                 width: isHovering ? 64 : 16,
                 height: isHovering ? 64 : 16,
-                backgroundColor: isHovering ? 'rgba(0, 209, 255, 0.15)' : 'rgba(0, 3, 9, 0.8)',
+                backgroundColor: isHovering ? 'transparent' : '#ffffff',
                 backdropFilter: isHovering ? 'blur(1.5px)' : 'blur(0px)',
-                border: isHovering ? '1px solid rgba(0, 209, 255, 0.4)' : '1px solid transparent',
+                border: isHovering ? '1px solid rgba(255, 255, 255, 0.6)' : '1px solid transparent',
             }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
         >
@@ -95,7 +95,7 @@ export default function CustomCursor() {
                         initial={{ opacity: 0, scale: 0.5 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.5 }}
-                        className="text-[10px] font-bold tracking-widest text-[#00d1ff] uppercase"
+                        className="text-[10px] font-bold tracking-widest text-white uppercase"
                     >
                         {hoverText}
                     </motion.span>

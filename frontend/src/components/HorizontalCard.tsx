@@ -9,7 +9,7 @@ export default function HorizontalCard({ blog, isDark }: { blog: Blog, isDark: b
     return (
         <Link
             href={`/blog/${blog.slug}`}
-            className={`group relative flex flex-col w-[320px] md:w-[360px] h-[520px] md:h-[560px] shrink-0 rounded-2xl overflow-hidden transition-all duration-500 ease-out hover:-translate-y-3 select-none ${isDark
+            className={`group relative flex flex-col w-[320px] md:w-[360px] h-fit shrink-0 rounded-2xl overflow-hidden transition-all duration-500 ease-out hover:-translate-y-3 select-none ${isDark
                 ? 'bg-[#0f1c2e] border border-white/5 hover:border-[#00d1ff]/25 shadow-xl hover:shadow-[0_24px_60px_rgba(0,209,255,0.1)]'
                 : 'bg-white border border-black/5 hover:border-[#1152d4]/20 shadow-xl hover:shadow-[0_24px_60px_rgba(17,82,212,0.1)]'
                 }`}
@@ -39,7 +39,7 @@ export default function HorizontalCard({ blog, isDark }: { blog: Blog, isDark: b
 
             {/* Typography Block with generous interior padding */}
             <div className="flex flex-col flex-1 px-6 pt-5 pb-6">
-                <h3 className={`text-lg md:text-xl font-serif font-semibold leading-[1.35] mb-3 line-clamp-2 transition-colors duration-300 ${isDark ? 'text-white/90 group-hover:text-[#00d1ff]' : 'text-[#000309] group-hover:text-[#1152d4]'
+                <h3 className={`text-lg md:text-xl font-serif font-semibold leading-[1.35] mb-3 line-clamp-2 transition-colors duration-300 ${isDark ? 'text-white group-hover:text-[#00d1ff]' : 'text-[#000309] group-hover:text-[#1152d4]'
                     }`}>
                     {blog.title}
                 </h3>
@@ -49,17 +49,13 @@ export default function HorizontalCard({ blog, isDark }: { blog: Blog, isDark: b
                     {blog.excerpt}
                 </p>
 
-                {/* Metadata Footer Row — author + read time */}
+                {/* Metadata Footer Row — date + read time */}
                 <div className={`flex items-center justify-between mt-6 pt-4 border-t transition-colors ${isDark ? 'border-white/5' : 'border-black/5'
                     }`}>
                     <div className="flex items-center gap-2">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-black ${isDark ? 'bg-white/10 text-white/60' : 'bg-black/5 text-black/50'
+                        <span className={`text-[11px] font-semibold tracking-wide uppercase ${isDark ? 'text-white/40' : 'text-black/40'
                             }`}>
-                            {blog.author.charAt(0).toUpperCase()}
-                        </div>
-                        <span className={`text-[11px] font-semibold tracking-wide ${isDark ? 'text-white/50' : 'text-black/40'
-                            }`}>
-                            {blog.author}
+                            {date}
                         </span>
                     </div>
                     <div className="flex items-center gap-3">

@@ -15,15 +15,40 @@ const journalCategories = [
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
+    const [isHidden, setIsHidden] = useState(false)
+    const [isDarkTheme, setIsDarkTheme] = useState(false)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+    const lastScrollY = useRef(0)
     const pathname = usePathname()
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 40)
+            const currentScrollY = window.scrollY
+            setIsScrolled(currentScrollY > 40)
+
+            // Auto-hide when scrolling down gracefully
+            if (currentScrollY > 150 && currentScrollY > lastScrollY.current) {
+                setIsHidden(true)
+            } else {
+                setIsHidden(false)
+            }
+            lastScrollY.current = currentScrollY
+
+            // Theme detection via center of viewport
+            const elements = document.elementsFromPoint(window.innerWidth / 2, 70)
+            let foundDark = false
+            if (elements) {
+                for (const el of elements) {
+                    if (el.getAttribute('data-theme') === 'dark') {
+                        foundDark = true
+                        break
+                    }
+                }
+            }
+            setIsDarkTheme(foundDark)
         }
-        window.addEventListener('scroll', handleScroll)
+        window.addEventListener('scroll', handleScroll, { passive: true })
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
@@ -56,12 +81,12 @@ export default function Navbar() {
         justifyContent: 'space-between',
         padding: isScrolled ? '0 24px' : '0 32px',
         borderRadius: '100px',
-        background: 'rgba(255, 255, 255, 0.7)',
+        background: isDarkTheme ? 'rgba(11, 23, 36, 0.7)' : 'rgba(255, 255, 255, 0.7)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         border: isScrolled
-            ? '1px solid rgba(0, 209, 255, 0.2)'
-            : '1px solid rgba(0, 0, 0, 0.06)',
+            ? (isDarkTheme ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 209, 255, 0.2)')
+            : (isDarkTheme ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(0, 0, 0, 0.06)'),
         boxShadow: isScrolled
             ? '0 8px 32px rgba(0, 0, 0, 0.08)'
             : '0 4px 20px rgba(0, 0, 0, 0.04)',
@@ -80,7 +105,8 @@ export default function Navbar() {
                     display: 'flex',
                     justifyContent: 'center',
                     padding: isScrolled ? '12px 24px' : '20px 24px',
-                    transition: 'padding 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                    transform: isHidden ? 'translateY(-100%)' : 'translateY(0)',
+                    transition: 'padding 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
                     pointerEvents: 'none',
                 }}
             >
@@ -99,7 +125,7 @@ export default function Navbar() {
                         />
                         <span
                             style={{
-                                color: '#000',
+                                color: isDarkTheme ? '#fff' : '#000',
                                 fontSize: isScrolled ? '15px' : '16px',
                                 fontWeight: 700,
                                 letterSpacing: '0.06em',
@@ -125,10 +151,10 @@ export default function Navbar() {
                                     >
                                         <Link
                                             href={link.href}
-                                            className="nav-glow-link"
+                                            className={`nav-glow-link ${isDarkTheme ? 'dark-theme' : ''}`}
                                             style={{
                                                 position: 'relative',
-                                                color: isActive ? '#00d1ff' : 'rgba(0, 0, 0, 0.6)',
+                                                color: isActive ? '#00d1ff' : (isDarkTheme ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'),
                                                 fontSize: '13px',
                                                 fontWeight: 500,
                                                 textDecoration: 'none',
@@ -221,10 +247,10 @@ export default function Navbar() {
                                 <Link
                                     key={link.name}
                                     href={link.href}
-                                    className="nav-glow-link"
+                                    className={`nav-glow-link ${isDarkTheme ? 'dark-theme' : ''}`}
                                     style={{
                                         position: 'relative',
-                                        color: isActive ? '#00d1ff' : 'rgba(0, 0, 0, 0.6)',
+                                        color: isActive ? '#00d1ff' : (isDarkTheme ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)'),
                                         fontSize: '13px',
                                         fontWeight: 500,
                                         textDecoration: 'none',
@@ -250,7 +276,7 @@ export default function Navbar() {
                             border: 'none',
                             cursor: 'pointer',
                             padding: '8px',
-                            color: '#000',
+                            color: isDarkTheme ? '#fff' : '#000',
                         }}
                     >
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

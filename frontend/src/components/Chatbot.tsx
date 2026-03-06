@@ -4,7 +4,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Lottie from 'lottie-react'
 import chatbotAnimation from '../../public/chatbot.json'
 
+import { usePathname } from 'next/navigation'
+
 export default function Chatbot() {
+    const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
     const [messages, setMessages] = useState([
         { role: 'bot', text: 'Hello. I am the Morrigan AI assistant. How can I help you navigate the insights today?' }
@@ -28,6 +31,8 @@ export default function Chatbot() {
             setMessages(prev => [...prev, { role: 'bot', text: "I am analyzing the repository for that information. (Backend connection pending...)" }])
         }, 1200)
     }
+
+    if (pathname && pathname.startsWith('/admin')) return null
 
     return (
         <div className="fixed bottom-8 right-8 z-[2000]">

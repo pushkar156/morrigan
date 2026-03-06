@@ -46,7 +46,7 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
         >
             <div
                 className="container-custom relative z-10 w-full px-6"
-                style={{ marginBottom: '20px' }} // Adjust this for gap between text and cards
+                style={{ marginBottom: '20px' }} // breathing space between title and gallery
             >
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
                     <div className="max-w-2xl">
@@ -83,7 +83,7 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
 
             {/* The Accordion Container */}
             <div className="container-custom px-6 h-[500px] md:h-[600px]">
-                <div className="flex w-full h-full gap-3 md:gap-4 items-stretch">
+                <div className="flex w-full h-full gap-5 md:gap-8 items-stretch">
                     {filteredBlogs.slice(0, 5).map((blog, idx) => {
                         const isExpanded = expandedIndex === idx
                         const date = new Date(blog.published_at).toLocaleDateString('en-US', {
@@ -108,48 +108,52 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
                                     ease: [0.23, 1, 0.32, 1],
                                 }}
                             >
-                                <Link href={`/blog/${blog.slug}`} className="block w-full h-full relative overflow-hidden rounded-3xl">
+                                <Link href={`/blog/${blog.slug}`} className="block w-full h-full relative overflow-hidden rounded-[2.5rem]">
                                     {/* background image */}
                                     <div className="absolute inset-0">
                                         <img
                                             src={blog.featured_image || '/logo.png'}
                                             alt={blog.title}
-                                            className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700"
+                                            className="w-full h-full object-cover grayscale-[0.2] transition-all duration-1000 ease-out group-hover:grayscale-0 group-hover:scale-[1.35]"
                                         />
-                                        <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500 ${isExpanded ? 'opacity-100' : 'opacity-40 hover:opacity-100'
-                                            }`} />
+                                        <div className={`absolute inset-0 bg-black/20 transition-opacity duration-700 ${isExpanded ? 'opacity-0' : 'opacity-100'}`} />
                                     </div>
 
-                                    {/* Expanded Content */}
-                                    <div className="absolute inset-0 p-8 flex flex-col justify-end overflow-hidden">
+                                    {/* Glass Content Layers - Removed flex-end to ensure pure absolute floating */}
+                                    <div className="absolute inset-0 overflow-hidden">
                                         <AnimatePresence mode="wait">
                                             {isExpanded ? (
                                                 <motion.div
                                                     key="expanded-content"
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    exit={{ opacity: 0, y: 10 }}
-                                                    transition={{ duration: 0.4, delay: 0.2 }}
-                                                    className="w-full"
+                                                    initial={{ opacity: 0, scale: 0.85, y: 60 }}
+                                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                    exit={{ opacity: 0, scale: 0.85, y: 40 }}
+                                                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                                                    className="absolute inset-x-12 bottom-12 bg-white/40 backdrop-blur-3xl border border-[#00d1ff]/30 z-20"
+                                                    style={{
+                                                        padding: '64px',
+                                                        borderRadius: '3rem',
+                                                        boxShadow: '0 50px 120px -30px rgba(0,0,0,0.4), 0 0 40px rgba(0,209,255,0.1)',
+                                                    }}
                                                 >
-                                                    <div className="flex items-center gap-3 mb-4">
-                                                        <span className="text-[10px] font-black tracking-widest text-[#00d1ff] uppercase">
+                                                    <div className="flex items-center gap-6 mb-8">
+                                                        <span className="text-[11px] font-black tracking-[0.15em] text-[#00d1ff]/80 uppercase">
                                                             {date}
                                                         </span>
-                                                        <span className="w-1 h-1 rounded-full bg-white/40" />
-                                                        <span className="text-[10px] font-black tracking-widest text-white/60 uppercase">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-black/10" />
+                                                        <span className="text-[11px] font-bold tracking-tight text-black/50 uppercase">
                                                             {blog.read_time} MIN READ
                                                         </span>
                                                     </div>
-                                                    <h3 className="text-2xl md:text-3xl font-serif font-bold text-white mb-4 leading-tight">
+                                                    <h3 className="text-4xl md:text-5xl font-serif font-black text-black mb-8 leading-[1] tracking-tighter">
                                                         {blog.title}
                                                     </h3>
-                                                    <p className="text-sm text-white/60 font-sans line-clamp-2 max-w-md mb-6">
+                                                    <p className="text-lg text-black/80 font-sans line-clamp-2 max-w-2xl mb-12 leading-relaxed font-medium">
                                                         {blog.excerpt}
                                                     </p>
-                                                    <div className="flex items-center gap-4 text-[10px] font-black tracking-[0.3em] text-[#00d1ff] group-hover:gap-6 transition-all">
-                                                        READ ARTICLE
-                                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                                    <div className="inline-flex items-center gap-5 text-[11px] font-black tracking-[0.4em] text-[#00d1ff]/80 group-hover:gap-8 transition-all cursor-pointer">
+                                                        READ FULL ARTICLE
+                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5">
                                                             <path d="M5 12h14M12 5l7 7-7 7" />
                                                         </svg>
                                                     </div>
@@ -157,14 +161,22 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
                                             ) : (
                                                 <motion.div
                                                     key="collapsed-content"
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 1 }}
-                                                    className="absolute inset-0 flex items-center justify-center p-4"
-                                                    style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+                                                    initial={{ opacity: 0, scale: 0.95 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    className="absolute inset-0 flex items-center justify-center p-10"
                                                 >
-                                                    <h3 className="text-lg font-serif font-bold text-white/80 whitespace-nowrap tracking-wider">
-                                                        {blog.title}
-                                                    </h3>
+                                                    <div
+                                                        className="bg-white/70 backdrop-blur-2xl rounded-full border border-white/50 flex items-center justify-center shadow-2xl"
+                                                        style={{
+                                                            writingMode: 'vertical-rl',
+                                                            transform: 'rotate(180deg)',
+                                                            padding: '12px 6px' // Matched pill proportion
+                                                        }}
+                                                    >
+                                                        <h3 className="text-sm font-serif font-bold text-black/80 whitespace-nowrap tracking-wide capitalize">
+                                                            {blog.title}
+                                                        </h3>
+                                                    </div>
                                                 </motion.div>
                                             )}
                                         </AnimatePresence>

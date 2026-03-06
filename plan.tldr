@@ -128,6 +128,31 @@
 															"type": "highlight"
 														}
 													],
+													"text": "favicon"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "3d object ?"
 												}
 											]
@@ -263,7 +288,67 @@
 											"content": [
 												{
 													"type": "text",
+													"text": "latest 4 cards to be shown in home page"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
 													"text": "magnetic cursor working"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "admin panel"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "editor space"
 												}
 											]
 										}
@@ -444,8 +529,8 @@
 			"typeName": "instance_page_state"
 		},
 		{
-			"x": 1027.7031762852812,
-			"y": 589.9596136445423,
+			"x": 1016.3196291661963,
+			"y": 582.370582231819,
 			"z": 0.7906147271891313,
 			"meta": {},
 			"id": "camera:page:page",

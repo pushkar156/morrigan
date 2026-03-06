@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { Blog } from '@/lib/demo-data'
@@ -13,32 +13,43 @@ interface CategoryAccordionProps {
     index: number
 }
 
-export default function CategoryScroll({ title, subtitle, category, blogs, theme }: CategoryAccordionProps) {
+export default function CategoryScroll({ title, subtitle, category, blogs, theme, index }: CategoryAccordionProps) {
     const filteredBlogs = blogs.filter(b => b.category === category)
     const isDark = theme === "dark"
-    const [expandedIndex, setExpandedIndex] = useState<number | null>(0)
+    const [expandedIndex, setExpandedIndex] = useState<number>(0)
+    const [isPaused, setIsPaused] = useState(false)
+
+    // Autoplay Logic
+    useEffect(() => {
+        if (isPaused) return
+
+        const interval = setInterval(() => {
+            setExpandedIndex((prev) => (prev + 1) % filteredBlogs.length)
+        }, 4000)
+
+        return () => clearInterval(interval)
+    }, [isPaused, filteredBlogs.length])
 
     if (filteredBlogs.length === 0) return null
 
     return (
         <section
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
             data-theme={isDark ? 'dark' : 'light'}
-            className={`relative py-32 md:py-48 w-full transition-colors duration-700 ${isDark
-                ? 'bg-[#000511] text-white'
-                : 'bg-[#f8f9fa] text-black'
-                }`}
+            className={`relative w-full transition-colors duration-700 ${isDark ? 'text-white' : 'text-black'}`}
+            style={{
+                backgroundColor: isDark ? '#000511' : '#f8f9fa',
+                paddingTop: index === 0 ? '80px' : '30px', // Adjust this for top breathing room
+                paddingBottom: '50px' // Adjust this for space between categories
+            }}
         >
-            <div className="container-custom relative z-10 w-full mb-16 px-6">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+            <div
+                className="container-custom relative z-10 w-full px-6"
+                style={{ marginBottom: '20px' }} // Adjust this for gap between text and cards
+            >
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
                     <div className="max-w-2xl">
-                        <motion.span
-                            initial={{ opacity: 0, x: -20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            className={`text-[10px] font-black tracking-[0.4em] uppercase mb-4 block ${isDark ? 'text-[#00d1ff]' : 'text-[#1152d4]'
-                                }`}
-                        >
-                            Editorial Series
-                        </motion.span>
                         <motion.h2
                             initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -59,10 +70,11 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
 
                     <Link
                         href={`/journal?category=${category}`}
-                        className={`group flex items-center gap-4 text-[11px] font-black tracking-[0.3em] px-6 py-3 rounded-full border transition-all ${isDark
-                                ? 'border-white/10 hover:border-[#00d1ff] hover:text-[#00d1ff]'
-                                : 'border-black/10 hover:border-[#1152d4] hover:text-[#1152d4]'
+                        className={`group flex items-center gap-4 text-[11px] font-black tracking-[0.3em] rounded-full border transition-all ${isDark
+                            ? 'border-white/10 hover:border-[#00d1ff] hover:text-[#00d1ff]'
+                            : 'border-black/10 hover:border-[#1152d4] hover:text-[#1152d4]'
                             }`}
+                        style={{ padding: '8px 20px' }} // Adjust this for button size/text clearance
                     >
                         VIEW FULL SERIES
                     </Link>
@@ -82,7 +94,10 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
                         return (
                             <motion.div
                                 key={blog.id}
-                                onMouseEnter={() => setExpandedIndex(idx)}
+                                onMouseEnter={() => {
+                                    setExpandedIndex(idx)
+                                    setIsPaused(true)
+                                }}
                                 className="relative h-full cursor-pointer group"
                                 initial={false}
                                 animate={{

@@ -70,9 +70,9 @@ const team = [
 export default function AboutPage() {
   const heroRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
-  const y       = useTransform(scrollYProgress, [0, 1],        ['0%', '40%'])
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '40%'])
   const opacity = useTransform(scrollYProgress, [0, 0.4, 0.7], [1, 0.5, 0])
-  const scale   = useTransform(scrollYProgress, [0, 1],        [1, 0.95])
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.95])
 
   return (
     <main className="bg-[#f8f9fa] relative overflow-x-hidden">

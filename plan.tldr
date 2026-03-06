@@ -98,6 +98,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "lenis "
 												}
 											]
@@ -118,6 +123,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "3d object ?"
 												}
 											]
@@ -138,6 +148,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "nav bar"
 												}
 											]
@@ -158,6 +173,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "hero section"
 												}
 											]
@@ -178,6 +198,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "footer"
 												}
 											]
@@ -358,11 +383,13 @@
 		{
 			"followingUserId": null,
 			"opacityForNextShape": 1,
-			"stylesForNextShape": {},
+			"stylesForNextShape": {
+				"tldraw:color": "violet"
+			},
 			"brush": null,
 			"scribbles": [],
 			"cursor": {
-				"type": "move",
+				"type": "default",
 				"rotation": 0
 			},
 			"isFocusMode": false,
@@ -402,12 +429,12 @@
 			"typeName": "instance"
 		},
 		{
-			"editingShapeId": null,
+			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
 			"croppingShapeId": null,
 			"selectedShapeIds": [
 				"shape:LnL7WgtCHXucFLuKWC5AW"
 			],
-			"hoveredShapeId": null,
+			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
 			"erasingShapeIds": [],
 			"hintingShapeIds": [],
 			"focusedGroupId": null,
@@ -417,8 +444,8 @@
 			"typeName": "instance_page_state"
 		},
 		{
-			"x": 871.3691214632186,
-			"y": 600.8371944562646,
+			"x": 1027.7031762852812,
+			"y": 589.9596136445423,
 			"z": 0.7906147271891313,
 			"meta": {},
 			"id": "camera:page:page",

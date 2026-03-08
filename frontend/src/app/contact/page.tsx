@@ -380,8 +380,8 @@ export default function ContactPage() {
                                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             >
                                 <div className="ct-form-row">
-                                    <Field label="Your Name" placeholder="John Doe" value={form.name} onChange={v => setForm(f => ({ ...f, name: v }))} required />
-                                    <Field label="Your Email" type="email" placeholder="john@example.com" value={form.email} onChange={v => setForm(f => ({ ...f, email: v }))} required />
+                                    <Field label="Your Name" placeholder="Pushkar" value={form.name} onChange={v => setForm(f => ({ ...f, name: v }))} required />
+                                    <Field label="Your Email" type="email" placeholder="example@gmail.com" value={form.email} onChange={v => setForm(f => ({ ...f, email: v }))} required />
                                 </div>
                                 <Field label="Subject" placeholder="What's this about?" value={form.subject} onChange={v => setForm(f => ({ ...f, subject: v }))} required />
                                 <Field label="Message" placeholder="Tell us more about your inquiry…" value={form.message} onChange={v => setForm(f => ({ ...f, message: v }))} required textarea />
@@ -625,10 +625,10 @@ export default function ContactPage() {
                 .ct-submit-btn {
                     position: relative; overflow: hidden;
                     margin-top: 8px; width: 100%; padding: 17px 28px;
-                    background: #000309; border: none; border-radius: 14px;
+                    background: linear-gradient(to right, #00d1ff, #1152d4); border: none; border-radius: 14px;
                     font-family: var(--font-sans); font-size: 0.9rem; font-weight: 700;
                     letter-spacing: 0.04em; color: #fff; cursor: pointer;
-                    transition: background 0.3s, box-shadow 0.3s;
+                    transition: box-shadow 0.3s;
                 }
                 .ct-submit-btn::after {
                     content: ''; position: absolute; inset: 0;
@@ -642,7 +642,7 @@ export default function ContactPage() {
                 }
                 .ct-btn-progress {
                     position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
-                    background: linear-gradient(to right, #00d1ff, #1152d4);
+                    background: rgba(255, 255, 255, 0.4);
                 }
                 .ct-spinner {
                     animation: ct-spin 0.75s linear infinite;

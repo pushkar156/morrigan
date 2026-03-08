@@ -3,7 +3,8 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { DEMO_BLOGS, Blog } from '@/lib/demo-data'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import { FloatingOrb, ParticleField } from '@/components/HeroVFX'
 
 const CATEGORIES = [
     { id: 'all', label: 'All Posts' },
@@ -62,6 +63,17 @@ function JournalContent() {
     const [searchQuery, setSearchQuery] = useState('')
     const [displayedBlogs, setDisplayedBlogs] = useState<Blog[]>([])
     const searchRef = useRef<HTMLInputElement>(null)
+    const headerRef = useRef<HTMLDivElement>(null)
+    const mx = useMotionValue(0); const my = useMotionValue(0)
+    const px = useSpring(useTransform(mx, [0, 1], [-22, 22]), { stiffness: 55, damping: 18 })
+    const py = useSpring(useTransform(my, [0, 1], [-12, 12]), { stiffness: 55, damping: 18 })
+
+    const handleHeaderMouse = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!headerRef.current) return
+        const r = headerRef.current.getBoundingClientRect()
+        mx.set((e.clientX - r.left) / r.width)
+        my.set((e.clientY - r.top) / r.height)
+    }
 
     useEffect(() => {
         const cat = searchParams.get('category') || 'all'
@@ -95,18 +107,46 @@ function JournalContent() {
     return (
         <main className="journal-page">
             {/* Page Header */}
-            <div className="journal-header">
+            <div ref={headerRef} onMouseMove={handleHeaderMouse} className="journal-header">
+                <ParticleField containerRef={headerRef} />
+
+                <FloatingOrb delay={0} size={320} x="5%" y="10%" color="rgba(0,209,255,0.1)" />
+                <FloatingOrb delay={2} size={200} x="70%" y="5%" color="rgba(17,82,212,0.13)" />
+                <FloatingOrb delay={1} size={160} x="48%" y="52%" color="rgba(0,209,255,0.07)" />
+                <FloatingOrb delay={3.5} size={110} x="88%" y="42%" color="rgba(135,206,235,0.09)" />
+
+                {/* Parallax watermark */}
+                <motion.div style={{ x: px, y: py }} className="journal-watermark">ARCHIVE</motion.div>
+
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                     className="journal-header-inner"
                 >
-                    <span className="journal-eyebrow">EDITORIAL ARCHIVE</span>
-                    <h1 className="journal-title">The Journal</h1>
-                    <p className="journal-subtitle">
+                    <motion.span className="journal-eyebrow"
+                        initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2, duration: 0.6 }}
+                    >
+                        <span className="journal-live-dot" />
+                        EDITORIAL ARCHIVE
+                    </motion.span>
+                    <h1 className="journal-title">
+                        {['The', 'Journal'].map((word, i) => (
+                            <motion.span key={word}
+                                initial={{ opacity: 0, y: 70, filter: 'blur(12px)' }}
+                                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                                transition={{ duration: 1, delay: 0.3 + i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                                style={{ display: 'inline-block', marginRight: '0.3em' }}
+                            >{word}</motion.span>
+                        ))}
+                    </h1>
+                    <motion.p className="journal-subtitle"
+                        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.65, duration: 0.7 }}
+                    >
                         Dispatches from the intersection of capital, strategy, and institutional logic.
-                    </p>
+                    </motion.p>
                 </motion.div>
             </div>
 
@@ -235,7 +275,7 @@ function JournalContent() {
 
                 /* Header */
                 .journal-header {
-                    background: #000309;
+                    background: #254665;
                     padding: 80px 2rem 90px;
                     position: relative;
                     overflow: hidden;
@@ -249,6 +289,12 @@ function JournalContent() {
                                       linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
                     background-size: 48px 48px;
                     pointer-events: none;
+                    animation: journal-grid-move 30s linear infinite;
+                }
+                
+                @keyframes journal-grid-move {
+                    0% { background-position: 0 0; }
+                    100% { background-position: 48px 48px; }
                 }
 
                 .journal-header::after {
@@ -274,12 +320,32 @@ function JournalContent() {
                 }
 
                 .journal-eyebrow {
+                    display: flex; align-items: center; justify-content: center; gap: 10px;
                     font-family: var(--font-sans);
                     font-size: 0.62rem;
                     font-weight: 700;
                     letter-spacing: 0.35em;
                     color: #00d1ff;
                     text-transform: uppercase;
+                }
+
+                .journal-live-dot {
+                    width: 7px; height: 7px; border-radius: 50%; background: #00d1ff;
+                    animation: journal-pulse 2s ease-out infinite;
+                }
+                @keyframes journal-pulse {
+                    0%   { box-shadow: 0 0 0 0 rgba(0,209,255,0.6); }
+                    70%  { box-shadow: 0 0 0 8px rgba(0,209,255,0); }
+                    100% { box-shadow: 0 0 0 0 rgba(0,209,255,0); }
+                }
+
+                .journal-watermark {
+                    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+                    font-family: var(--font-serif); font-size: clamp(60px, 17vw, 200px);
+                    font-weight: 900; color: transparent;
+                    -webkit-text-stroke: 1px rgba(255,255,255,0.04);
+                    white-space: nowrap; pointer-events: none; user-select: none;
+                    letter-spacing: -0.04em; z-index: 0;
                 }
 
                 .journal-title {

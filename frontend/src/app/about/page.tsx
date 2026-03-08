@@ -1,12 +1,8 @@
 "use client"
 
-import { motion, useScroll, useTransform, useInView } from 'framer-motion'
+import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { useRef } from 'react'
-import dynamic from 'next/dynamic'
-import Link from 'next/link'
-import { MagneticButton } from '@/components/CustomCursor'
-
-const LiquidEther = dynamic(() => import('@/components/LiquidEther'), { ssr: false })
+import { FloatingOrb, ParticleField } from '@/components/HeroVFX'
 
 function StaggeredText({ text, delay = 0 }: { text: string; delay?: number }) {
   const words = text.split(' ')
@@ -69,10 +65,16 @@ const team = [
 
 export default function AboutPage() {
   const heroRef = useRef<HTMLElement>(null)
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '40%'])
-  const opacity = useTransform(scrollYProgress, [0, 0.4, 0.7], [1, 0.5, 0])
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.95])
+  const mx = useMotionValue(0); const my = useMotionValue(0)
+  const px = useSpring(useTransform(mx, [0, 1], [-22, 22]), { stiffness: 55, damping: 18 })
+  const py = useSpring(useTransform(my, [0, 1], [-12, 12]), { stiffness: 55, damping: 18 })
+
+  const handleHeaderMouse = (e: React.MouseEvent<HTMLElement>) => {
+    if (!heroRef.current) return
+    const r = heroRef.current.getBoundingClientRect()
+    mx.set((e.clientX - r.left) / r.width)
+    my.set((e.clientY - r.top) / r.height)
+  }
 
   return (
     <main className="bg-[#f8f9fa] relative overflow-x-hidden">
@@ -82,117 +84,82 @@ export default function AboutPage() {
       ════════════════════════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className="relative min-h-[105vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden pt-20"
+        onMouseMove={handleHeaderMouse}
+        className="relative overflow-hidden cursor-default"
+        style={{
+          background: '#254665',
+          padding: '180px 2rem 90px',
+        }}
       >
-        <div className="absolute inset-0 z-0" style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }}>
-          <LiquidEther
-            colors={['#00d1ff', '#1152d4', '#87CEEB']}
-            mouseForce={15}
-            cursorSize={80}
-            isViscous
-            viscous={30}
-            iterationsViscous={16}
-            iterationsPoisson={16}
-            resolution={0.35}
-            isBounce={false}
-            autoDemo
-            autoSpeed={0.4}
-            autoIntensity={2.0}
-            takeoverDuration={0.3}
-            autoResumeDelay={3000}
-            autoRampDuration={0.6}
-            style={{ width: '100%', height: '100%' }}
-          />
-        </div>
+        <ParticleField containerRef={heroRef as any} />
+
+        <FloatingOrb delay={0} size={320} x="5%" y="10%" color="rgba(0,209,255,0.1)" />
+        <FloatingOrb delay={2} size={200} x="70%" y="5%" color="rgba(17,82,212,0.13)" />
+        <FloatingOrb delay={1} size={160} x="48%" y="52%" color="rgba(0,209,255,0.07)" />
+        <FloatingOrb delay={3.5} size={110} x="88%" y="42%" color="rgba(135,206,235,0.09)" />
+
+        <motion.div style={{ x: px, y: py }} className="about-watermark">STORY</motion.div>
 
         <div
-          className="absolute inset-0 z-[1] pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at center, transparent 50%, rgba(248,249,250,0.6) 100%)' }}
+          className="absolute inset-0 pointer-events-none z-[1]"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)',
+            backgroundSize: '48px 48px'
+          }}
+        />
+        <div
+          className="absolute bottom-0 left-0 right-0 h-[1px]"
+          style={{
+            background: 'linear-gradient(to right, transparent, rgba(0,209,255,0.3), transparent)',
+            zIndex: 1
+          }}
         />
 
-        <motion.div style={{ y, opacity, scale }} className="relative z-20 max-w-5xl w-full">
-          <div
-            style={{
-              background: 'rgba(248, 249, 250, 0.55)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              borderRadius: '32px',
-              border: '1px solid rgba(0, 0, 0, 0.06)',
-              padding: '60px 48px 56px',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.04)',
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15 }}
-              className="hero-badge"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                borderRadius: '100px', padding: '6px 16px',
-                fontSize: '11px', fontFamily: 'var(--font-sans)', fontWeight: 700,
-                letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '28px',
-              }}
-            >
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#00d1ff', display: 'inline-block' }} />
-              Our Story
-            </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="relative z-10 max-w-5xl mx-auto flex flex-col items-center text-center gap-4"
+        >
+          <span style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '0.62rem',
+            fontWeight: 700,
+            letterSpacing: '0.35em',
+            color: '#00d1ff',
+            textTransform: 'uppercase'
+          }}>
+            OUR STORY
+          </span>
 
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2.2rem, 7vw, 6rem)', lineHeight: 1.05, letterSpacing: '-0.02em', color: '#000309', fontWeight: 700, marginBottom: '24px' }}>
-              <StaggeredText text="Intelligence deserves" delay={0.2} />
-              <br />
-              <span style={{ color: '#00d1ff' }}>
-                <StaggeredText text="better storytelling." delay={0.7} />
-              </span>
-            </h1>
+          <h1 style={{
+            fontFamily: 'var(--font-serif)',
+            fontSize: 'clamp(3rem, 8vw, 6.5rem)',
+            fontWeight: 700,
+            color: '#fff',
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
+            margin: '0 0 8px 0'
+          }}>
+            <StaggeredText text="Intelligence deserves" delay={0.2} />
+            <br />
+            <span style={{ color: '#00d1ff' }}>
+              <StaggeredText text="better storytelling." delay={0.7} />
+            </span>
+          </h1>
 
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: 100 }}
-              transition={{ duration: 2, delay: 1.2, ease: 'circOut' }}
-              style={{ height: '1px', background: 'linear-gradient(to right, transparent, #00d1ff, transparent)', margin: '0 auto 32px', opacity: 0.5 }}
-            />
-
-            <motion.p
-              style={{ fontSize: 'clamp(0.95rem, 1.5vw, 1.25rem)', color: 'rgba(0, 3, 9, 0.55)', maxWidth: '640px', margin: '0 auto 40px', lineHeight: 1.7, fontFamily: 'var(--font-sans)', fontWeight: 500 }}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, delay: 1.0 }}
-            >
-              Morrigan was built on a single conviction — that finance, strategy, and technology
-              are too important to be left to jargon and gated paywalls. We write for the curious
-              and the serious.
-            </motion.p>
-
-            <motion.div
-              style={{ display: 'flex', gap: '16px', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' as const }}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.4, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <MagneticButton strength={0.4}>
-                <Link
-                  href="/journal"
-                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '14px 36px', background: 'linear-gradient(135deg, #00d1ff, #00b8e6)', color: '#000309', fontWeight: 900, fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase' as const, borderRadius: '100px', textDecoration: 'none', boxShadow: '0 6px 20px rgba(0, 209, 255, 0.35)', transition: 'all 0.3s ease', border: 'none' }}
-                  onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 28px rgba(0, 209, 255, 0.5)' }}
-                  onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 209, 255, 0.35)' }}
-                >
-                  Explore Articles
-                </Link>
-              </MagneticButton>
-
-              <MagneticButton strength={0.4}>
-                <Link
-                  href="/contact"
-                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '14px 36px', background: 'rgba(255, 255, 255, 0.3)', color: '#000309', fontWeight: 900, fontSize: '11px', letterSpacing: '0.15em', textTransform: 'uppercase' as const, borderRadius: '100px', textDecoration: 'none', border: '1px solid rgba(0, 3, 9, 0.15)', transition: 'all 0.3s ease' }}
-                  onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.background = 'rgba(0, 3, 9, 0.05)'; e.currentTarget.style.borderColor = 'rgba(0, 3, 9, 0.3)' }}
-                  onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)'; e.currentTarget.style.borderColor = 'rgba(0, 3, 9, 0.15)' }}
-                >
-                  Contact Us
-                </Link>
-              </MagneticButton>
-            </motion.div>
-          </div>
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '0.95rem',
+            color: 'rgba(255,255,255,0.45)',
+            maxWidth: '480px',
+            lineHeight: 1.65,
+            margin: '0 auto'
+          }}>
+            Morrigan was built on a single conviction — that finance, strategy, and technology
+            are too important to be left to jargon and gated paywalls. We write for the curious
+            and the serious.
+          </p>
         </motion.div>
       </section>
 
@@ -303,6 +270,17 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      <style jsx global>{`
+        .about-watermark {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            font-family: var(--font-serif); font-size: clamp(60px, 17vw, 200px);
+            font-weight: 900; color: transparent;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.04);
+            white-space: nowrap; pointer-events: none; user-select: none;
+            letter-spacing: -0.04em; z-index: 0;
+        }
+      `}</style>
 
     </main>
   )

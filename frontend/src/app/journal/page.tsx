@@ -64,6 +64,8 @@ function JournalContent() {
     const [displayedBlogs, setDisplayedBlogs] = useState<Blog[]>([])
     const searchRef = useRef<HTMLInputElement>(null)
     const headerRef = useRef<HTMLDivElement>(null)
+    const [isNavHidden, setIsNavHidden] = useState(false)
+    const lastScrollY = useRef(0)
     const mx = useMotionValue(0); const my = useMotionValue(0)
     const px = useSpring(useTransform(mx, [0, 1], [-22, 22]), { stiffness: 55, damping: 18 })
     const py = useSpring(useTransform(my, [0, 1], [-12, 12]), { stiffness: 55, damping: 18 })
@@ -79,6 +81,20 @@ function JournalContent() {
         const cat = searchParams.get('category') || 'all'
         setActiveCategory(cat)
     }, [searchParams])
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY
+            if (currentScrollY > 150 && currentScrollY > lastScrollY.current) {
+                setIsNavHidden(true)
+            } else {
+                setIsNavHidden(false)
+            }
+            lastScrollY.current = currentScrollY
+        }
+        window.addEventListener('scroll', handleScroll, { passive: true })
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
 
     useEffect(() => {
         let filtered = DEMO_BLOGS
@@ -151,7 +167,7 @@ function JournalContent() {
             </div>
 
             {/* Search + Filters */}
-            <div className="journal-controls">
+            <div className={`journal-controls ${isNavHidden ? 'is-nav-hidden' : ''}`}>
                 {/* Search */}
                 <motion.div
                     initial={{ opacity: 0, y: 16 }}
@@ -378,6 +394,11 @@ function JournalContent() {
                     display: flex;
                     flex-direction: column;
                     max-width: 100%;
+                    transition: top 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+
+                .journal-controls.is-nav-hidden {
+                    top: 0px;
                 }
 
                 .journal-search-wrap {

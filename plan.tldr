@@ -308,6 +308,66 @@
 											"content": [
 												{
 													"type": "text",
+													"text": "journal page"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "about page"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "contact page"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
 													"text": "magnetic cursor working"
 												}
 											]
@@ -468,9 +528,7 @@
 		{
 			"followingUserId": null,
 			"opacityForNextShape": 1,
-			"stylesForNextShape": {
-				"tldraw:color": "violet"
-			},
+			"stylesForNextShape": {},
 			"brush": null,
 			"scribbles": [],
 			"cursor": {
@@ -529,9 +587,9 @@
 			"typeName": "instance_page_state"
 		},
 		{
-			"x": 1016.3196291661963,
-			"y": 582.370582231819,
-			"z": 0.7906147271891313,
+			"x": 1201.7449302711354,
+			"y": 614.8671985082432,
+			"z": 0.6045877634773831,
 			"meta": {},
 			"id": "camera:page:page",
 			"typeName": "camera"

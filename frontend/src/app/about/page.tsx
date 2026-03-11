@@ -22,26 +22,62 @@ function FadeUp({ children, delay = 0, className = '' }: { children: React.React
   )
 }
 
+const values = [
+  {
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
+    ),
+    title: 'Independence',
+    desc: 'No gatekeepers, no conflicts of interest. We answer only to intellectual honesty and our readers.',
+  },
+  {
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+      </svg>
+    ),
+    title: 'Rigour',
+    desc: 'Every claim is sourced, every model stress-tested. We hold our analysis to institutional standards.',
+  },
+  {
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+      </svg>
+    ),
+    title: 'Accessibility',
+    desc: 'Complexity without confusion. We make institutional-grade research readable for everyone.',
+  },
+  {
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
+    ),
+    title: 'Depth',
+    desc: 'Surface-level takes are everywhere. We go deeper — connecting dots others overlook.',
+  },
+]
+
 const team = [
   {
     name: 'Akshit Tyagi',
     role: 'Co-Founder',
-    initials: '',
-    color: '#1152d4',
+    image: '/images/AKSHIT.jpg',
     bio: 'Visionary leader with expertise in strategy and innovation.',
   },
   {
     name: 'Laksh Ranglani',
     role: 'Co-Founder & Role',
-    initials: '',
-    color: '#00d1ff',
+    image: '/images/LAKSH.jpg',
     bio: 'Experienced analyst focused on market research and insights.',
   },
   {
     name: 'Srikrishna Ved Kodakalla',
     role: 'Co-Founder & Role',
-    initials: '',
-    color: '#1152d4',
+    image: '/images/SHRIKRISHNA.jpg',
     bio: 'strategist driving innovation and digital transformation.',
   },
 ]
@@ -122,6 +158,9 @@ export default function AboutPage() {
             <FadeUp className="ab-mission-label-col" delay={0}>
               <p className="ab-section-eyebrow">Our Mission</p>
               <div className="ab-section-rule" />
+              <div className="ab-mission-img-wrap">
+                <img src="/images/mission.png" alt="Market intelligence" className="ab-mission-img" />
+              </div>
             </FadeUp>
 
             <FadeUp className="ab-mission-content-col" delay={0.15}>
@@ -135,6 +174,30 @@ export default function AboutPage() {
                 methodology, and a genuine belief that ideas shape markets — not the other way around.
               </p>
             </FadeUp>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════════════
+          VALUES
+      ════════════════════════════════════════════════════════════ */}
+      <section className="ab-values">
+        <div className="container-custom">
+          <FadeUp>
+            <p className="ab-section-eyebrow">What Drives Us</p>
+            <h2 className="ab-values-heading">Built on conviction,<br />not convention.</h2>
+          </FadeUp>
+
+          <div className="ab-values-grid">
+            {values.map((v, i) => (
+              <FadeUp key={i} delay={i * 0.08}>
+                <div className="ab-value-card">
+                  <div className="ab-value-icon">{v.icon}</div>
+                  <h3 className="ab-value-title">{v.title}</h3>
+                  <p className="ab-value-desc">{v.desc}</p>
+                </div>
+              </FadeUp>
+            ))}
           </div>
         </div>
       </section>
@@ -155,29 +218,12 @@ export default function AboutPage() {
             {team.map((member, i) => (
               <FadeUp key={i} delay={i * 0.1}>
                 <div className="ab-founder-card">
-                  <div
-                    className="ab-founder-avatar"
-                    style={{ '--member-color': member.color } as React.CSSProperties}
-                    onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => {
-                      const el = e.currentTarget
-                      el.style.transform = 'translateY(-8px)'
-                      el.style.background = member.color
-                      el.style.borderColor = 'transparent'
-                      const span = el.querySelector('span') as HTMLElement
-                      if (span) span.style.color = member.color === '#000309' ? '#f8f9fa' : '#fff'
-                    }}
-                    onMouseLeave={(e: React.MouseEvent<HTMLDivElement>) => {
-                      const el = e.currentTarget
-                      el.style.transform = 'translateY(0)'
-                      el.style.background = 'rgba(0,3,9,0.04)'
-                      el.style.borderColor = 'rgba(0,3,9,0.07)'
-                      const span = el.querySelector('span') as HTMLElement
-                      if (span) span.style.color = member.color
-                    }}
-                  >
-                    <span className="ab-founder-initials" style={{ color: member.color }}>
-                      {member.initials}
-                    </span>
+                  <div className="ab-founder-avatar">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="ab-founder-img"
+                    />
                   </div>
                   <h3 className="ab-founder-name">{member.name}</h3>
                   <p className="ab-founder-role">{member.role}</p>
@@ -300,11 +346,11 @@ export default function AboutPage() {
 
         /* ══ Mission ══ */
         .ab-mission {
-            padding: 128px 0;
+            padding: 96px 0;
             background: #f8f9fa;
         }
         @media (max-width: 768px) {
-            .ab-mission { padding: 80px 0; }
+            .ab-mission { padding: 64px 0; }
         }
 
         .ab-mission-grid {
@@ -330,6 +376,24 @@ export default function AboutPage() {
         .ab-section-rule {
             width: 48px; height: 1px;
             background: rgba(0,3,9,0.15);
+        }
+
+        .ab-mission-img-wrap {
+            margin-top: 28px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(0,3,9,0.07);
+            background: rgba(0,3,9,0.03);
+        }
+
+        .ab-mission-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.16,1,0.3,1);
+        }
+        .ab-mission-img-wrap:hover .ab-mission-img {
+            transform: scale(1.03);
         }
 
         .ab-mission-quote {
@@ -358,13 +422,91 @@ export default function AboutPage() {
             color: rgba(0,3,9,0.55);
         }
 
+        /* ══ Values ══ */
+        .ab-values {
+            padding: 96px 0;
+            background: #f8f9fa;
+            border-top: 1px solid rgba(0,3,9,0.06);
+        }
+        @media (max-width: 768px) {
+            .ab-values { padding: 64px 0; }
+        }
+
+        .ab-values-heading {
+            font-family: var(--font-serif);
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 900;
+            letter-spacing: -0.025em;
+            color: #000309;
+            margin-bottom: 48px;
+            line-height: 1.15;
+        }
+
+        .ab-values-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        @media (max-width: 1024px) {
+            .ab-values-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .ab-values-grid { grid-template-columns: 1fr; }
+        }
+
+        .ab-value-card {
+            padding: 32px 28px;
+            background: #fff;
+            border: 1px solid rgba(0,3,9,0.06);
+            border-radius: 18px;
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease, border-color 0.3s;
+        }
+        .ab-value-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.08);
+            border-color: rgba(0,209,255,0.2);
+        }
+
+        .ab-value-icon {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            background: rgba(0,209,255,0.06);
+            border: 1px solid rgba(0,209,255,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00d1ff;
+            margin-bottom: 20px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .ab-value-card:hover .ab-value-icon {
+            background: rgba(0,209,255,0.1);
+            border-color: rgba(0,209,255,0.25);
+        }
+
+        .ab-value-title {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #000309;
+            margin-bottom: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .ab-value-desc {
+            font-family: var(--font-sans);
+            font-size: 0.82rem;
+            line-height: 1.65;
+            color: rgba(0,3,9,0.5);
+        }
+
         /* ══ Founders ══ */
         .ab-founders {
-            padding: 128px 0;
+            padding: 96px 0;
             background: rgba(0,0,0,0.015);
         }
         @media (max-width: 768px) {
-            .ab-founders { padding: 80px 0; }
+            .ab-founders { padding: 64px 0; }
         }
 
         .ab-founders-heading {
@@ -373,7 +515,7 @@ export default function AboutPage() {
             font-weight: 900;
             letter-spacing: -0.025em;
             color: #000309;
-            margin-bottom: 64px;
+            margin-bottom: 48px;
             line-height: 1.1;
         }
 
@@ -397,20 +539,23 @@ export default function AboutPage() {
             aspect-ratio: 1;
             border-radius: 20px;
             margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            overflow: hidden;
             background: rgba(0,3,9,0.04);
             border: 1px solid rgba(0,3,9,0.07);
-            transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), background 0.4s ease, border-color 0.4s ease;
+            transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), border-color 0.4s ease;
+        }
+        .ab-founder-avatar:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0,209,255,0.3);
         }
 
-        .ab-founder-initials {
-            font-family: var(--font-serif);
-            font-size: clamp(2rem, 6vw, 3rem);
-            font-weight: 900;
-            letter-spacing: -0.04em;
-            transition: color 0.4s ease;
+        .ab-founder-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+        }
+        .ab-founder-avatar:hover .ab-founder-img {
+            transform: scale(1.05);
         }
 
         .ab-founder-name {

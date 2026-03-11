@@ -1,9 +1,14 @@
 "use client"
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { MagneticButton } from './CustomCursor'
 
 export default function Footer() {
+    const pathname = usePathname()
     const currentYear = new Date().getFullYear()
+
+    // Hide footer on admin routes
+    if (pathname && pathname.startsWith('/admin')) return null
 
     const scrollToTop = () => {
         window.scrollTo({

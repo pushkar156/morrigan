@@ -40,7 +40,7 @@ export default function AdminLogin() {
             {/* Back to home */}
             <Link href="/" className="adm-login-home-link">
                 <img src="/logo.png" alt="Morrigan" className="adm-login-home-logo" />
-                <span className="adm-login-home-text">THE MORRIGAN</span>
+                <span className="adm-login-home-text">The Morrigan</span>
             </Link>
 
             <motion.div
@@ -209,9 +209,9 @@ export default function AdminLogin() {
                 }
                 .adm-login-home-text {
                     font-family: var(--font-serif);
-                    font-weight: 900;
+                    font-weight: 700;
                     color: rgba(255,255,255,0.7);
-                    letter-spacing: 0.18em;
+                    letter-spacing: 0.06em;
                     font-size: 0.85rem;
                     transition: color 0.2s;
                 }

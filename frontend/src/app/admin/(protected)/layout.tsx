@@ -38,7 +38,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <div className="adm-sidebar-header">
                     <Link href="/" className="adm-sidebar-logo-link">
                         <img src="/logo.png" alt="Morrigan" className="adm-sidebar-logo-img" />
-                        {isSidebarOpen && <span className="adm-sidebar-logo-text">MORRIGAN</span>}
+                        {isSidebarOpen && <span className="adm-sidebar-logo-text">The Morrigan</span>}
                     </Link>
                     {isSidebarOpen && (
                         <button onClick={() => setIsSidebarOpen(false)} className="adm-sidebar-toggle">
@@ -150,10 +150,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                 .adm-sidebar-logo-text {
                     font-family: var(--font-serif);
-                    font-weight: 900;
+                    font-weight: 700;
                     color: rgba(255,255,255,0.8);
-                    letter-spacing: 0.2em;
-                    font-size: 0.75rem;
+                    letter-spacing: 0.06em;
+                    font-size: 0.85rem;
                 }
 
                 .adm-sidebar-toggle {

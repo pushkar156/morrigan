@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -7,6 +7,10 @@ import { useRouter } from 'next/navigation'
 export default function AdminEditor() {
     const router = useRouter()
     const [isSaving, setIsSaving] = useState(false)
+    const [imageMode, setImageMode] = useState<'upload' | 'url'>('upload')
+    const [imageFile, setImageFile] = useState<File | null>(null)
+    const [isDragging, setIsDragging] = useState(false)
+    const fileInputRef = useRef<HTMLInputElement>(null)
     const [formData, setFormData] = useState({
         title: '',
         excerpt: '',
@@ -16,6 +20,26 @@ export default function AdminEditor() {
         content: '',
         status: 'draft'
     })
+
+    const handleFileSelect = useCallback((file: File) => {
+        if (!file.type.startsWith('image/')) return
+        setImageFile(file)
+        const url = URL.createObjectURL(file)
+        setFormData(prev => ({ ...prev, featured_image: url }))
+    }, [])
+
+    const handleDrop = useCallback((e: React.DragEvent) => {
+        e.preventDefault()
+        setIsDragging(false)
+        const file = e.dataTransfer.files[0]
+        if (file) handleFileSelect(file)
+    }, [handleFileSelect])
+
+    const handleRemoveImage = () => {
+        setImageFile(null)
+        setFormData(prev => ({ ...prev, featured_image: '' }))
+        if (fileInputRef.current) fileInputRef.current.value = ''
+    }
 
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault()
@@ -163,19 +187,93 @@ export default function AdminEditor() {
                             />
                         </div>
 
-                        {/* Featured Image */}
+                        {/* Cover Image */}
                         <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Featured Graphic (URL)</label>
-                            <input
-                                type="text"
-                                placeholder="/images/cover.jpg"
-                                className="adm-editor-text-input mono"
-                                value={formData.featured_image}
-                                onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
-                            />
+                            <label className="adm-editor-label">Cover Image</label>
+
+                            {/* Mode Toggle */}
+                            <div className="adm-editor-img-mode-toggle">
+                                <button
+                                    onClick={() => setImageMode('upload')}
+                                    className={`adm-editor-img-mode-btn ${imageMode === 'upload' ? 'active' : ''}`}
+                                >
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                                    Upload File
+                                </button>
+                                <button
+                                    onClick={() => setImageMode('url')}
+                                    className={`adm-editor-img-mode-btn ${imageMode === 'url' ? 'active' : ''}`}
+                                >
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+                                    Image URL
+                                </button>
+                            </div>
+
+                            {/* Upload Mode */}
+                            {imageMode === 'upload' && (
+                                <>
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
+                                        className="adm-editor-file-hidden"
+                                    />
+                                    {!imageFile ? (
+                                        <div
+                                            className={`adm-editor-dropzone ${isDragging ? 'dragging' : ''}`}
+                                            onClick={() => fileInputRef.current?.click()}
+                                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
+                                            onDragLeave={() => setIsDragging(false)}
+                                            onDrop={handleDrop}
+                                        >
+                                            <div className="adm-editor-dropzone-icon">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                                    <polyline points="21 15 16 10 5 21" />
+                                                </svg>
+                                            </div>
+                                            <p className="adm-editor-dropzone-text">Drop an image here or <span>browse files</span></p>
+                                            <p className="adm-editor-dropzone-hint">PNG, JPG, WebP up to 5MB</p>
+                                        </div>
+                                    ) : (
+                                        <div className="adm-editor-file-info">
+                                            <div className="adm-editor-file-info-left">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                                    <circle cx="8.5" cy="8.5" r="1.5" />
+                                                    <polyline points="21 15 16 10 5 21" />
+                                                </svg>
+                                                <div>
+                                                    <span className="adm-editor-file-name">{imageFile.name}</span>
+                                                    <span className="adm-editor-file-size">{(imageFile.size / 1024).toFixed(1)} KB</span>
+                                                </div>
+                                            </div>
+                                            <button onClick={handleRemoveImage} className="adm-editor-file-remove" aria-label="Remove image">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                                            </button>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                            {/* URL Mode */}
+                            {imageMode === 'url' && (
+                                <input
+                                    type="text"
+                                    placeholder="https://example.com/cover.jpg"
+                                    className="adm-editor-text-input mono"
+                                    value={formData.featured_image}
+                                    onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
+                                />
+                            )}
+
+                            {/* Preview */}
                             {formData.featured_image && (
                                 <div className="adm-editor-image-preview">
-                                    <img src={formData.featured_image} alt="Preview" />
+                                    <img src={formData.featured_image} alt="Cover preview" />
+                                    <div className="adm-editor-image-preview-label">Cover Preview</div>
                                 </div>
                             )}
                         </div>
@@ -464,15 +562,181 @@ export default function AdminEditor() {
                 .adm-editor-image-preview {
                     margin-top: 12px;
                     width: 100%;
-                    height: 120px;
-                    border-radius: 12px;
+                    height: 160px;
+                    border-radius: 14px;
                     overflow: hidden;
                     background: rgba(255,255,255,0.03);
                     border: 1px solid rgba(255,255,255,0.06);
+                    position: relative;
                 }
                 .adm-editor-image-preview img {
                     width: 100%; height: 100%;
                     object-fit: cover;
+                }
+                .adm-editor-image-preview-label {
+                    position: absolute;
+                    bottom: 8px; left: 8px;
+                    padding: 4px 10px;
+                    background: rgba(0,0,0,0.5);
+                    backdrop-filter: blur(8px);
+                    border-radius: 8px;
+                    font-size: 0.55rem;
+                    font-weight: 700;
+                    letter-spacing: 0.15em;
+                    text-transform: uppercase;
+                    color: rgba(255,255,255,0.7);
+                }
+
+                /* ══ Image Upload ══ */
+                .adm-editor-img-mode-toggle {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 6px;
+                    margin-bottom: 12px;
+                }
+
+                .adm-editor-img-mode-btn {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    padding: 10px;
+                    border-radius: 10px;
+                    border: 1px solid rgba(255,255,255,0.06);
+                    background: rgba(255,255,255,0.02);
+                    color: rgba(255,255,255,0.3);
+                    font-family: var(--font-sans);
+                    font-size: 0.62rem;
+                    font-weight: 700;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    cursor: pointer;
+                    transition: all 0.25s ease;
+                }
+                .adm-editor-img-mode-btn:hover {
+                    color: rgba(255,255,255,0.5);
+                    background: rgba(255,255,255,0.04);
+                }
+                .adm-editor-img-mode-btn.active {
+                    color: #00d1ff;
+                    background: rgba(0,209,255,0.08);
+                    border-color: rgba(0,209,255,0.2);
+                }
+
+                .adm-editor-file-hidden {
+                    display: none;
+                }
+
+                .adm-editor-dropzone {
+                    padding: 32px 20px;
+                    border: 2px dashed rgba(255,255,255,0.1);
+                    border-radius: 14px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    background: transparent;
+                }
+                .adm-editor-dropzone:hover,
+                .adm-editor-dropzone.dragging {
+                    border-color: rgba(0,209,255,0.35);
+                    background: rgba(0,209,255,0.04);
+                }
+
+                .adm-editor-dropzone-icon {
+                    width: 48px; height: 48px;
+                    border-radius: 14px;
+                    background: rgba(255,255,255,0.04);
+                    border: 1px solid rgba(255,255,255,0.06);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: rgba(255,255,255,0.2);
+                    transition: all 0.3s;
+                }
+                .adm-editor-dropzone:hover .adm-editor-dropzone-icon {
+                    color: rgba(0,209,255,0.5);
+                    background: rgba(0,209,255,0.06);
+                    border-color: rgba(0,209,255,0.15);
+                }
+
+                .adm-editor-dropzone-text {
+                    font-size: 0.78rem;
+                    font-weight: 600;
+                    color: rgba(255,255,255,0.35);
+                    margin: 0;
+                }
+                .adm-editor-dropzone-text span {
+                    color: #00d1ff;
+                    text-decoration: underline;
+                    text-underline-offset: 2px;
+                }
+
+                .adm-editor-dropzone-hint {
+                    font-size: 0.62rem;
+                    font-weight: 600;
+                    color: rgba(255,255,255,0.15);
+                    letter-spacing: 0.06em;
+                    margin: 0;
+                }
+
+                .adm-editor-file-info {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    padding: 14px 16px;
+                    background: rgba(0,209,255,0.04);
+                    border: 1px solid rgba(0,209,255,0.12);
+                    border-radius: 12px;
+                }
+
+                .adm-editor-file-info-left {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    color: rgba(0,209,255,0.6);
+                }
+                .adm-editor-file-info-left div {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                }
+
+                .adm-editor-file-name {
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    color: rgba(255,255,255,0.7);
+                    max-width: 180px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .adm-editor-file-size {
+                    font-size: 0.6rem;
+                    font-weight: 600;
+                    color: rgba(255,255,255,0.25);
+                    letter-spacing: 0.05em;
+                }
+
+                .adm-editor-file-remove {
+                    width: 28px; height: 28px;
+                    border-radius: 8px;
+                    border: 1px solid rgba(255,100,100,0.15);
+                    background: rgba(255,100,100,0.06);
+                    color: rgba(255,100,100,0.6);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+                .adm-editor-file-remove:hover {
+                    color: #ff6b6b;
+                    background: rgba(255,100,100,0.12);
+                    border-color: rgba(255,100,100,0.3);
                 }
 
                 .adm-editor-divider {

@@ -358,13 +358,17 @@ export default function AboutPage() {
 
         .ab-mission-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 2fr 3fr;
             gap: 48px;
             align-items: center;
             margin-top: 40px;
         }
         @media (max-width: 1024px) {
             .ab-mission-grid { grid-template-columns: 1fr; gap: 32px; }
+        }
+
+        .ab-mission-img-col {
+            max-width: 380px;
         }
 
         .ab-section-eyebrow {

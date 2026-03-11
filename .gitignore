@@ -9,3 +9,6 @@ node_modules/
 # Private Folders
 Backend/
 Chatbot/
+
+frontend_review.md
+implementation_plan.md

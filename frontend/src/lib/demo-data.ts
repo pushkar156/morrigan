@@ -12,208 +12,253 @@
 }
 
 export const DEMO_BLOGS: Blog[] = [
+    // BACK TO BASICS
     {
         id: 1,
         title: "Understanding Financial Statements",
-        slug: "understanding-financial-statements",
+        slug: "financial-statements-deep-dive",
         category: "back-to-basics",
         excerpt: "A comprehensive guide to reading and interpreting balance sheets, income statements, and cash flow statements.",
-        featured_image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=600&fit=crop",
+        featured_image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80",
         author: "Pushkar",
         published_at: "2024-02-10",
         read_time: 5,
-        content: "<h2>Introduction to Financial Statements</h2><p>Financial statements are the backbone of financial analysis...</p>"
+        content: "..."
     },
     {
         id: 2,
-        title: "Understanding Financial Statements",
-        slug: "understanding-financial-statements",
+        title: "What is Market Capitalization?",
+        slug: "market-cap-explained",
         category: "back-to-basics",
-        excerpt: "A comprehensive guide to reading and interpreting balance sheets, income statements, and cash flow statements.",
-        featured_image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=600&fit=crop",
+        excerpt: "Learn the fundamentals of market cap and why it matters for every modern investor.",
+        featured_image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80",
         author: "Pushkar",
-        published_at: "2024-02-10",
-        read_time: 5,
-        content: "<h2>Introduction to Financial Statements</h2><p>Financial statements are the backbone of financial analysis...</p>"
+        published_at: "2024-02-08",
+        read_time: 4,
+        content: "..."
     },
     {
         id: 3,
-        title: "What is Market Capitalization?",
-        slug: "what-is-market-capitalization",
+        title: "IPO Basics: The Investor's Entry Point",
+        slug: "ipo-investing-basics",
         category: "back-to-basics",
-        excerpt: "Learn the fundamentals of market cap and why it matters for investors.",
-        featured_image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=600&fit=crop",
+        excerpt: "Everything you need to know about Initial Public Offerings before putting your capital at risk.",
+        featured_image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&q=80",
         author: "Pushkar",
-        published_at: "2024-02-08",
-        read_time: 4,
-        content: "<h2>Market Capitalization Explained</h2><p>Market capitalization is a key metric...</p>"
+        published_at: "2024-02-05",
+        read_time: 6,
+        content: "..."
     },
     {
         id: 4,
-        title: "IPO Basics: What Every Investor Should Know",
-        slug: "ipo-basics",
+        title: "Debt vs Equity: Choosing the Source",
+        slug: "debt-vs-equity-finance",
         category: "back-to-basics",
-        excerpt: "Everything you need to know about Initial Public Offerings before investing.",
-        featured_image: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&h=600&fit=crop",
+        excerpt: "A breakdown of the two primary ways companies raise capital and what it means for growth.",
+        featured_image: "https://images.unsplash.com/photo-1454165833767-027ffea7025c?w=800&q=80",
         author: "Pushkar",
-        published_at: "2024-02-05",
-        read_time: 6,
-        content: "<h2>IPO Fundamentals</h2><p>An Initial Public Offering is when a company...</p>"
+        published_at: "2024-02-01",
+        read_time: 5,
+        content: "..."
     },
+
+    // CASE STUDIES
     {
         id: 5,
         title: "Tata Motors' Turnaround Strategy",
-        slug: "tata-motors-turnaround",
+        slug: "tata-motors-success",
         category: "case-studies",
-        excerpt: "Deep dive into how Tata Motors transformed from losses to profitability through strategic decisions.",
-        featured_image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&h=600&fit=crop",
+        excerpt: "How Tata Motors transformed from heavy losses to consistent profitability through strategic shifts.",
+        featured_image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80",
         author: "Pushkar",
         published_at: "2024-02-12",
         read_time: 8,
-        content: "<h2>The Tata Motors Story</h2><p>In 2019, Tata Motors faced significant challenges...</p>"
+        content: "..."
     },
     {
         id: 6,
-        title: "Reliance Jio: Disrupting Indian Telecom",
-        slug: "reliance-jio-disruption",
+        title: "Reliance Jio: The Digital Disruption",
+        slug: "reliance-jio-impact",
         category: "case-studies",
-        excerpt: "How Reliance Jio changed the Indian telecom landscape with aggressive pricing and digital strategy.",
-        featured_image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=800&h=600&fit=crop",
+        excerpt: "How Jio completely redefined the Indian telecom landscape with a data-first digital strategy.",
+        featured_image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=800&q=80",
         author: "Pushkar",
         published_at: "2024-02-09",
         read_time: 10,
-        content: "<h2>Jio's Market Entry</h2><p>When Reliance Jio launched in 2016...</p>"
+        content: "..."
     },
     {
         id: 7,
-        title: "Zomato's IPO Journey",
-        slug: "zomato-ipo-journey",
+        title: "Zomato's Journey to the Public Market",
+        slug: "zomato-ipo-case-study",
         category: "case-studies",
-        excerpt: "Analyzing Zomato's path to becoming India's first unicorn food-tech IPO.",
-        featured_image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=600&fit=crop",
+        excerpt: "Analyzing the path of India's first food-tech unicorn to a blockbuster stock market debut.",
+        featured_image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80",
         author: "Pushkar",
         published_at: "2024-02-06",
         read_time: 7,
-        content: "<h2>Zomato Goes Public</h2><p>Zomato's IPO in July 2021 marked a milestone...</p>"
+        content: "..."
     },
     {
         id: 8,
-        title: "HDFC Bank: A Banking Giant Analysis",
-        slug: "hdfc-bank-analysis",
+        title: "Nykaa: Building a Beauty Empire",
+        slug: "nykaa-business-model",
+        category: "case-studies",
+        excerpt: "The strategic masterclass of Falguni Nayar in building a profitable niche e-commerce leader.",
+        featured_image: "https://images.unsplash.com/photo-1596462502278-27bf87f65746?w=800&q=80",
+        author: "Pushkar",
+        published_at: "2024-01-28",
+        read_time: 9,
+        content: "..."
+    },
+
+    // STOCK ANALYSIS
+    {
+        id: 9,
+        title: "HDFC Bank: A Financial Fortress?",
+        slug: "hdfc-bank-stock-analysis",
         category: "stock-analysis",
-        excerpt: "Comprehensive analysis of HDFC Bank's financials, growth prospects, and market position.",
-        featured_image: "https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=800&h=600&fit=crop",
+        excerpt: "Comprehensive analysis of HDFC Bank's financials, growth prospects, and post-merger position.",
+        featured_image: "https://images.unsplash.com/photo-1541354329998-f4d9a9f9297f?w=800&q=80",
         author: "Pushkar",
         published_at: "2024-02-11",
         read_time: 9,
-        content: "<h2>HDFC Bank Overview</h2><p>HDFC Bank is India's largest private sector bank...</p>"
-    },
-    {
-        id: 9,
-        title: "Infosys Q4 Results Breakdown",
-        slug: "infosys-q4-results",
-        category: "stock-analysis",
-        excerpt: "Detailed breakdown of Infosys quarterly results and future guidance.",
-        featured_image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop",
-        author: "Pushkar",
-        published_at: "2024-02-07",
-        read_time: 6,
-        content: "<h2>Q4 Performance</h2><p>Infosys reported strong Q4 results...</p>"
+        content: "..."
     },
     {
         id: 10,
-        title: "Asian Paints: Valuation Check",
-        slug: "asian-paints-valuation",
+        title: "Infosys: Navigating the Tech Slowdown",
+        slug: "infosys-q4-results-analysis",
         category: "stock-analysis",
-        excerpt: "Is Asian Paints overvalued? A deep dive into the paint giant's metrics.",
-        featured_image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800&h=600&fit=crop",
+        excerpt: "Detailed breakdown of Infosys' quarterly performance and what the future holds for IT stocks.",
+        featured_image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
         author: "Pushkar",
-        published_at: "2024-02-04",
-        read_time: 7,
-        content: "<h2>Valuation Analysis</h2><p>Asian Paints has been a market favorite...</p>"
+        published_at: "2024-02-07",
+        read_time: 6,
+        content: "..."
     },
     {
         id: 11,
-        title: "Day 1: Setting Investment Goals",
-        slug: "day-1-investment-goals",
-        category: "100-days-challenge",
-        excerpt: "Starting the 100-day journey to financial literacy. Today: defining clear investment objectives.",
-        featured_image: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=600&fit=crop",
+        title: "Asian Paints: The Premium Valuation",
+        slug: "asian-paints-metrics",
+        category: "stock-analysis",
+        excerpt: "Is the market favorite finally starting to look overvalued? A deep dive into paint sector metrics.",
+        featured_image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=800&q=80",
         author: "Pushkar",
-        published_at: "2024-02-13",
-        read_time: 4,
-        content: "<h2>Day 1 Challenge</h2><p>Welcome to the 100 Days Challenge...</p>"
+        published_at: "2024-02-04",
+        read_time: 7,
+        content: "..."
     },
     {
         id: 12,
-        title: "Day 15: Understanding Risk Tolerance",
-        slug: "day-15-risk-tolerance",
-        category: "100-days-challenge",
-        excerpt: "Assessing your risk appetite and how it shapes your investment strategy.",
-        featured_image: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&h=600&fit=crop",
+        title: "ITC: Beyond the Cigarette Business",
+        slug: "itc-conglomerate-valuation",
+        category: "stock-analysis",
+        excerpt: "Analyzing the FMCG and Hotel business of ITC and its impact on long-term shareholder value.",
+        featured_image: "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=800&q=80",
         author: "Pushkar",
-        published_at: "2024-02-10",
-        read_time: 5,
-        content: "<h2>Risk Assessment</h2><p>Understanding risk is crucial...</p>"
+        published_at: "2024-01-30",
+        read_time: 8,
+        content: "..."
     },
+
+    // 100 DAYS CHALLENGE
     {
         id: 13,
-        title: "Day 30: Portfolio Diversification",
-        slug: "day-30-portfolio-diversification",
+        title: "Day 1: Defining Your Financial North Star",
+        slug: "investing-day-1",
         category: "100-days-challenge",
-        excerpt: "Why putting all eggs in one basket is risky. Learn diversification strategies.",
-        featured_image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop",
+        excerpt: "Starting the journey to mastery. Today: how to define investment goals that actually matter.",
+        featured_image: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&q=80",
         author: "Pushkar",
-        published_at: "2024-02-08",
-        read_time: 6,
-        content: "<h2>Diversification Matters</h2><p>Don't put all your eggs in one basket...</p>"
+        published_at: "2024-02-13",
+        read_time: 4,
+        content: "..."
     },
     {
         id: 14,
-        title: "Walmart-Flipkart Deal: $16B Acquisition",
-        slug: "walmart-flipkart-deal",
-        category: "ma-diaries",
-        excerpt: "Breaking down Walmart's mega acquisition of Flipkart and its impact on Indian e-commerce.",
-        featured_image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
+        title: "Day 15: The Psychology of Risk Appetite",
+        slug: "investing-day-15",
+        category: "100-days-challenge",
+        excerpt: "Assessing how your personal psychology shapes your portfolio's performance during market volatility.",
+        featured_image: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80",
         author: "Pushkar",
-        published_at: "2024-02-12",
-        read_time: 8,
-        content: "<h2>The Deal</h2><p>In 2018, Walmart acquired 77% stake in Flipkart...</p>"
+        published_at: "2024-02-10",
+        read_time: 5,
+        content: "..."
     },
     {
         id: 15,
-        title: "Tata-Air India Merger Analysis",
-        slug: "tata-air-india-merger",
-        category: "ma-diaries",
-        excerpt: "Tata Group's acquisition of Air India: Strategic rationale and challenges ahead.",
-        featured_image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&h=600&fit=crop",
+        title: "Day 30: Advanced Portfolio Construction",
+        slug: "investing-day-30",
+        category: "100-days-challenge",
+        excerpt: "Moving beyond simple diversification to building a resilient, all-weather investment portfolio.",
+        featured_image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
         author: "Pushkar",
-        published_at: "2024-02-09",
-        read_time: 9,
-        content: "<h2>Air India Returns Home</h2><p>After 69 years, Air India returns to Tata...</p>"
+        published_at: "2024-02-08",
+        read_time: 6,
+        content: "..."
     },
     {
         id: 16,
-        title: "HDFC-HDFC Bank Merger: Creating a Giant",
-        slug: "hdfc-merger",
-        category: "ma-diaries",
-        excerpt: "The largest merger in Indian corporate history. What it means for stakeholders.",
-        featured_image: "https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=800&h=600&fit=crop",
+        title: "Day 45: Mastering Tax-Efficient Investing",
+        slug: "investing-day-45",
+        category: "100-days-challenge",
+        excerpt: "It's not about how much you make, but how much you keep. A guide to legal tax optimization.",
+        featured_image: "https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=800&q=80",
         author: "Pushkar",
-        published_at: "2024-02-05",
-        read_time: 10,
-        content: "<h2>Historic Merger</h2><p>HDFC Ltd and HDFC Bank announced their merger...</p>"
+        published_at: "2024-01-25",
+        read_time: 7,
+        content: "..."
     },
+
+    // M&A DIARIES
     {
         id: 17,
-        title: "blah",
-        slug: "hdfc-merger",
+        title: "The Walmart-Flipkart $16B Masterstroke",
+        slug: "walmart-flipkart-acquisition",
         category: "ma-diaries",
-        excerpt: "The largest merger in Indian corporate history. What it means for stakeholders.",
-        featured_image: "https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=800&h=600&fit=crop",
+        excerpt: "Breaking down the mechanics of Walmart's mega-bet on the Indian e-commerce consumer.",
+        featured_image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
+        author: "Pushkar",
+        published_at: "2024-02-12",
+        read_time: 8,
+        content: "..."
+    },
+    {
+        id: 18,
+        title: "Air India's Homecoming: The Tata Merger",
+        slug: "air-india-tata-acquisition",
+        category: "ma-diaries",
+        excerpt: "Analyzing the strategic rationale and the massive challenges in integrating a legacy airline giant.",
+        featured_image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80",
+        author: "Pushkar",
+        published_at: "2024-02-09",
+        read_time: 9,
+        content: "..."
+    },
+    {
+        id: 19,
+        title: "HDFC-HDFC Bank: The Mega-Merger Impact",
+        slug: "hdfc-bank-merger-insights",
+        category: "ma-diaries",
+        excerpt: "The largest corporate marriage in Indian history. What it means for the banking ecosystem.",
+        featured_image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80",
         author: "Pushkar",
         published_at: "2024-02-05",
         read_time: 10,
-        content: "<h2>Historic Merger</h2><p>HDFC Ltd and HDFC Bank announced their merger...</p>"
+        content: "..."
+    },
+    {
+        id: 20,
+        title: "L&T's Hostile Takeover of Mindtree",
+        slug: "lt-mindtree-acquisition",
+        category: "ma-diaries",
+        excerpt: "A rare case study on hostile takeovers in the Indian IT sector and its eventual outcome.",
+        featured_image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
+        author: "Pushkar",
+        published_at: "2024-01-20",
+        read_time: 12,
+        content: "..."
     }
 ];

@@ -4,24 +4,7 @@ import { motion, useInView, useMotionValue, useSpring, useTransform } from 'fram
 import { useRef } from 'react'
 import { FloatingOrb, ParticleField } from '@/components/HeroVFX'
 
-function StaggeredText({ text, delay = 0 }: { text: string; delay?: number }) {
-  const words = text.split(' ')
-  return (
-    <>
-      {words.map((word, i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0, y: 40, filter: 'blur(8px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          transition={{ duration: 0.8, delay: delay + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-          style={{ display: 'inline-block', marginRight: '0.3em' }}
-        >
-          {word}
-        </motion.span>
-      ))}
-    </>
-  )
-}
+
 
 function FadeUp({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef(null)
@@ -64,12 +47,12 @@ const team = [
 ]
 
 export default function AboutPage() {
-  const heroRef = useRef<HTMLElement>(null)
+  const heroRef = useRef<HTMLDivElement>(null)
   const mx = useMotionValue(0); const my = useMotionValue(0)
   const px = useSpring(useTransform(mx, [0, 1], [-22, 22]), { stiffness: 55, damping: 18 })
   const py = useSpring(useTransform(my, [0, 1], [-12, 12]), { stiffness: 55, damping: 18 })
 
-  const handleHeaderMouse = (e: React.MouseEvent<HTMLElement>) => {
+  const handleHeaderMouse = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!heroRef.current) return
     const r = heroRef.current.getBoundingClientRect()
     mx.set((e.clientX - r.left) / r.width)
@@ -77,19 +60,15 @@ export default function AboutPage() {
   }
 
   return (
-    <main className="bg-[#f8f9fa] relative overflow-x-hidden">
+    <main className="ab-page">
 
       {/* ════════════════════════════════════════════════════════════
           HERO
       ════════════════════════════════════════════════════════════ */}
-      <section
+      <div
         ref={heroRef}
         onMouseMove={handleHeaderMouse}
-        className="relative overflow-hidden cursor-default"
-        style={{
-          background: '#254665',
-          padding: '180px 2rem 90px',
-        }}
+        className="ab-header"
       >
         <ParticleField containerRef={heroRef as any} />
 
@@ -98,90 +77,59 @@ export default function AboutPage() {
         <FloatingOrb delay={1} size={160} x="48%" y="52%" color="rgba(0,209,255,0.07)" />
         <FloatingOrb delay={3.5} size={110} x="88%" y="42%" color="rgba(135,206,235,0.09)" />
 
-        <motion.div style={{ x: px, y: py }} className="about-watermark">STORY</motion.div>
-
-        <div
-          className="absolute inset-0 pointer-events-none z-[1]"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)',
-            backgroundSize: '48px 48px'
-          }}
-        />
-        <div
-          className="absolute bottom-0 left-0 right-0 h-[1px]"
-          style={{
-            background: 'linear-gradient(to right, transparent, rgba(0,209,255,0.3), transparent)',
-            zIndex: 1
-          }}
-        />
+        <motion.div style={{ x: px, y: py }} className="ab-watermark">STORY</motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative z-10 max-w-5xl mx-auto flex flex-col items-center text-center gap-4"
+          className="ab-header-inner"
         >
-          <span style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: '0.62rem',
-            fontWeight: 700,
-            letterSpacing: '0.35em',
-            color: '#00d1ff',
-            textTransform: 'uppercase'
-          }}>
+          <motion.span className="ab-eyebrow"
+            initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
+            <span className="ab-live-dot" />
             OUR STORY
-          </span>
+          </motion.span>
 
-          <h1 style={{
-            fontFamily: 'var(--font-serif)',
-            fontSize: 'clamp(3rem, 8vw, 6.5rem)',
-            fontWeight: 700,
-            color: '#fff',
-            lineHeight: 1,
-            letterSpacing: '-0.02em',
-            margin: '0 0 8px 0'
-          }}>
-            <StaggeredText text="Intelligence deserves" delay={0.2} />
-            <br />
-            <span style={{ color: '#00d1ff' }}>
-              <StaggeredText text="better storytelling." delay={0.7} />
-            </span>
+          <h1 className="ab-title">
+            {['About', 'Us'].map((word, i) => (
+              <motion.span key={word}
+                initial={{ opacity: 0, y: 70, filter: 'blur(12px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                transition={{ duration: 1, delay: 0.3 + i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                style={{ display: 'inline-block', marginRight: '0.3em' }}
+              >{word}</motion.span>
+            ))}
           </h1>
 
-          <p style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: '0.95rem',
-            color: 'rgba(255,255,255,0.45)',
-            maxWidth: '480px',
-            lineHeight: 1.65,
-            margin: '0 auto'
-          }}>
-            Morrigan was built on a single conviction — that finance, strategy, and technology
-            are too important to be left to jargon and gated paywalls. We write for the curious
-            and the serious.
-          </p>
+          <motion.p className="ab-subtitle"
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65, duration: 0.7 }}
+          >
+            Intelligence deserves better storytelling. Morrigan was built on a single conviction — that finance, strategy, and technology are too important to be left to jargon and gated paywalls. We write for the curious and the serious.
+          </motion.p>
         </motion.div>
-      </section>
+      </div>
 
       {/* ════════════════════════════════════════════════════════════
           MISSION
       ════════════════════════════════════════════════════════════ */}
-      <section className="py-32 md:py-44 bg-[#f8f9fa]">
+      <section className="ab-mission">
         <div className="container-custom">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-            <FadeUp className="lg:col-span-4" delay={0}>
-              <p style={{ color: '#00d1ff', fontSize: '11px', fontFamily: 'var(--font-sans)', fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '16px' }}>
-                Our Mission
-              </p>
-              <div style={{ width: 48, height: 1, background: 'rgba(0,3,9,0.15)' }} />
+          <div className="ab-mission-grid">
+            <FadeUp className="ab-mission-label-col" delay={0}>
+              <p className="ab-section-eyebrow">Our Mission</p>
+              <div className="ab-section-rule" />
             </FadeUp>
 
-            <FadeUp className="lg:col-span-8" delay={0.15}>
-              <blockquote style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.6rem, 3vw, 2.8rem)', lineHeight: 1.2, fontWeight: 700, letterSpacing: '-0.01em', color: '#000309' }}>
+            <FadeUp className="ab-mission-content-col" delay={0.15}>
+              <blockquote className="ab-mission-quote">
                 &ldquo;We restore depth to discourse — building a publication where rigour and{' '}
-                <em style={{ color: '#1152d4' }}>readability</em> are never in conflict.&rdquo;
+                <em className="ab-mission-em">readability</em> are never in conflict.&rdquo;
               </blockquote>
-              <p style={{ marginTop: '32px', fontFamily: 'var(--font-sans)', fontSize: '1rem', lineHeight: 1.75, maxWidth: '560px', color: 'rgba(0,3,9,0.55)' }}>
+              <p className="ab-mission-body">
                 Morrigan sits at the intersection of institutional research quality and modern
                 media accessibility. Our editorial team draws on real-world experience, academic
                 methodology, and a genuine belief that ideas shape markets — not the other way around.
@@ -194,23 +142,22 @@ export default function AboutPage() {
       {/* ════════════════════════════════════════════════════════════
           FOUNDERS — 3 col centred
       ════════════════════════════════════════════════════════════ */}
-      <section className="py-32 md:py-44" style={{ background: 'rgba(0,0,0,0.015)' }}>
+      <section className="ab-founders">
         <div className="container-custom">
           <FadeUp>
-            <p style={{ color: '#00d1ff', fontSize: '11px', fontFamily: 'var(--font-sans)', fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '12px' }}>
-              The Founders
-            </p>
-            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 900, letterSpacing: '-0.025em', color: '#000309', marginBottom: '64px', lineHeight: 1.1 }}>
+            <p className="ab-section-eyebrow">The Founders</p>
+            <h2 className="ab-founders-heading">
               The minds behind<br />the analysis.
             </h2>
           </FadeUp>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', maxWidth: '900px', margin: '0 auto' }}>
+          <div className="ab-founders-grid">
             {team.map((member, i) => (
               <FadeUp key={i} delay={i * 0.1}>
-                <div style={{ cursor: 'default' }}>
+                <div className="ab-founder-card">
                   <div
-                    style={{ width: '100%', aspectRatio: '1', borderRadius: '20px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,3,9,0.04)', border: '1px solid rgba(0,3,9,0.07)', transition: 'transform 0.5s cubic-bezier(0.16,1,0.3,1), background 0.4s ease, border-color 0.4s ease' }}
+                    className="ab-founder-avatar"
+                    style={{ '--member-color': member.color } as React.CSSProperties}
                     onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => {
                       const el = e.currentTarget
                       el.style.transform = 'translateY(-8px)'
@@ -228,19 +175,13 @@ export default function AboutPage() {
                       if (span) span.style.color = member.color
                     }}
                   >
-                    <span style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 6vw, 3rem)', fontWeight: 900, letterSpacing: '-0.04em', color: member.color, transition: 'color 0.4s ease' }}>
+                    <span className="ab-founder-initials" style={{ color: member.color }}>
                       {member.initials}
                     </span>
                   </div>
-                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.2rem', fontWeight: 700, letterSpacing: '-0.01em', color: '#000309', marginBottom: '4px' }}>
-                    {member.name}
-                  </h3>
-                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#00d1ff', marginBottom: '14px' }}>
-                    {member.role}
-                  </p>
-                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.85rem', lineHeight: 1.65, color: 'rgba(0,3,9,0.5)' }}>
-                    {member.bio}
-                  </p>
+                  <h3 className="ab-founder-name">{member.name}</h3>
+                  <p className="ab-founder-role">{member.role}</p>
+                  <p className="ab-founder-bio">{member.bio}</p>
                 </div>
               </FadeUp>
             ))}
@@ -251,20 +192,18 @@ export default function AboutPage() {
       {/* ════════════════════════════════════════════════════════════
           MARQUEE
       ════════════════════════════════════════════════════════════ */}
-      <section className="py-24" style={{ borderTop: '1px solid rgba(0,3,9,0.07)', overflow: 'hidden' }}>
+      <section className="ab-marquee-section">
         <FadeUp>
-          <p style={{ textAlign: 'center', fontFamily: 'var(--font-sans)', fontSize: '10px', fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(0,3,9,0.3)', marginBottom: '40px' }}>
-            What we cover
-          </p>
+          <p className="ab-marquee-label">What we cover</p>
         </FadeUp>
-        <div style={{ overflow: 'hidden' }}>
-          <div className="animate-marquee" style={{ display: 'flex', gap: 0, whiteSpace: 'nowrap', animationDuration: '22s' }}>
+        <div className="ab-marquee-track-wrap">
+          <div className="animate-marquee ab-marquee-track">
             {Array(3).fill(['Back to Basics', 'Strategy Series', 'Market Insights', 'Financial Literacy', 'Corporate Restructuring']).flat().map((label, i) => (
-              <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                <span style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 900, letterSpacing: '-0.03em', padding: '0 32px', color: i % 2 === 0 ? 'rgba(0,3,9,0.07)' : 'rgba(0,3,9,0.12)' }}>
+              <span key={i} className="ab-marquee-item">
+                <span className={`ab-marquee-word ${i % 2 === 0 ? 'alt' : ''}`}>
                   {label}
                 </span>
-                <span style={{ width: 10, height: 10, borderRadius: '50%', background: 'rgba(0,209,255,0.35)', flexShrink: 0 }} />
+                <span className="ab-marquee-dot" />
               </span>
             ))}
           </div>
@@ -272,13 +211,290 @@ export default function AboutPage() {
       </section>
 
       <style jsx global>{`
-        .about-watermark {
+        /* ── About Page ── */
+
+        .ab-page {
+            min-height: 100vh;
+            background: #f8f9fa;
+            padding-top: 100px;
+            overflow-x: hidden;
+        }
+
+        /* ══ Header ══ */
+        .ab-header {
+            position: relative;
+            background: #254665;
+            padding: 80px 2rem 90px;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .ab-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+            animation: ab-grid-move 30s linear infinite;
+        }
+
+        @keyframes ab-grid-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 48px 48px; }
+        }
+
+        .ab-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(0,209,255,0.3), transparent);
+        }
+
+        .ab-watermark {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
             font-family: var(--font-serif); font-size: clamp(60px, 17vw, 200px);
             font-weight: 900; color: transparent;
             -webkit-text-stroke: 1px rgba(255,255,255,0.04);
             white-space: nowrap; pointer-events: none; user-select: none;
             letter-spacing: -0.04em; z-index: 0;
+        }
+
+        .ab-header-inner {
+            position: relative; z-index: 2; max-width: 1400px; margin: 0 auto;
+            display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px;
+        }
+
+        .ab-eyebrow {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-family: var(--font-sans); font-size: 0.62rem; font-weight: 700;
+            letter-spacing: 0.35em; color: #00d1ff; text-transform: uppercase;
+        }
+
+        .ab-live-dot {
+            width: 7px; height: 7px; border-radius: 50%; background: #00d1ff;
+            animation: ab-pulse 2s ease-out infinite;
+        }
+        @keyframes ab-pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(0,209,255,0.6); }
+            70%  { box-shadow: 0 0 0 8px rgba(0,209,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(0,209,255,0); }
+        }
+
+        .ab-title {
+            font-family: var(--font-serif);
+            font-size: clamp(3rem, 8vw, 6.5rem);
+            font-weight: 700; color: #fff; line-height: 1;
+            letter-spacing: -0.02em; margin: 0;
+        }
+
+        .ab-subtitle {
+            font-family: var(--font-sans); font-size: 0.95rem;
+            color: rgba(255,255,255,0.45); max-width: 500px; line-height: 1.65; margin: 0;
+        }
+
+        /* ══ Mission ══ */
+        .ab-mission {
+            padding: 128px 0;
+            background: #f8f9fa;
+        }
+        @media (max-width: 768px) {
+            .ab-mission { padding: 80px 0; }
+        }
+
+        .ab-mission-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 64px;
+            align-items: start;
+        }
+        @media (max-width: 1024px) {
+            .ab-mission-grid { grid-template-columns: 1fr; gap: 32px; }
+        }
+
+        .ab-section-eyebrow {
+            color: #00d1ff;
+            font-size: 11px;
+            font-family: var(--font-sans);
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .ab-section-rule {
+            width: 48px; height: 1px;
+            background: rgba(0,3,9,0.15);
+        }
+
+        .ab-mission-quote {
+            font-family: var(--font-serif);
+            font-size: clamp(1.6rem, 3vw, 2.8rem);
+            line-height: 1.2;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: #000309;
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
+        .ab-mission-em {
+            color: #1152d4;
+            font-style: italic;
+        }
+
+        .ab-mission-body {
+            margin-top: 32px;
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            line-height: 1.75;
+            max-width: 560px;
+            color: rgba(0,3,9,0.55);
+        }
+
+        /* ══ Founders ══ */
+        .ab-founders {
+            padding: 128px 0;
+            background: rgba(0,0,0,0.015);
+        }
+        @media (max-width: 768px) {
+            .ab-founders { padding: 80px 0; }
+        }
+
+        .ab-founders-heading {
+            font-family: var(--font-serif);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            letter-spacing: -0.025em;
+            color: #000309;
+            margin-bottom: 64px;
+            line-height: 1.1;
+        }
+
+        .ab-founders-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        @media (max-width: 768px) {
+            .ab-founders-grid { grid-template-columns: 1fr; max-width: 320px; }
+        }
+
+        .ab-founder-card {
+            cursor: default;
+        }
+
+        .ab-founder-avatar {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,3,9,0.04);
+            border: 1px solid rgba(0,3,9,0.07);
+            transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), background 0.4s ease, border-color 0.4s ease;
+        }
+
+        .ab-founder-initials {
+            font-family: var(--font-serif);
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            transition: color 0.4s ease;
+        }
+
+        .ab-founder-name {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: #000309;
+            margin-bottom: 4px;
+        }
+
+        .ab-founder-role {
+            font-family: var(--font-sans);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #00d1ff;
+            margin-bottom: 14px;
+        }
+
+        .ab-founder-bio {
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            line-height: 1.65;
+            color: rgba(0,3,9,0.5);
+        }
+
+        /* ══ Marquee ══ */
+        .ab-marquee-section {
+            padding: 96px 0;
+            border-top: 1px solid rgba(0,3,9,0.07);
+            overflow: hidden;
+        }
+
+        .ab-marquee-label {
+            text-align: center;
+            font-family: var(--font-sans);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(0,3,9,0.3);
+            margin-bottom: 40px;
+        }
+
+        .ab-marquee-track-wrap {
+            overflow: hidden;
+        }
+
+        .ab-marquee-track {
+            display: flex;
+            gap: 0;
+            white-space: nowrap;
+            animation-duration: 22s;
+        }
+
+        .ab-marquee-item {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .ab-marquee-word {
+            font-family: var(--font-serif);
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            padding: 0 32px;
+            color: rgba(0,3,9,0.12);
+        }
+
+        .ab-marquee-word.alt {
+            color: rgba(0,3,9,0.07);
+        }
+
+        .ab-marquee-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: rgba(0,209,255,0.35);
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 640px) {
+            .ab-header { padding: 60px 1.5rem 70px; }
         }
       `}</style>
 

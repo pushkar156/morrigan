@@ -34,8 +34,8 @@
 	},
 	"records": [
 		{
-			"x": -776.920377903016,
-			"y": -509.0099452421602,
+			"x": -778.4771081886854,
+			"y": -477.09712284674197,
 			"rotation": 5.551115123125783e-16,
 			"isLocked": false,
 			"opacity": 1,
@@ -78,6 +78,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "Shifting to next.js"
 												}
 											]
@@ -308,6 +313,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "journal page"
 												}
 											]
@@ -348,6 +358,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "contact page"
 												}
 											]
@@ -448,6 +463,86 @@
 											"content": [
 												{
 													"type": "text",
+													"text": "backend"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "fastapi setup"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "database"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "chatbot testing and working"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
 													"text": "Remove the files dont need (Cleaning codebase)"
 												}
 											]
@@ -504,6 +599,37 @@
 			"typeName": "shape"
 		},
 		{
+			"x": 0,
+			"y": 0,
+			"lastActivityTimestamp": 0,
+			"meta": {},
+			"id": "pointer:pointer",
+			"typeName": "pointer"
+		},
+		{
+			"x": 815.4437321991015,
+			"y": 609.8078229720411,
+			"z": 0.5138995875665446,
+			"meta": {},
+			"id": "camera:page:page",
+			"typeName": "camera"
+		},
+		{
+			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
+			"croppingShapeId": null,
+			"selectedShapeIds": [
+				"shape:LnL7WgtCHXucFLuKWC5AW"
+			],
+			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
+			"erasingShapeIds": [],
+			"hintingShapeIds": [],
+			"focusedGroupId": null,
+			"meta": {},
+			"id": "instance_page_state:page:page",
+			"pageId": "page:page",
+			"typeName": "instance_page_state"
+		},
+		{
 			"meta": {},
 			"id": "page:page",
 			"name": "todos",
@@ -518,17 +644,11 @@
 			"typeName": "document"
 		},
 		{
-			"x": 0,
-			"y": 0,
-			"lastActivityTimestamp": 0,
-			"meta": {},
-			"id": "pointer:pointer",
-			"typeName": "pointer"
-		},
-		{
 			"followingUserId": null,
 			"opacityForNextShape": 1,
-			"stylesForNextShape": {},
+			"stylesForNextShape": {
+				"tldraw:color": "black"
+			},
 			"brush": null,
 			"scribbles": [],
 			"cursor": {
@@ -542,7 +662,7 @@
 			"screenBounds": {
 				"x": 0,
 				"y": 0,
-				"w": 894.4000244140625,
+				"w": 1194.4000244140625,
 				"h": 441.6000061035156
 			},
 			"insets": [
@@ -570,29 +690,6 @@
 			"id": "instance:instance",
 			"currentPageId": "page:page",
 			"typeName": "instance"
-		},
-		{
-			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
-			"croppingShapeId": null,
-			"selectedShapeIds": [
-				"shape:LnL7WgtCHXucFLuKWC5AW"
-			],
-			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
-			"erasingShapeIds": [],
-			"hintingShapeIds": [],
-			"focusedGroupId": null,
-			"meta": {},
-			"id": "instance_page_state:page:page",
-			"pageId": "page:page",
-			"typeName": "instance_page_state"
-		},
-		{
-			"x": 1201.7449302711354,
-			"y": 614.8671985082432,
-			"z": 0.6045877634773831,
-			"meta": {},
-			"id": "camera:page:page",
-			"typeName": "camera"
 		}
 	]
 }

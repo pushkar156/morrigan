@@ -70,13 +70,13 @@ const team = [
   },
   {
     name: 'Laksh Ranglani',
-    role: 'Co-Founder & Role',
+    role: 'Co-Founder',
     image: '/images/LAKSH.jpg',
     bio: 'Experienced analyst focused on market research and insights.',
   },
   {
     name: 'Srikrishna Ved Kodakalla',
-    role: 'Co-Founder & Role',
+    role: 'Co-Founder',
     image: '/images/SHRIKRISHNA.jpg',
     bio: 'strategist driving innovation and digital transformation.',
   },
@@ -154,16 +154,19 @@ export default function AboutPage() {
       ════════════════════════════════════════════════════════════ */}
       <section className="ab-mission">
         <div className="container-custom">
+          <FadeUp>
+            <p className="ab-section-eyebrow">Our Mission</p>
+            <div className="ab-section-rule" />
+          </FadeUp>
+
           <div className="ab-mission-grid">
-            <FadeUp className="ab-mission-label-col" delay={0}>
-              <p className="ab-section-eyebrow">Our Mission</p>
-              <div className="ab-section-rule" />
+            <FadeUp className="ab-mission-img-col" delay={0.1}>
               <div className="ab-mission-img-wrap">
                 <img src="/images/mission.png" alt="Market intelligence" className="ab-mission-img" />
               </div>
             </FadeUp>
 
-            <FadeUp className="ab-mission-content-col" delay={0.15}>
+            <FadeUp className="ab-mission-text-col" delay={0.2}>
               <blockquote className="ab-mission-quote">
                 &ldquo;We restore depth to discourse — building a publication where rigour and{' '}
                 <em className="ab-mission-em">readability</em> are never in conflict.&rdquo;
@@ -355,9 +358,10 @@ export default function AboutPage() {
 
         .ab-mission-grid {
             display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 64px;
-            align-items: start;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+            margin-top: 40px;
         }
         @media (max-width: 1024px) {
             .ab-mission-grid { grid-template-columns: 1fr; gap: 32px; }
@@ -379,8 +383,7 @@ export default function AboutPage() {
         }
 
         .ab-mission-img-wrap {
-            margin-top: 28px;
-            border-radius: 16px;
+            border-radius: 20px;
             overflow: hidden;
             border: 1px solid rgba(0,3,9,0.07);
             background: rgba(0,3,9,0.03);
@@ -394,6 +397,12 @@ export default function AboutPage() {
         }
         .ab-mission-img-wrap:hover .ab-mission-img {
             transform: scale(1.03);
+        }
+
+        .ab-mission-text-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .ab-mission-quote {

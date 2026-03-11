@@ -371,15 +371,16 @@ export default function Chatbot() {
           position: absolute;
           bottom: 80px; right: 0;
           width: 400px;
-          height: 640px;
+          max-height: calc(100vh - 140px);
+          height: 580px;
           border-radius: 28px;
           display: flex;
           flex-direction: column;
           overflow: hidden;
-          background: rgba(255,255,255,0.78);
-          backdrop-filter: blur(40px) saturate(180%);
-          -webkit-backdrop-filter: blur(40px) saturate(180%);
-          border: 1px solid rgba(255,255,255,0.6);
+          background: rgba(255,255,255,0.92);
+          backdrop-filter: blur(60px) saturate(180%);
+          -webkit-backdrop-filter: blur(60px) saturate(180%);
+          border: 1px solid rgba(255,255,255,0.7);
           box-shadow:
             0 32px 80px -16px rgba(0,0,0,0.22),
             0 0 1px rgba(0,0,0,0.1),
@@ -583,12 +584,12 @@ export default function Chatbot() {
           word-break: break-word;
         }
         .cb-msg-bubble.bot {
-          background: rgba(255,255,255,0.8);
-          backdrop-filter: blur(16px);
-          border: 1px solid rgba(255,255,255,0.85);
+          background: rgba(255,255,255,0.95);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(0,0,0,0.06);
           border-radius: 20px 20px 20px 6px;
           color: #000309;
-          box-shadow: 0 2px 12px rgba(0,3,9,0.05), inset 0 1px 0 rgba(255,255,255,0.95);
+          box-shadow: 0 2px 12px rgba(0,3,9,0.05);
         }
         .cb-msg-bubble.user {
           background: linear-gradient(135deg, #00d1ff 0%, #0088bb 100%);
@@ -618,9 +619,9 @@ export default function Chatbot() {
 
         .cb-typing-indicator {
           padding: 14px 18px;
-          background: rgba(255,255,255,0.8);
-          backdrop-filter: blur(16px);
-          border: 1px solid rgba(255,255,255,0.85);
+          background: rgba(255,255,255,0.95);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(0,0,0,0.06);
           border-radius: 20px 20px 20px 6px;
           box-shadow: 0 2px 12px rgba(0,3,9,0.05);
           display: flex;
@@ -834,7 +835,8 @@ export default function Chatbot() {
           }
           .cb-panel {
             width: calc(100vw - 40px);
-            height: calc(100vh - 120px);
+            max-height: calc(100vh - 120px);
+            height: 520px;
             bottom: 72px;
             right: 0;
             border-radius: 24px;

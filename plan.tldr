@@ -433,7 +433,7 @@
 											"content": [
 												{
 													"type": "text",
-													"text": "404 page"
+													"text": "404 page design"
 												}
 											]
 										}
@@ -504,6 +504,26 @@
 												{
 													"type": "text",
 													"text": "admin panel connections"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "search bar and category filter in admin panel"
 												}
 											]
 										}
@@ -742,7 +762,7 @@
 			"typeName": "instance_page_state"
 		},
 		{
-			"x": 1822.4800491028482,
+			"x": 1842.0076006143017,
 			"y": 648.7291209540664,
 			"z": 0.4096775776168179,
 			"meta": {},

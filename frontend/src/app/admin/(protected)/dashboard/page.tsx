@@ -9,6 +9,10 @@ export default function AdminDashboard() {
     const [blogs, setBlogs] = useState<Blog[]>([])
     const [isLoadingData, setIsLoadingData] = useState(true)
 
+    const [searchQuery, setSearchQuery] = useState('')
+    const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all')
+    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
     useEffect(() => {
         loadBlogs()
     }, [])
@@ -31,6 +35,9 @@ export default function AdminDashboard() {
                 try {
                     await deleteBlog(id)
                     setBlogs(blogs.filter(b => b.id !== id))
+                    const newSelected = new Set(selectedIds)
+                    newSelected.delete(id)
+                    setSelectedIds(newSelected)
                 } catch (err: any) {
                     alert('Failed to delete: ' + err.message)
                 }
@@ -38,11 +45,51 @@ export default function AdminDashboard() {
         }
     }
 
+    const handleBulkDelete = async () => {
+        if (selectedIds.size === 0) return
+        if (window.confirm(`Delete ${selectedIds.size} articles? This cannot be undone.`)) {
+            try {
+                // We'll delete them one by one since the API doesn't have a bulk endpoint yet
+                for (const id of Array.from(selectedIds)) {
+                    await deleteBlog(id)
+                }
+                setBlogs(blogs.filter(b => !selectedIds.has(b.id)))
+                setSelectedIds(new Set())
+            } catch (err: any) {
+                alert('Failed during bulk delete: ' + err.message)
+            }
+        }
+    }
+
+    const toggleSortInfo = () => { }
+
+    const toggleSelectAll = () => {
+        if (selectedIds.size === filteredBlogs.length && filteredBlogs.length > 0) {
+            setSelectedIds(new Set())
+        } else {
+            setSelectedIds(new Set(filteredBlogs.map(b => b.id)))
+        }
+    }
+
+    const toggleSelectOne = (id: string) => {
+        const newSelected = new Set(selectedIds)
+        if (newSelected.has(id)) newSelected.delete(id)
+        else newSelected.add(id)
+        setSelectedIds(newSelected)
+    }
+
     const stats = {
         total: blogs.length,
         published: blogs.filter(b => b.status === 'published').length,
         drafts: blogs.filter(b => b.status === 'draft').length
     }
+
+    const filteredBlogs = blogs.filter(b => {
+        const matchesSearch = b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            b.category.toLowerCase().includes(searchQuery.toLowerCase())
+        const matchesStatus = statusFilter === 'all' || b.status === statusFilter
+        return matchesSearch && matchesStatus
+    })
 
     return (
         <div className="adm-dash">
@@ -108,15 +155,52 @@ export default function AdminDashboard() {
                 transition={{ delay: 0.4, duration: 0.6 }}
                 className="adm-dash-table-wrap"
             >
-                <div className="adm-dash-table-header">
-                    <h2 className="adm-dash-table-title">Intelligence Repository</h2>
-                    <span className="adm-dash-table-count">{blogs.length} articles</span>
+                <div className="adm-dash-table-header flex flex-col md:flex-row gap-4">
+                    <div>
+                        <h2 className="adm-dash-table-title">Intelligence Repository</h2>
+                        <span className="adm-dash-table-count">{filteredBlogs.length} articles</span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                        <input
+                            type="text"
+                            placeholder="Search titles or categories..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-sm text-[rgba(255,255,255,0.8)] outline-none focus:border-[#00d1ff]/40 transition-colors w-full md:w-64"
+                        />
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value as any)}
+                            className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-sm text-[rgba(255,255,255,0.8)] outline-none focus:border-[#00d1ff]/40 transition-colors"
+                        >
+                            <option value="all">All Status</option>
+                            <option value="published">Published</option>
+                            <option value="draft">Drafts</option>
+                        </select>
+                        {selectedIds.size > 0 && (
+                            <button
+                                onClick={handleBulkDelete}
+                                className="bg-[rgba(255,100,100,0.1)] hover:bg-[rgba(255,100,100,0.2)] text-[#ff6b6b] border border-[rgba(255,100,100,0.2)] rounded-lg px-4 py-2 text-xs font-bold tracking-widest uppercase transition-colors"
+                            >
+                                Delete ({selectedIds.size})
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="adm-dash-table-scroll">
                     <table className="adm-dash-table">
                         <thead>
                             <tr>
+                                <th style={{ width: 40, paddingLeft: 24, paddingRight: 0 }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedIds.size === filteredBlogs.length && filteredBlogs.length > 0}
+                                        onChange={toggleSelectAll}
+                                        className="w-4 h-4 rounded border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] cursor-pointer accent-[#00d1ff]"
+                                    />
+                                </th>
                                 <th>Title & Details</th>
                                 <th>Category</th>
                                 <th>Status</th>
@@ -124,15 +208,23 @@ export default function AdminDashboard() {
                             </tr>
                         </thead>
                         <tbody>
-                            {blogs.length === 0 ? (
+                            {filteredBlogs.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="adm-dash-empty">
+                                    <td colSpan={5} className="adm-dash-empty">
                                         <p>No articles found in the repository.</p>
                                     </td>
                                 </tr>
                             ) : (
-                                blogs.map((blog) => (
+                                filteredBlogs.map((blog) => (
                                     <tr key={blog.id} className="adm-dash-row">
+                                        <td style={{ width: 40, paddingLeft: 24, paddingRight: 0 }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.has(blog.id)}
+                                                onChange={() => toggleSelectOne(blog.id)}
+                                                className="w-4 h-4 rounded border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] cursor-pointer accent-[#00d1ff]"
+                                            />
+                                        </td>
                                         <td className="adm-dash-td-title">
                                             <span className="adm-dash-blog-title">{blog.title}</span>
                                             <span className="adm-dash-blog-meta">

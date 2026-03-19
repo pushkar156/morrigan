@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createBlog, updateBlog, uploadImage, fetchAdminBlogs } from '@/lib/api'
 import type { Blog } from '@/lib/types'
+import RichTextEditor from '@/components/RichTextEditor'
 
 export default function AdminEditorPage() {
     return (
@@ -19,6 +20,7 @@ function AdminEditor() {
     const searchParams = useSearchParams()
     const editId = searchParams.get('id')
 
+    const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
     const [isSaving, setIsSaving] = useState(false)
     const [imageMode, setImageMode] = useState<'upload' | 'url'>('upload')
     const [imageFile, setImageFile] = useState<File | null>(null)
@@ -31,8 +33,11 @@ function AdminEditor() {
         read_time: '5',
         featured_image: '',
         content: '',
-        status: 'draft'
+        status: 'draft',
+        tags: [] as string[]
     })
+
+    const [tagInput, setTagInput] = useState('')
 
     // Load existing blog data when editing
     useEffect(() => {
@@ -47,7 +52,8 @@ function AdminEditor() {
                         read_time: String(blog.read_time),
                         featured_image: blog.featured_image || '',
                         content: blog.content,
-                        status: blog.status
+                        status: blog.status,
+                        tags: blog.tags || []
                     })
                 }
             }).catch(err => console.error('Failed to load blog for editing:', err))
@@ -96,6 +102,7 @@ function AdminEditor() {
                 read_time: parseInt(formData.read_time) || 5,
                 featured_image: imageUrl || undefined,
                 status: formData.status,
+                tags: formData.tags.length > 0 ? formData.tags : undefined,
             }
 
             if (editId) {
@@ -135,22 +142,48 @@ function AdminEditor() {
                             Back to Vault
                         </Link>
                     </motion.div>
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                        className="adm-editor-title"
-                    >New Article</motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2, duration: 0.6 }}
-                        className="adm-editor-desc"
-                    >Drafting Intelligence Report M-{(Math.random() * 1000).toFixed(0)}</motion.p>
+                    <div className="flex justify-between items-end">
+                        <div>
+                            <motion.h1
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                                className="adm-editor-title"
+                            >{editId ? 'Edit Article' : 'New Article'}</motion.h1>
+                            <motion.p
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2, duration: 0.6 }}
+                                className="adm-editor-desc"
+                            >Drafting Intelligence Report M-{(Math.random() * 1000).toFixed(0)}</motion.p>
+                        </div>
+
+                        {/* Tabs */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3, duration: 0.5 }}
+                            className="flex bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] rounded-lg p-1"
+                        >
+                            <button 
+                                onClick={() => setActiveTab('edit')} 
+                                className={`px-5 py-2 rounded-md text-xs font-bold tracking-widest uppercase transition-all ${activeTab === 'edit' ? 'bg-[rgba(0,209,255,0.1)] text-[#00d1ff]' : 'text-[rgba(255,255,255,0.4)] hover:text-white'}`}
+                            >
+                                Edit
+                            </button>
+                            <button 
+                                onClick={() => setActiveTab('preview')} 
+                                className={`px-5 py-2 rounded-md text-xs font-bold tracking-widest uppercase transition-all ${activeTab === 'preview' ? 'bg-[rgba(0,209,255,0.1)] text-[#00d1ff]' : 'text-[rgba(255,255,255,0.4)] hover:text-white'}`}
+                            >
+                                Preview
+                            </button>
+                        </motion.div>
+                    </div>
                 </div>
             </header>
 
             {/* Form Section */}
+            {activeTab === 'edit' ? (
             <div className="adm-editor-grid">
                 {/* Main Content Area */}
                 <div className="adm-editor-main">
@@ -180,13 +213,10 @@ function AdminEditor() {
                         </div>
 
                         <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Intelligence Body (Markdown)</label>
-                            <textarea
-                                rows={20}
-                                placeholder="Begin drafting the analysis... (Supports Markdown)"
-                                className="adm-editor-textarea mono"
-                                value={formData.content}
-                                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                            <label className="adm-editor-label">Intelligence Body (Rich Text)</label>
+                            <RichTextEditor 
+                                content={formData.content} 
+                                onChange={(html) => setFormData({ ...formData, content: html })} 
                             />
                         </div>
                     </motion.div>
@@ -234,6 +264,44 @@ function AdminEditor() {
                                 </select>
                                 <svg className="adm-editor-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
                             </div>
+                        </div>
+
+                        {/* Tags */}
+                        <div className="adm-editor-field-group">
+                            <label className="adm-editor-label">Tags</label>
+                            <input
+                                type="text"
+                                placeholder="Type a tag and press Enter"
+                                className="adm-editor-text-input mb-2"
+                                value={tagInput}
+                                onChange={(e) => setTagInput(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ',') {
+                                        e.preventDefault()
+                                        const trimmed = tagInput.trim().replace(/^,+|,+$/g, '') // remove commas
+                                        if (trimmed && !formData.tags.includes(trimmed)) {
+                                            setFormData(prev => ({ ...prev, tags: [...prev.tags, trimmed] }))
+                                            setTagInput('')
+                                        }
+                                    }
+                                }}
+                            />
+                            {formData.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {formData.tags.map((tag) => (
+                                        <div key={tag} className="flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(0,209,255,0.08)] border border-[rgba(0,209,255,0.2)] rounded-full">
+                                            <span className="text-[11px] font-bold text-[#00d1ff] tracking-wider uppercase">{tag}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData(p => ({ ...p, tags: p.tags.filter(t => t !== tag) }))}
+                                                className="text-[#00d1ff]/50 hover:text-[#00d1ff] transition-colors"
+                                            >
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {/* Read Time */}
@@ -366,6 +434,62 @@ function AdminEditor() {
                     </motion.div>
                 </div>
             </div>
+            ) : (
+                <div className="bg-[#f8f9fa] rounded-2xl overflow-hidden shadow-2xl pb-20">
+                    {/* Preview Mode */}
+                    <div className="relative w-full h-[50vh] min-h-[400px] overflow-hidden">
+                        <div
+                            className="absolute inset-0 bg-cover bg-center"
+                            style={{
+                                backgroundImage: `url(${formData.featured_image || '/logo.png'})`,
+                                filter: 'grayscale(0.5) brightness(0.6)',
+                                transform: 'scale(1.05)'
+                            }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#f8f9fa] via-transparent to-black/40" />
+        
+                        <div className="absolute inset-0 flex flex-col items-center justify-end pb-16 px-6 z-10 text-center container-custom">
+                            <span className="text-[#00d1ff] font-bold tracking-[0.3em] text-[10px] uppercase mb-4 bg-black/40 px-3 py-1.5 rounded-sm backdrop-blur-md border border-white/10">
+                                {categories.find(c => c.id === formData.category)?.name || formData.category}
+                            </span>
+                            <h1 className="text-3xl md:text-5xl lg:text-5xl font-serif text-white max-w-4xl leading-tight mb-6 drop-shadow-xl">
+                                {formData.title || 'Untitled Article'}
+                            </h1>
+                            <div className="flex items-center gap-4 text-white/70 font-sans tracking-wide text-xs uppercase">
+                                <span>By <strong className="text-white">Author Preview</strong></span>
+                                <span className="w-1 h-1 bg-[#00d1ff] rounded-full" />
+                                <span>{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                                <span className="w-1 h-1 bg-[#00d1ff] rounded-full" />
+                                <span>{formData.read_time || 5} MIN READ</span>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div className="container-custom max-w-4xl mx-auto py-12 px-6 flex flex-col relative">
+                        <div className="w-full">
+                            {formData.excerpt && (
+                                <p className="text-xl font-serif text-[#1152d4] italic mb-10 leading-relaxed border-l-4 border-[#00d1ff] pl-5 text-black/70 font-semibold shadow-[calc(-10px)_0_20px_rgba(0,209,255,0.05)]">
+                                    &ldquo;{formData.excerpt}&rdquo;
+                                </p>
+                            )}
+        
+                            {formData.content ? (
+                                <div
+                                    className={`prose prose-md prose-slate max-w-none 
+                                               prose-p:font-sans prose-p:text-black/80 prose-p:leading-loose prose-p:tracking-wide
+                                               prose-headings:font-serif prose-headings:text-black prose-headings:tracking-tight
+                                               prose-a:text-[#1152d4] prose-a:no-underline hover:prose-a:underline
+                                               prose-strong:text-black
+                                               prose-li:text-black/80 prose-li:leading-loose`}
+                                    dangerouslySetInnerHTML={{ __html: formData.content }}
+                                />
+                            ) : (
+                                <p className="text-center text-black/30 font-sans mt-20 italic">No content written yet.</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <style jsx global>{`
                 .adm-editor {

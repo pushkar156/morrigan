@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import { Blog } from '@/lib/demo-data'
+import type { Blog } from '@/lib/types'
 
 export default function BlogCard({ blog }: { blog: Blog }) {
-    const date = new Date(blog.published_at).toLocaleDateString()
-    const categoryDisplay = blog.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+    const date = blog.published_at ? new Date(blog.published_at).toLocaleDateString() : 'Draft'
+    const categoryDisplay = (blog.category || '').replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
 
     return (
         <Link href={`/blog/${blog.slug}`} className="blog-card">

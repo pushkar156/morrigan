@@ -1,11 +1,24 @@
 "use client"
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { createBlog, updateBlog, uploadImage, fetchAdminBlogs } from '@/lib/api'
+import type { Blog } from '@/lib/types'
 
-export default function AdminEditor() {
+export default function AdminEditorPage() {
+    return (
+        <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.4)' }}>Loading editor...</div>}>
+            <AdminEditor />
+        </Suspense>
+    )
+}
+
+function AdminEditor() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const editId = searchParams.get('id')
+
     const [isSaving, setIsSaving] = useState(false)
     const [imageMode, setImageMode] = useState<'upload' | 'url'>('upload')
     const [imageFile, setImageFile] = useState<File | null>(null)
@@ -20,6 +33,26 @@ export default function AdminEditor() {
         content: '',
         status: 'draft'
     })
+
+    // Load existing blog data when editing
+    useEffect(() => {
+        if (editId) {
+            fetchAdminBlogs().then(blogs => {
+                const blog = blogs.find(b => b.id === editId)
+                if (blog) {
+                    setFormData({
+                        title: blog.title,
+                        excerpt: blog.excerpt || '',
+                        category: blog.category || 'stock-analysis',
+                        read_time: String(blog.read_time),
+                        featured_image: blog.featured_image || '',
+                        content: blog.content,
+                        status: blog.status
+                    })
+                }
+            }).catch(err => console.error('Failed to load blog for editing:', err))
+        }
+    }, [editId])
 
     const handleFileSelect = useCallback((file: File) => {
         if (!file.type.startsWith('image/')) return
@@ -41,14 +74,42 @@ export default function AdminEditor() {
         if (fileInputRef.current) fileInputRef.current.value = ''
     }
 
-    const handleSave = (e: React.FormEvent) => {
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsSaving(true)
-        setTimeout(() => {
-            setIsSaving(false)
-            alert('Intelligence saved to repository.')
+
+        try {
+            // If there's a local file to upload, upload it first
+            let imageUrl = formData.featured_image
+            if (imageFile) {
+                const uploadRes = await uploadImage(imageFile)
+                // Build full URL for the image
+                const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+                imageUrl = `${apiBase.replace('/api', '')}${uploadRes.url}`
+            }
+
+            const payload = {
+                title: formData.title,
+                content: formData.content,
+                excerpt: formData.excerpt || undefined,
+                category: formData.category,
+                read_time: parseInt(formData.read_time) || 5,
+                featured_image: imageUrl || undefined,
+                status: formData.status,
+            }
+
+            if (editId) {
+                await updateBlog(editId, payload)
+            } else {
+                await createBlog(payload)
+            }
+
             router.push('/admin/dashboard')
-        }, 1200)
+        } catch (err: any) {
+            alert('Failed to save: ' + err.message)
+        } finally {
+            setIsSaving(false)
+        }
     }
 
     const categories = [

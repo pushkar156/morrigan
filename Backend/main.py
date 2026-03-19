@@ -2,7 +2,6 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from dotenv import load_dotenv
 import os
@@ -10,49 +9,46 @@ import os
 load_dotenv()
 
 from database.connection import engine, Base
-
 from api import blogs, contact, chat, admin, upload
 
+# Create all tables on startup
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Morrigan API",
-    description="Backend API for Morrigan Editorial Platform - Context-aware AI chatbot and blog management",
+    description="Backend API for Morrigan Editorial Platform — Blog management, AI chatbot, and content intelligence",
     version="1.0.0",
     docs_url="/api/docs",
     redoc_url="/api/redoc"
 )
 
-class CORSHeaderMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        response = await call_next(request)
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Allow-Methods"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "*"
-        return response
-
-app.add_middleware(CORSHeaderMiddleware)
+# ── CORS ──────────────────────────────────────────────────────────────────────
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(blogs.router, prefix="/api", tags=["Blogs"])
 app.include_router(contact.router, prefix="/api", tags=["Contact"])
 app.include_router(chat.router, prefix="/api", tags=["Chat"])
 app.include_router(admin.router, prefix="/api", tags=["Admin"])
 app.include_router(upload.router, prefix="/api", tags=["Upload"])
 
-app.mount("/static", StaticFiles(directory="../Web"), name="static")
+# ── Serve uploaded images ─────────────────────────────────────────────────────
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+app.mount("/api/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+
+# ── Root & Health ─────────────────────────────────────────────────────────────
 
 @app.get("/")
 def root():
-
     return {
         "service": "Morrigan API",
         "version": "1.0.0",
@@ -61,22 +57,24 @@ def root():
         "endpoints": {
             "blogs": "/api/blogs",
             "contact": "/api/contact",
-            "chat": "/api/chat"
+            "chat": "/api/chat",
+            "auth": "/api/auth/login",
+            "upload": "/api/upload"
         }
     }
 
+
 @app.get("/health")
 def health_check():
-
     return {
         "status": "healthy",
         "database": "connected",
         "api": "operational"
     }
 
+
 @app.get("/api/status")
 def api_status():
-
     gemini_key = os.getenv("GEMINI_API_KEY")
     pinecone_key = os.getenv("PINECONE_API_KEY")
 
@@ -84,8 +82,8 @@ def api_status():
         "api": "online",
         "services": {
             "database": "operational",
-            "gemini_ai": "configured" if gemini_key and gemini_key != "your_gemini_api_key_here" else "not_configured",
-            "pinecone": "configured" if pinecone_key and pinecone_key != "your_pinecone_api_key_here" else "not_configured",
+            "gemini_ai": "configured" if gemini_key and gemini_key != "your_actual_gemini_key_here" else "not_configured",
+            "pinecone": "configured" if pinecone_key and pinecone_key != "your_actual_pinecone_key_here" else "not_configured",
             "chatbot": "ready" if (gemini_key and pinecone_key) else "blocked"
         },
         "features": {
@@ -95,9 +93,11 @@ def api_status():
         }
     }
 
+
+# ── Error Handlers ────────────────────────────────────────────────────────────
+
 @app.exception_handler(404)
 async def not_found_handler(request, exc):
-
     return JSONResponse(
         status_code=404,
         content={
@@ -107,9 +107,9 @@ async def not_found_handler(request, exc):
         }
     )
 
+
 @app.exception_handler(500)
 async def server_error_handler(request, exc):
-
     return JSONResponse(
         status_code=500,
         content={
@@ -117,6 +117,9 @@ async def server_error_handler(request, exc):
             "message": "An unexpected error occurred. Please try again later."
         }
     )
+
+
+# ── Run ───────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     import uvicorn

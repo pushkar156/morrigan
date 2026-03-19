@@ -2,25 +2,24 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { useAuth } from '@/lib/auth-context'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
     const router = useRouter()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+    const { isAuthenticated, isLoading, logout } = useAuth()
 
     const handleLogout = () => {
-        localStorage.removeItem('admin_token')
+        logout()
         router.push('/admin/login')
     }
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const token = localStorage.getItem('admin_token')
-            if (!token) {
-                router.push('/admin/login')
-            }
+        if (!isLoading && !isAuthenticated) {
+            router.push('/admin/login')
         }
-    }, [pathname, router])
+    }, [isLoading, isAuthenticated, router])
 
     const navLinks = [
         { name: 'Dashboard', href: '/admin/dashboard', icon: 'M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h6v6h-6z' },

@@ -1,43 +1,48 @@
-
 import os
 import uuid
-from fastapi import APIRouter, File, UploadFile, HTTPException
-from fastapi.staticfiles import StaticFiles
+from fastapi import APIRouter, File, UploadFile, HTTPException, Depends
+from utils.auth import get_current_admin
 
 router = APIRouter()
 
-# Directory where images will be saved
-# Note: In production, consider using a cloud storage service like AWS S3 or Google Cloud Storage.
-UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "Web", "uploads")
-
-# Ensure the upload directory exists
+# Store uploads inside Backend/uploads/ (dev). In production, swap for cloud storage.
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-@router.post("/upload")
-async def upload_image(file: UploadFile = File(...)):
-    """
-    Handle image uploads from the admin editor.
-    Returns a static URL that can be used to access the image.
-    """
-    # Simple validation
-    if not file.content_type.startswith("image/"):
-        raise HTTPException(status_code=400, detail="Only image files are allowed")
+ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"}
+MAX_SIZE_MB = 5
 
-    # Generate a unique filename
-    file_extension = os.path.splitext(file.filename)[1]
+
+@router.post("/upload")
+async def upload_image(
+    file: UploadFile = File(...),
+    admin: str = Depends(get_current_admin)
+):
+    """Upload an image file. Returns a URL for the stored image.
+    Requires admin authentication."""
+
+    if file.content_type not in ALLOWED_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File type '{file.content_type}' not allowed. Accepted: JPEG, PNG, WebP, GIF, SVG"
+        )
+
+    content = await file.read()
+
+    if len(content) > MAX_SIZE_MB * 1024 * 1024:
+        raise HTTPException(status_code=400, detail=f"File exceeds {MAX_SIZE_MB}MB limit")
+
+    file_extension = os.path.splitext(file.filename or "image.jpg")[1].lower()
     new_filename = f"{uuid.uuid4()}{file_extension}"
     file_path = os.path.join(UPLOAD_DIR, new_filename)
 
     try:
-        # Save the file to the local filesystem
         with open(file_path, "wb") as buffer:
-            content = await file.read()
             buffer.write(content)
-        
-        # Return the public URL
-        # The frontend expects a path served via /static/uploads/
-        return {"url": f"/static/uploads/{new_filename}"}
-        
+
+        # Return a URL path that the frontend can reference
+        return {"url": f"/api/uploads/{new_filename}", "filename": new_filename}
+
     except Exception as e:
         print(f"[Upload Error] {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to save image")

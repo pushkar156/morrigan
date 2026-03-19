@@ -161,21 +161,23 @@ export default function AboutPage() {
 
           <div className="ab-mission-grid">
             <FadeUp className="ab-mission-img-col" delay={0.1}>
-              <div className="ab-mission-img-wrap">
+              <div className="ab-mission-img-wrap" style={{ maxWidth: '340px' }}>
                 <img src="/images/mission.png" alt="Market intelligence" className="ab-mission-img" />
               </div>
             </FadeUp>
 
             <FadeUp className="ab-mission-text-col" delay={0.2}>
-              <blockquote className="ab-mission-quote">
-                &ldquo;We restore depth to discourse — building a publication where rigour and{' '}
-                <em className="ab-mission-em">readability</em> are never in conflict.&rdquo;
-              </blockquote>
-              <p className="ab-mission-body">
-                Morrigan sits at the intersection of institutional research quality and modern
-                media accessibility. Our editorial team draws on real-world experience, academic
-                methodology, and a genuine belief that ideas shape markets — not the other way around.
-              </p>
+              <div className="flex flex-col justify-center h-full">
+                <blockquote className="ab-mission-quote">
+                  &ldquo;We restore depth to discourse — building a publication where rigour and{' '}
+                  <em className="ab-mission-em">readability</em> are never in conflict.&rdquo;
+                </blockquote>
+                <p className="ab-mission-body">
+                  Morrigan sits at the intersection of institutional research quality and modern
+                  media accessibility. Our editorial team draws on real-world experience, academic
+                  methodology, and a genuine belief that ideas shape markets — not the other way around.
+                </p>
+              </div>
             </FadeUp>
           </div>
         </div>

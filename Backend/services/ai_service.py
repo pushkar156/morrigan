@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 load_dotenv()
 
 gemini_key = os.getenv("GEMINI_API_KEY")
-if gemini_key:
+if gemini_key and gemini_key != "your_actual_gemini_key_here":
     genai.configure(api_key=gemini_key)
 
 pinecone_key = os.getenv("PINECONE_API_KEY")
@@ -17,7 +17,7 @@ pinecone_index_name = os.getenv("PINECONE_INDEX_NAME")
 
 pc = None
 index = None
-if pinecone_key and pinecone_index_name:
+if pinecone_key and pinecone_key != "your_actual_pinecone_key_here" and pinecone_index_name:
     try:
         pc = Pinecone(api_key=pinecone_key)
         index = pc.Index(pinecone_index_name)
@@ -27,13 +27,15 @@ if pinecone_key and pinecone_index_name:
 CHAT_MODEL = 'models/gemini-2.0-flash'
 EMBEDDING_MODEL = "models/gemini-embedding-001"
 
+
 def is_service_available() -> bool:
     return all([
-        gemini_key and gemini_key != "your_gemini_api_key_here",
-        pinecone_key and pinecone_key != "your_pinecone_api_key_here",
+        gemini_key and gemini_key != "your_actual_gemini_key_here",
+        pinecone_key and pinecone_key != "your_actual_pinecone_key_here",
         pinecone_index_name,
         index is not None
     ])
+
 
 async def ask_morrigan(
     query: str,
@@ -87,7 +89,22 @@ async def ask_morrigan(
                 return await answer_page_question_dynamic(query, page_content, page_url)
             return "I couldn't find any relevant information to answer that question. Could you try rephrasing or asking about a different topic?"
 
-        final_prompt = f
+        final_prompt = f"""You are "The Morrigan" — a highly knowledgeable AI assistant for The Morrigan editorial platform, specializing in finance, strategy, M&A, and market analysis.
+
+Use ONLY the following context from our published articles to answer the user's question. If the context doesn't contain enough information, say so honestly rather than making things up.
+
+CONTEXT FROM OUR ARTICLES:
+{context_text}
+
+USER QUESTION: {query}
+
+INSTRUCTIONS:
+- Be concise but thorough
+- Reference specific article titles when citing information
+- Use professional, analytical language
+- If the answer spans multiple articles, synthesize the insights
+- If you cannot answer from the context, say "I don't have enough information in our published articles to answer that fully."
+"""
 
         model = genai.GenerativeModel(CHAT_MODEL)
         response = model.generate_content(final_prompt)
@@ -97,30 +114,52 @@ async def ask_morrigan(
         print(f"[ERROR] Chat error: {e}")
         return "I'm experiencing technical difficulties at the moment. Please try again in a few seconds."
 
+
 def get_page_context(page_url: Optional[str], query: str) -> dict:
+    if not page_url:
+        return {"page_name": "Unknown"}
 
-    if not page_url: return {"page_name": "Unknown"}
-
-    if "index.html" in page_url:
-        return {"page_name": "Homepage", "description": "Morrigan's main hub for finance and business insights."}
-    elif "journal.html" in page_url:
+    if "/about" in page_url:
+        return {"page_name": "About Us", "description": "Learn about the Morrigan team and mission."}
+    elif "/journal" in page_url:
         return {"page_name": "Journal", "description": "Browse our full collection of articles and case studies."}
+    elif "/contact" in page_url:
+        return {"page_name": "Contact", "description": "Get in touch with the Morrigan team."}
+    elif "/" == page_url or "/home" in page_url:
+        return {"page_name": "Homepage", "description": "Morrigan's main hub for finance and business insights."}
     return {"page_name": "Unknown"}
+
 
 def is_page_specific_question(query: str, page_url: Optional[str]) -> bool:
     query_lower = query.lower()
     keywords = ["this page", "this site", "homepage", "what is this", "navigate", "sections", "where am i"]
     return any(kw in query_lower for kw in keywords)
 
+
 async def answer_page_question_dynamic(query: str, page_content: str, page_url: Optional[str] = None) -> str:
     try:
         page_name = "this page"
         if page_url:
-            if "index.html" in page_url: page_name = "the homepage"
-            elif "journal.html" in page_url: page_name = "the journal page"
-            elif "contact.html" in page_url: page_name = "the contact page"
+            if "/about" in page_url:
+                page_name = "the about page"
+            elif "/journal" in page_url:
+                page_name = "the journal page"
+            elif "/contact" in page_url:
+                page_name = "the contact page"
+            elif "/" == page_url or "/home" in page_url:
+                page_name = "the homepage"
 
-        prompt = f
+        prompt = f"""You are "The Morrigan" AI assistant embedded on {page_name} of The Morrigan editorial platform.
+
+The user is asking a question about the page they are currently viewing. Here is the page content:
+
+---
+{page_content[:3000]}
+---
+
+USER QUESTION: {query}
+
+Answer the question based on what you can see on the page. Be helpful and specific."""
 
         model = genai.GenerativeModel(CHAT_MODEL)
         response = model.generate_content(prompt)

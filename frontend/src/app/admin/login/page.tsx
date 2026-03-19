@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import { useAuth } from '@/lib/auth-context'
 
 export default function AdminLogin() {
     const [username, setUsername] = useState('')
@@ -11,21 +12,20 @@ export default function AdminLogin() {
     const [isLoading, setIsLoading] = useState(false)
     const [focusedField, setFocusedField] = useState<string | null>(null)
     const router = useRouter()
+    const { login } = useAuth()
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
         setError('')
 
-        setTimeout(() => {
-            if (username === 'admin' && password === 'admin') {
-                localStorage.setItem('admin_token', 'temp_token')
-                router.push('/admin/dashboard')
-            } else {
-                setError('Invalid credentials. Please verify your access.')
-                setIsLoading(false)
-            }
-        }, 800)
+        try {
+            await login(username, password)
+            router.push('/admin/dashboard')
+        } catch (err: any) {
+            setError(err.message || 'Invalid credentials. Please verify your access.')
+            setIsLoading(false)
+        }
     }
 
     return (

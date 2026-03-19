@@ -2,27 +2,46 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { DEMO_BLOGS as initialBlogs, Blog } from '@/lib/demo-data'
+import { fetchAdminBlogs, deleteBlog } from '@/lib/api'
+import type { Blog } from '@/lib/types'
 
 export default function AdminDashboard() {
     const [blogs, setBlogs] = useState<Blog[]>([])
+    const [isLoadingData, setIsLoadingData] = useState(true)
 
     useEffect(() => {
-        setBlogs(initialBlogs)
+        loadBlogs()
     }, [])
 
-    const handleAction = (id: number, action: 'edit' | 'delete') => {
+    const loadBlogs = async () => {
+        setIsLoadingData(true)
+        try {
+            const data = await fetchAdminBlogs()
+            setBlogs(data)
+        } catch (err) {
+            console.error('Failed to load blogs:', err)
+        } finally {
+            setIsLoadingData(false)
+        }
+    }
+
+    const handleAction = async (id: string, action: 'edit' | 'delete') => {
         if (action === 'delete') {
-            if (window.confirm('Delete this article?')) {
-                setBlogs(blogs.filter(b => b.id !== id))
+            if (window.confirm('Delete this article? This cannot be undone.')) {
+                try {
+                    await deleteBlog(id)
+                    setBlogs(blogs.filter(b => b.id !== id))
+                } catch (err: any) {
+                    alert('Failed to delete: ' + err.message)
+                }
             }
         }
     }
 
     const stats = {
         total: blogs.length,
-        published: blogs.length,
-        drafts: 0
+        published: blogs.filter(b => b.status === 'published').length,
+        drafts: blogs.filter(b => b.status === 'draft').length
     }
 
     return (
@@ -117,7 +136,7 @@ export default function AdminDashboard() {
                                         <td className="adm-dash-td-title">
                                             <span className="adm-dash-blog-title">{blog.title}</span>
                                             <span className="adm-dash-blog-meta">
-                                                {new Date(blog.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} • {blog.read_time} min read
+                                                {blog.published_at ? new Date(blog.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not published'} • {blog.read_time} min read
                                             </span>
                                         </td>
                                         <td>
@@ -126,9 +145,9 @@ export default function AdminDashboard() {
                                             </span>
                                         </td>
                                         <td>
-                                            <div className="adm-dash-status">
-                                                <span className="adm-dash-status-dot" />
-                                                <span>Published</span>
+                                            <div className={`adm-dash-status ${blog.status === 'draft' ? 'draft' : ''}`}>
+                                                <span className="adm-dash-status-dot" style={blog.status === 'draft' ? { background: '#8b8fa3' } : {}} />
+                                                <span>{blog.status === 'published' ? 'Published' : 'Draft'}</span>
                                             </div>
                                         </td>
                                         <td>

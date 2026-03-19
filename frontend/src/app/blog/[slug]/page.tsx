@@ -1,12 +1,75 @@
-import { DEMO_BLOGS } from '@/lib/demo-data'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import { fetchBlog } from '@/lib/api'
+import type { Blog } from '@/lib/types'
 
-// We force Next.js to run this down the server router, but since we are using static demo data for now we just find it
-export default function BlogPost({ params }: { params: { slug: string } }) {
-    const blog = DEMO_BLOGS.find(b => b.slug === params.slug) || DEMO_BLOGS[0]
+export default function BlogPost() {
+    const params = useParams()
+    const slug = params.slug as string
+    const [blog, setBlog] = useState<Blog | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
 
-    const date = new Date(blog.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-    const categoryDisplay = blog.category.replace(/-/g, ' ').toUpperCase()
+    useEffect(() => {
+        if (slug) {
+            fetchBlog(slug)
+                .then(data => setBlog(data))
+                .catch(err => console.error('Failed to load blog:', err))
+                .finally(() => setIsLoading(false))
+        }
+    }, [slug])
+
+    if (isLoading) {
+        return (
+            <article className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+                    <div style={{
+                        width: '40px', height: '40px',
+                        border: '3px solid rgba(0,0,0,0.1)',
+                        borderTopColor: '#1152d4',
+                        borderRadius: '50%',
+                        animation: 'spin 0.8s linear infinite',
+                    }} />
+                    <p style={{ fontFamily: 'var(--font-sans)', color: 'rgba(0,0,0,0.4)', fontSize: '0.85rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                        Loading article...
+                    </p>
+                    <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                </div>
+            </article>
+        )
+    }
+
+    if (!blog) {
+        return (
+            <article className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
+                <div style={{ textAlign: 'center' }}>
+                    <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', color: '#1a1a2e', marginBottom: '16px' }}>
+                        Article Not Found
+                    </h1>
+                    <p style={{ fontFamily: 'var(--font-sans)', color: 'rgba(0,0,0,0.5)', marginBottom: '24px' }}>
+                        The article you&apos;re looking for doesn&apos;t exist or has been removed.
+                    </p>
+                    <Link href="/journal" style={{
+                        fontFamily: 'var(--font-sans)',
+                        color: '#1152d4',
+                        fontWeight: 600,
+                        textDecoration: 'none',
+                        borderBottom: '2px solid #00d1ff',
+                        paddingBottom: '2px',
+                    }}>
+                        ← Back to Journal
+                    </Link>
+                </div>
+            </article>
+        )
+    }
+
+    const date = blog.published_at
+        ? new Date(blog.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        : 'Unpublished'
+    const categoryDisplay = (blog.category || '').replace(/-/g, ' ').toUpperCase()
 
     return (
         <article className="min-h-screen bg-[#f8f9fa] selection:bg-[#00d1ff] selection:text-black">
@@ -73,9 +136,11 @@ export default function BlogPost({ params }: { params: { slug: string } }) {
 
                 {/* Main Content Reading Width */}
                 <div className="w-full max-w-[65ch] mx-auto lg:mx-0">
-                    <p className="text-2xl font-serif text-[#1152d4] italic mb-12 leading-relaxed border-l-4 border-[#00d1ff] pl-6 text-black/70 font-semibold shadow-[calc(-10px)_0_20px_rgba(0,209,255,0.05)]">
-                        "{blog.excerpt}"
-                    </p>
+                    {blog.excerpt && (
+                        <p className="text-2xl font-serif text-[#1152d4] italic mb-12 leading-relaxed border-l-4 border-[#00d1ff] pl-6 text-black/70 font-semibold shadow-[calc(-10px)_0_20px_rgba(0,209,255,0.05)]">
+                            &ldquo;{blog.excerpt}&rdquo;
+                        </p>
+                    )}
 
                     <div
                         className="prose prose-lg prose-slate max-w-none 

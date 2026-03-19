@@ -1,10 +1,21 @@
 "use client"
 import Hero from "@/components/Hero";
 import CategoryScroll from "@/components/CategoryScroll";
-import { DEMO_BLOGS } from "@/lib/demo-data";
-import { useRef } from "react";
+import { fetchBlogs } from "@/lib/api";
+import type { Blog } from "@/lib/types";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [blogs, setBlogs] = useState<Blog[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    fetchBlogs()
+      .then(data => setBlogs(data))
+      .catch(err => console.error('Failed to fetch blogs:', err))
+      .finally(() => setIsLoading(false))
+  }, [])
+
   const categories = [
     { title: "Back to Basics", subtitle: "Essential groundwork for institutional knowledge", id: "back-to-basics", theme: "light" },
     { title: "Strategy Series", subtitle: "Analyzing corporate maneuvers and M&A trends", id: "case-studies", theme: "light" },
@@ -12,8 +23,6 @@ export default function Home() {
     { title: "Financial Literacy", subtitle: "Advanced concepts simplified for contemporary leaders", id: "100-days-challenge", theme: "light" },
     { title: "Corporate Restructuring", subtitle: "The mechanics of mergers, acquisitions, and deals", id: "ma-diaries", theme: "light" }
   ];
-
-
 
   return (
     <main className="bg-[#f8f9fa] relative overflow-x-hidden">
@@ -28,15 +37,14 @@ export default function Home() {
               title={cat.title}
               subtitle={cat.subtitle}
               category={cat.id}
-              blogs={DEMO_BLOGS}
+              blogs={blogs}
               theme={cat.theme as "light" | "dark"}
               index={index}
+              isLoading={isLoading}
             />
           ))}
         </div>
       </div>
-
-
     </main>
   );
 }

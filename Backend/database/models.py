@@ -1,11 +1,15 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, JSON
 from .connection import Base
 from datetime import datetime
+import uuid
+
+def generate_uuid():
+    return str(uuid.uuid4())
 
 class Blog(Base):
     __tablename__ = "blogs"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(36), primary_key=True, default=generate_uuid, index=True)
     title = Column(String(500), nullable=False)
     slug = Column(String(500), unique=True, index=True)
     content = Column(Text, nullable=False)

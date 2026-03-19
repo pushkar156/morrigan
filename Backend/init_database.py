@@ -30,8 +30,9 @@ def init_db():
         print(f"\n📊 Created tables: {', '.join(tables)}")
         
         # Test connection
+        from sqlalchemy import text
         db = next(get_db())
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
         print("✅ Database connection verified!")
         
     except Exception as e:

@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Lottie from 'lottie-react'
 import chatbotAnimation from '../../public/chatbot.json'
 import { usePathname } from 'next/navigation'
+import { sendChatMessage } from '@/lib/api'
+import type { ChatPayload } from '@/lib/types'
 
 type Message = { role: 'bot' | 'user'; text: string; timestamp: Date }
 
@@ -78,7 +80,7 @@ export default function Chatbot() {
     e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
   }, [])
 
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback(async () => {
     if (!input.trim() || isTyping) return
     const userText = input.trim()
     setMessages(prev => [...prev, { role: 'user', text: userText, timestamp: new Date() }])
@@ -86,17 +88,42 @@ export default function Chatbot() {
     if (inputRef.current) inputRef.current.style.height = 'auto'
     setIsTyping(true)
 
-    setTimeout(() => {
+    try {
+      // Prepare payload with context
+      const payload: ChatPayload = {
+        message: userText,
+        page_url: window.location.href,
+      }
+
+      // If we're on a blog page, try to get the article content for context
+      if (pathname?.startsWith('/blog/')) {
+        const article = document.querySelector('article')
+        if (article) {
+          payload.page_content = article.innerText.slice(0, 5000) // limit context size
+        }
+      }
+
+      const res = await sendChatMessage(payload)
+      
       setIsTyping(false)
       const reply: Message = {
         role: 'bot',
-        text: 'I\'m currently indexing the intelligence repository. Once backend integration is complete, I\'ll be able to surface real analysis and insights for you.',
+        text: res.response,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, reply])
       if (!isOpen) setUnread(u => u + 1)
-    }, 1400)
-  }, [input, isTyping, isOpen])
+    } catch (err: any) {
+      console.error('Chat failed:', err)
+      setIsTyping(false)
+      const errorReply: Message = {
+        role: 'bot',
+        text: "I encountered a synchronization error with the intelligence repository. Please verify your connection and try again.",
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorReply])
+    }
+  }, [input, isTyping, isOpen, pathname])
 
   const handleClearChat = () => {
     setMessages([{

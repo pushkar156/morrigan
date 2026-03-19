@@ -15,7 +15,7 @@ def generate_slug(title: str) -> str:
     slug = re.sub(r'[\s-]+', '-', slug).strip('-')
     return slug
 
-def get_blog_by_id(db: Session, blog_id: int):
+def get_blog_by_id(db: Session, blog_id: str):
     return db.query(models.Blog).filter(models.Blog.id == blog_id).first()
 
 def get_blog_by_slug(db: Session, slug: str):
@@ -73,7 +73,7 @@ def create_blog(db: Session, blog: schemas.BlogCreate) -> models.Blog:
 
     return db_blog
 
-def update_blog(db: Session, blog_id: int, blog_update: schemas.BlogUpdate) -> Optional[models.Blog]:
+def update_blog(db: Session, blog_id: str, blog_update: schemas.BlogUpdate) -> Optional[models.Blog]:
 
     db_blog = get_blog_by_id(db, blog_id)
     if not db_blog:
@@ -100,7 +100,7 @@ def update_blog(db: Session, blog_id: int, blog_update: schemas.BlogUpdate) -> O
 
     return db_blog
 
-def delete_blog(db: Session, blog_id: int) -> bool:
+def delete_blog(db: Session, blog_id: str) -> bool:
     db_blog = get_blog_by_id(db, blog_id)
     if not db_blog:
         return False

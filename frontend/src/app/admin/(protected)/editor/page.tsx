@@ -33,6 +33,8 @@ function AdminEditor() {
     const [formData, setFormData] = useState({
         title: '',
         excerpt: '',
+        author: '',
+        published_at: new Date().toISOString().split('T')[0],
         category: 'stock-analysis',
         read_time: '5',
         featured_image: '',
@@ -43,18 +45,12 @@ function AdminEditor() {
 
     // -- Metrics --
     const metrics = useMemo(() => {
-        const text = formData.content.replace(/<[^>]*>?/gm, '') // Strip HTML
+        const text = formData.content.replace(/<[^>]*>?/gm, ' ') // Replace tags with space
         const words = text.trim().split(/\s+/).filter(w => w.length > 0)
-        const wordCount = words.length
-        const rawMinutes = Math.max(1, Math.ceil(wordCount / 225))
-        return { wordCount, readTime: rawMinutes }
+        return { wordCount: words.length }
     }, [formData.content])
 
-    useEffect(() => {
-        setFormData(prev => ({ ...prev, read_time: String(metrics.readTime) }))
-    }, [metrics.readTime])
-
-    // -- Load Data --
+    // Load Data --
     useEffect(() => {
         if (editId) {
             fetchAdminBlogs().then(blogs => {
@@ -63,6 +59,8 @@ function AdminEditor() {
                     setFormData({
                         title: blog.title,
                         excerpt: blog.excerpt || '',
+                        author: blog.author || '',
+                        published_at: blog.published_at ? new Date(blog.published_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
                         category: blog.category || 'stock-analysis',
                         read_time: String(blog.read_time),
                         featured_image: blog.featured_image || '',
@@ -92,10 +90,12 @@ function AdminEditor() {
                 title: formData.title,
                 content: formData.content,
                 excerpt: formData.excerpt || undefined,
+                author: formData.author || undefined,
                 category: formData.category,
                 read_time: parseInt(formData.read_time) || 5,
                 featured_image: imageUrl || undefined,
                 status: formData.status,
+                published_at: formData.published_at ? new Date(formData.published_at).toISOString() : undefined,
                 tags: formData.tags.length > 0 ? formData.tags : undefined,
             }
 
@@ -110,6 +110,18 @@ function AdminEditor() {
         }
     }
 
+    const [isCatOpen, setIsCatOpen] = useState(false)
+    const catRef = useRef<HTMLDivElement>(null)
+
+    // Close dropdown on click outside
+    useEffect(() => {
+        const handleClick = (e: MouseEvent) => {
+            if (catRef.current && !catRef.current.contains(e.target as Node)) setIsCatOpen(false)
+        }
+        window.addEventListener('mousedown', handleClick)
+        return () => window.removeEventListener('mousedown', handleClick)
+    }, [])
+
     const categories = [
         { id: 'back-to-basics', name: 'Back to Basics' },
         { id: 'case-studies', name: 'Case Studies' },
@@ -117,6 +129,8 @@ function AdminEditor() {
         { id: '100-days-challenge', name: '100 Days Challenge' },
         { id: 'ma-diaries', name: 'M&A Diaries' }
     ]
+
+    const selectedCategoryName = categories.find(c => c.id === formData.category)?.name || 'SELECT CATEGORY'
 
     return (
         <div className={`adm-editor-root ${isZenMode ? 'zen-active' : ''}`}>
@@ -204,65 +218,117 @@ function AdminEditor() {
                                     <div className="adm-editor-glass-card sidebar-config">
                                         <div className="adm-editor-field">
                                             <label>CLASSIFICATION</label>
-                                            <div className="adm-editor-custom-select">
-                                                <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })}>
-                                                    {categories.map(c => <option key={c.id} value={c.id}>{c.name.toUpperCase()}</option>)}
-                                                </select>
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m6 9 6 6 6-6"/></svg>
+                                            <div className="adm-editor-cat-dropdown-root" ref={catRef}>
+                                                <button 
+                                                    className={`dropdown-trigger ${isCatOpen ? 'active' : ''}`}
+                                                    onClick={() => setIsCatOpen(!isCatOpen)}
+                                                >
+                                                    <span>{selectedCategoryName.toUpperCase()}</span>
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ transform: isCatOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }}>
+                                                        <path d="m6 9 6 6 6-6"/>
+                                                    </svg>
+                                                </button>
+                                                
+                                                <AnimatePresence>
+                                                    {isCatOpen && (
+                                                        <motion.div 
+                                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                            className="dropdown-list"
+                                                        >
+                                                            {categories.map(c => (
+                                                                <button 
+                                                                    key={c.id} 
+                                                                    className={`dropdown-item ${formData.category === c.id ? 'active' : ''}`}
+                                                                    onClick={() => {
+                                                                        setFormData({ ...formData, category: c.id })
+                                                                        setIsCatOpen(false)
+                                                                    }}
+                                                                >
+                                                                    {c.name.toUpperCase()}
+                                                                </button>
+                                                            ))}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
                                             </div>
                                         </div>
 
                                         <div className="adm-editor-field">
-                                            <label>TAGS</label>
+                                            <label>AUTHOR NAME</label>
                                             <div className="tag-input-wrap">
                                                 <input 
                                                     type="text" 
-                                                    placeholder="ADD TAG..." 
-                                                    value={tagInput}
-                                                    onChange={e => setTagInput(e.target.value)}
-                                                    onKeyDown={e => {
-                                                        if (e.key === 'Enter') {
-                                                            const val = tagInput.trim()
-                                                            if (val && !formData.tags.includes(val)) {
-                                                                setFormData(p => ({ ...p, tags: [...p.tags, val] }))
-                                                                setTagInput('')
-                                                            }
-                                                        }
-                                                    }}
+                                                    placeholder="NAME..." 
+                                                    value={formData.author}
+                                                    onChange={e => setFormData(p => ({ ...p, author: e.target.value }))}
                                                 />
                                             </div>
-                                            <div className="tag-list">
-                                                {formData.tags.map(t => (
-                                                    <span key={t} className="tag-pill">
-                                                        {t}
-                                                        <button onClick={() => setFormData(p => ({ ...p, tags: p.tags.filter(tg => tg !== t) }))}>×</button>
-                                                    </span>
-                                                ))}
+                                        </div>
+
+                                        <div className="adm-editor-field">
+                                            <label>DATE</label>
+                                            <div className="tag-input-wrap">
+                                                <input 
+                                                    type="date" 
+                                                    value={formData.published_at}
+                                                    onChange={e => setFormData(p => ({ ...p, published_at: e.target.value }))}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="adm-editor-field">
+                                            <label>READ TIME (MIN)</label>
+                                            <div className="tag-input-wrap">
+                                                <input 
+                                                    type="number" 
+                                                    value={formData.read_time}
+                                                    onChange={e => setFormData(p => ({ ...p, read_time: e.target.value }))}
+                                                    min="1"
+                                                />
                                             </div>
                                         </div>
 
                                         <div className="adm-editor-field">
                                             <label>COVER INTEL (IMAGE)</label>
-                                            <div className="adm-editor-dropzone-tech" onClick={() => fileInputRef.current?.click()}>
-                                                {formData.featured_image ? (
-                                                    <div className="image-filled">
-                                                        <img src={formData.featured_image} alt="Cover" />
-                                                        <button onClick={(e) => { e.stopPropagation(); setFormData({...formData, featured_image: ''}); setImageFile(null); }}>REMOVE</button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="dropzone-empty">
-                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                                                        <span>DROP SCAN</span>
-                                                    </div>
-                                                )}
-                                                <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={e => {
-                                                    const f = e.target.files?.[0]
-                                                    if(f) {
-                                                        setImageFile(f)
-                                                        setFormData({...formData, featured_image: URL.createObjectURL(f)})
-                                                    }
-                                                }} />
+                                            
+                                            <div className="img-mode-toggle-mini">
+                                                <button onClick={() => setImageMode('upload')} className={imageMode === 'upload' ? 'active' : ''}>FILE</button>
+                                                <button onClick={() => setImageMode('url')} className={imageMode === 'url' ? 'active' : ''}>URL</button>
                                             </div>
+
+                                            {imageMode === 'upload' ? (
+                                                <div className="adm-editor-dropzone-tech" onClick={() => fileInputRef.current?.click()}>
+                                                    {formData.featured_image && imageMode === 'upload' ? (
+                                                        <div className="image-filled">
+                                                            <img src={formData.featured_image} alt="Cover" />
+                                                            <button onClick={(e) => { e.stopPropagation(); setFormData({...formData, featured_image: ''}); setImageFile(null); }}>REMOVE</button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="dropzone-empty">
+                                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                                                            <span>DROP SCAN</span>
+                                                        </div>
+                                                    )}
+                                                    <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={e => {
+                                                        const f = e.target.files?.[0]
+                                                        if(f) {
+                                                            setImageFile(f)
+                                                            setFormData({...formData, featured_image: URL.createObjectURL(f)})
+                                                        }
+                                                    }} />
+                                                </div>
+                                            ) : (
+                                                <div className="tag-input-wrap">
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="IMAGE URL..." 
+                                                        value={formData.featured_image}
+                                                        onChange={e => setFormData(p => ({ ...p, featured_image: e.target.value }))}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="sidebar-metrics">
@@ -272,7 +338,7 @@ function AdminEditor() {
                                             </div>
                                             <div className="metric">
                                                 <span className="label">READ TIME</span>
-                                                <span className="val">{metrics.readTime}M</span>
+                                                <span className="val">{formData.read_time}M</span>
                                             </div>
                                         </div>
                                     </div>
@@ -289,7 +355,7 @@ function AdminEditor() {
                                 <div className="hero-content">
                                     <span className="cat">{categories.find(c => c.id === formData.category)?.name}</span>
                                     <h1>{formData.title || 'UNTITLED REPORT'}</h1>
-                                    <div className="meta">{metrics.readTime} MIN READ • PREVIEW MODE</div>
+                                    <div className="meta">{formData.read_time} MIN READ • PREVIEW MODE</div>
                                 </div>
                             </div>
                             <div className="preview-body">
@@ -493,30 +559,53 @@ function AdminEditor() {
                 }
                 .adm-editor-text-area-minimal:focus { border-color: rgba(0,209,255,0.3); }
 
-                /* Sidebar Select */
-                .adm-editor-custom-select {
+                /* Custom Cat Dropdown */
+                .adm-editor-cat-dropdown-root {
                     position: relative;
                 }
-                .adm-editor-custom-select select {
-                    width: 100%;
-                    height: 48px;
-                    background: var(--glass);
+                .adm-editor-cat-dropdown-root .dropdown-trigger {
+                    width: 100%; height: 44px;
+                    background: rgba(255,255,255,0.03);
                     border: 1px solid var(--glass-border);
-                    border-radius: 12px;
+                    border-radius: 10px;
                     padding: 0 16px;
-                    font-size: 0.75rem;
-                    font-weight: 700;
-                    color: #fff;
-                    appearance: none;
-                    outline: none;
+                    display: flex; align-items: center; justify-content: space-between;
+                    font-size: 0.65rem; font-weight: 800; color: #fff;
+                    letter-spacing: 0.1em;
+                    transition: all 0.3s;
                 }
-                .adm-editor-custom-select select option { background: #0a1120; }
-                .adm-editor-custom-select svg {
-                    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
-                    color: rgba(255,255,255,0.2); pointer-events: none;
+                .adm-editor-cat-dropdown-root .dropdown-trigger:hover,
+                .adm-editor-cat-dropdown-root .dropdown-trigger.active {
+                    background: rgba(255,255,255,0.06); border-color: rgba(0,209,255,0.3);
+                }
+                .adm-editor-cat-dropdown-root .dropdown-trigger svg { color: rgba(255,255,255,0.2); }
+                .adm-editor-cat-dropdown-root .dropdown-trigger:hover svg { color: var(--c-cyan); }
+
+                .adm-editor-cat-dropdown-root .dropdown-list {
+                    position: absolute; top: calc(100% + 12px); left: 0; right: 0;
+                    background: rgba(10,15,26,0.95);
+                    backdrop-filter: blur(20px);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 14px;
+                    padding: 8px;
+                    z-index: 110;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(0,209,255,0.05);
+                }
+                .adm-editor-cat-dropdown-root .dropdown-item {
+                    width: 100%; padding: 12px 14px;
+                    text-align: left; border-radius: 8px;
+                    font-size: 0.6rem; font-weight: 800; color: rgba(255,255,255,0.4);
+                    letter-spacing: 0.05em;
+                    transition: all 0.2s;
+                }
+                .adm-editor-cat-dropdown-root .dropdown-item:hover {
+                    background: rgba(255,255,255,0.05); color: #fff;
+                }
+                .adm-editor-cat-dropdown-root .dropdown-item.active {
+                    background: rgba(0,209,255,0.08); color: var(--c-cyan);
                 }
 
-                /* Tags */
+                /* Tags & Inputs */
                 .tag-input-wrap input {
                     width: 100%; height: 44px;
                     background: var(--glass);
@@ -525,8 +614,13 @@ function AdminEditor() {
                     padding: 0 14px;
                     font-size: 0.7rem;
                     font-weight: 700;
-                    color: var(--c-cyan);
+                    color: #ffffff;
                     outline: none;
+                }
+                .tag-input-wrap input::placeholder { color: rgba(255,255,255,0.2); }
+                .tag-input-wrap input::-webkit-calendar-picker-indicator {
+                    filter: invert(1);
+                    cursor: pointer;
                 }
                 .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
                 .tag-pill {
@@ -538,6 +632,15 @@ function AdminEditor() {
                     font-size: 0.6rem; font-weight: 800; color: var(--c-cyan);
                 }
                 .tag-pill button { color: rgba(255,255,255,0.3); font-size: 1rem; line-height: 1; }
+
+                /* Image Mode Toggle */
+                .img-mode-toggle-mini {
+                    display: flex; gap: 4px; background: var(--glass); padding: 3px; border-radius: 8px; margin-bottom: 12px;
+                }
+                .img-mode-toggle-mini button {
+                    flex: 1; padding: 6px; font-size: 0.55rem; font-weight: 900; color: rgba(255,255,255,0.2); border-radius: 6px; transition: all 0.2s;
+                }
+                .img-mode-toggle-mini button.active { background: rgba(0,209,255,0.1); color: var(--c-cyan); }
 
                 /* Dropzone Tech */
                 .adm-editor-dropzone-tech {

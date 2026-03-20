@@ -1,6 +1,6 @@
 "use client"
-import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useRef, useCallback, useEffect, Suspense, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createBlog, updateBlog, uploadImage, fetchAdminBlogs } from '@/lib/api'
@@ -9,7 +9,7 @@ import RichTextEditor from '@/components/RichTextEditor'
 
 export default function AdminEditorPage() {
     return (
-        <Suspense fallback={<div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.4)' }}>Loading editor...</div>}>
+        <Suspense fallback={<div className="adm-editor-loading">Loading Command Suite...</div>}>
             <AdminEditor />
         </Suspense>
     )
@@ -20,12 +20,16 @@ function AdminEditor() {
     const searchParams = useSearchParams()
     const editId = searchParams.get('id')
 
+    // -- State --
     const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
     const [isSaving, setIsSaving] = useState(false)
+    const [isZenMode, setIsZenMode] = useState(false)
     const [imageMode, setImageMode] = useState<'upload' | 'url'>('upload')
     const [imageFile, setImageFile] = useState<File | null>(null)
     const [isDragging, setIsDragging] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const [tagInput, setTagInput] = useState('')
+    
     const [formData, setFormData] = useState({
         title: '',
         excerpt: '',
@@ -37,9 +41,20 @@ function AdminEditor() {
         tags: [] as string[]
     })
 
-    const [tagInput, setTagInput] = useState('')
+    // -- Metrics --
+    const metrics = useMemo(() => {
+        const text = formData.content.replace(/<[^>]*>?/gm, '') // Strip HTML
+        const words = text.trim().split(/\s+/).filter(w => w.length > 0)
+        const wordCount = words.length
+        const rawMinutes = Math.max(1, Math.ceil(wordCount / 225))
+        return { wordCount, readTime: rawMinutes }
+    }, [formData.content])
 
-    // Load existing blog data when editing
+    useEffect(() => {
+        setFormData(prev => ({ ...prev, read_time: String(metrics.readTime) }))
+    }, [metrics.readTime])
+
+    // -- Load Data --
     useEffect(() => {
         if (editId) {
             fetchAdminBlogs().then(blogs => {
@@ -56,40 +71,19 @@ function AdminEditor() {
                         tags: blog.tags || []
                     })
                 }
-            }).catch(err => console.error('Failed to load blog for editing:', err))
+            }).catch(err => console.error('Failed to load blog:', err))
         }
     }, [editId])
 
-    const handleFileSelect = useCallback((file: File) => {
-        if (!file.type.startsWith('image/')) return
-        setImageFile(file)
-        const url = URL.createObjectURL(file)
-        setFormData(prev => ({ ...prev, featured_image: url }))
-    }, [])
-
-    const handleDrop = useCallback((e: React.DragEvent) => {
-        e.preventDefault()
-        setIsDragging(false)
-        const file = e.dataTransfer.files[0]
-        if (file) handleFileSelect(file)
-    }, [handleFileSelect])
-
-    const handleRemoveImage = () => {
-        setImageFile(null)
-        setFormData(prev => ({ ...prev, featured_image: '' }))
-        if (fileInputRef.current) fileInputRef.current.value = ''
-    }
-
-    const handleSave = async (e: React.FormEvent) => {
-        e.preventDefault()
+    const handleSave = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault()
+        if (!formData.title.trim()) return
         setIsSaving(true)
 
         try {
-            // If there's a local file to upload, upload it first
             let imageUrl = formData.featured_image
             if (imageFile) {
                 const uploadRes = await uploadImage(imageFile)
-                // Build full URL for the image
                 const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
                 imageUrl = `${apiBase.replace('/api', '')}${uploadRes.url}`
             }
@@ -105,11 +99,8 @@ function AdminEditor() {
                 tags: formData.tags.length > 0 ? formData.tags : undefined,
             }
 
-            if (editId) {
-                await updateBlog(editId, payload)
-            } else {
-                await createBlog(payload)
-            }
+            if (editId) await updateBlog(editId, payload)
+            else await createBlog(payload)
 
             router.push('/admin/dashboard')
         } catch (err: any) {
@@ -128,864 +119,528 @@ function AdminEditor() {
     ]
 
     return (
-        <div className="adm-editor">
-            {/* Header */}
-            <header className="adm-editor-header">
-                <div>
-                    <motion.div
-                        initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <Link href="/admin/dashboard" className="adm-editor-back">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                            Back to Vault
-                        </Link>
-                    </motion.div>
-                    <div className="flex justify-between items-end">
-                        <div>
-                            <motion.h1
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                                className="adm-editor-title"
-                            >{editId ? 'Edit Article' : 'New Article'}</motion.h1>
-                            <motion.p
-                                initial={{ opacity: 0, y: 12 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2, duration: 0.6 }}
-                                className="adm-editor-desc"
-                            >Drafting Intelligence Report M-{(Math.random() * 1000).toFixed(0)}</motion.p>
-                        </div>
-
-                        {/* Tabs */}
-                        <motion.div 
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3, duration: 0.5 }}
-                            className="flex bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] rounded-lg p-1"
-                        >
-                            <button 
-                                onClick={() => setActiveTab('edit')} 
-                                className={`px-5 py-2 rounded-md text-xs font-bold tracking-widest uppercase transition-all ${activeTab === 'edit' ? 'bg-[rgba(0,209,255,0.1)] text-[#00d1ff]' : 'text-[rgba(255,255,255,0.4)] hover:text-white'}`}
-                            >
-                                Edit
-                            </button>
-                            <button 
-                                onClick={() => setActiveTab('preview')} 
-                                className={`px-5 py-2 rounded-md text-xs font-bold tracking-widest uppercase transition-all ${activeTab === 'preview' ? 'bg-[rgba(0,209,255,0.1)] text-[#00d1ff]' : 'text-[rgba(255,255,255,0.4)] hover:text-white'}`}
-                            >
-                                Preview
-                            </button>
-                        </motion.div>
-                    </div>
-                </div>
-            </header>
-
-            {/* Form Section */}
-            {activeTab === 'edit' ? (
-            <div className="adm-editor-grid">
-                {/* Main Content Area */}
-                <div className="adm-editor-main">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+        <div className={`adm-editor-root ${isZenMode ? 'zen-active' : ''}`}>
+            {/* Header HUD */}
+            <AnimatePresence>
+                {!isZenMode && (
+                    <motion.header 
+                        initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3, duration: 0.6 }}
-                        className="adm-editor-content-card"
+                        exit={{ opacity: 0, y: -20 }}
+                        className="adm-editor-header"
                     >
-                        <input
-                            type="text"
-                            placeholder="ARTICLE HEADLINE"
-                            className="adm-editor-headline"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        />
-
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Executive Subtitle / Excerpt</label>
-                            <textarea
-                                rows={3}
-                                placeholder="A brief summary to draw the reader in..."
-                                className="adm-editor-textarea"
-                                value={formData.excerpt}
-                                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                            />
-                        </div>
-
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Intelligence Body (Rich Text)</label>
-                            <RichTextEditor 
-                                content={formData.content} 
-                                onChange={(html) => setFormData({ ...formData, content: html })} 
-                            />
-                        </div>
-                    </motion.div>
-                </div>
-
-                {/* Sidebar Configuration */}
-                <div className="adm-editor-sidebar">
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4, duration: 0.6 }}
-                        className="adm-editor-sidebar-card"
-                    >
-                        {/* Status Toggle */}
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Save State</label>
-                            <div className="adm-editor-status-toggle">
-                                <button
-                                    onClick={() => setFormData({ ...formData, status: 'draft' })}
-                                    className={`adm-editor-status-btn ${formData.status === 'draft' ? 'active' : ''}`}
-                                >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                    Draft
-                                </button>
-                                <button
-                                    onClick={() => setFormData({ ...formData, status: 'published' })}
-                                    className={`adm-editor-status-btn publish ${formData.status === 'published' ? 'active' : ''}`}
-                                >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" strokeLinecap="round" strokeLinejoin="round" /><polyline points="22 4 12 14.01 9 11.01" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                    Publish
-                                </button>
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                            <div>
+                                <Link href="/admin/dashboard" className="adm-editor-back-hud">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+                                    <span>VAULT REPOSITORY</span>
+                                </Link>
+                                <h1 className="adm-editor-title-main">{editId ? 'ARTICLE EDITOR' : 'NEW INTEL'}</h1>
                             </div>
-                        </div>
 
-                        {/* Category */}
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Category Classification</label>
-                            <div className="adm-editor-select-wrap">
-                                <select
-                                    className="adm-editor-select"
-                                    value={formData.category}
-                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                >
-                                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                </select>
-                                <svg className="adm-editor-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                            </div>
-                        </div>
-
-                        {/* Tags */}
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Tags</label>
-                            <input
-                                type="text"
-                                placeholder="Type a tag and press Enter"
-                                className="adm-editor-text-input mb-2"
-                                value={tagInput}
-                                onChange={(e) => setTagInput(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' || e.key === ',') {
-                                        e.preventDefault()
-                                        const trimmed = tagInput.trim().replace(/^,+|,+$/g, '') // remove commas
-                                        if (trimmed && !formData.tags.includes(trimmed)) {
-                                            setFormData(prev => ({ ...prev, tags: [...prev.tags, trimmed] }))
-                                            setTagInput('')
-                                        }
-                                    }
-                                }}
-                            />
-                            {formData.tags.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                    {formData.tags.map((tag) => (
-                                        <div key={tag} className="flex items-center gap-1.5 px-3 py-1.5 bg-[rgba(0,209,255,0.08)] border border-[rgba(0,209,255,0.2)] rounded-full">
-                                            <span className="text-[11px] font-bold text-[#00d1ff] tracking-wider uppercase">{tag}</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => setFormData(p => ({ ...p, tags: p.tags.filter(t => t !== tag) }))}
-                                                className="text-[#00d1ff]/50 hover:text-[#00d1ff] transition-colors"
-                                            >
-                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                                            </button>
-                                        </div>
-                                    ))}
+                            <div className="adm-editor-top-actions">
+                                <button onClick={() => setIsZenMode(true)} className="adm-editor-tool-btn" title="Focus Mode">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3" /></svg>
+                                    <span>ZEN</span>
+                                </button>
+                                <div className="adm-editor-tab-hud">
+                                    <div className="tab-slider" style={{ transform: `translateX(${activeTab === 'edit' ? '0%' : '100%'})` }} />
+                                    <button onClick={() => setActiveTab('edit')} className={activeTab === 'edit' ? 'active' : ''}>EDIT</button>
+                                    <button onClick={() => setActiveTab('preview')} className={activeTab === 'preview' ? 'active' : ''}>PREVIEW</button>
                                 </div>
-                            )}
-                        </div>
-
-                        {/* Read Time */}
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Read Time (Minutes)</label>
-                            <input
-                                type="number"
-                                className="adm-editor-number-input"
-                                value={formData.read_time}
-                                onChange={(e) => setFormData({ ...formData, read_time: e.target.value })}
-                                min="1"
-                            />
-                        </div>
-
-                        {/* Cover Image */}
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Cover Image</label>
-
-                            {/* Mode Toggle */}
-                            <div className="adm-editor-img-mode-toggle">
-                                <button
-                                    onClick={() => setImageMode('upload')}
-                                    className={`adm-editor-img-mode-btn ${imageMode === 'upload' ? 'active' : ''}`}
-                                >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
-                                    Upload File
-                                </button>
-                                <button
-                                    onClick={() => setImageMode('url')}
-                                    className={`adm-editor-img-mode-btn ${imageMode === 'url' ? 'active' : ''}`}
-                                >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
-                                    Image URL
-                                </button>
                             </div>
+                        </div>
+                    </motion.header>
+                )}
+            </AnimatePresence>
 
-                            {/* Upload Mode */}
-                            {imageMode === 'upload' && (
-                                <>
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
-                                        className="adm-editor-file-hidden"
-                                    />
-                                    {!imageFile ? (
-                                        <div
-                                            className={`adm-editor-dropzone ${isDragging ? 'dragging' : ''}`}
-                                            onClick={() => fileInputRef.current?.click()}
-                                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
-                                            onDragLeave={() => setIsDragging(false)}
-                                            onDrop={handleDrop}
-                                        >
-                                            <div className="adm-editor-dropzone-icon">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                                    <circle cx="8.5" cy="8.5" r="1.5" />
-                                                    <polyline points="21 15 16 10 5 21" />
-                                                </svg>
-                                            </div>
-                                            <p className="adm-editor-dropzone-text">Drop an image here or <span>browse files</span></p>
-                                            <p className="adm-editor-dropzone-hint">PNG, JPG, WebP up to 5MB</p>
-                                        </div>
-                                    ) : (
-                                        <div className="adm-editor-file-info">
-                                            <div className="adm-editor-file-info-left">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                                    <circle cx="8.5" cy="8.5" r="1.5" />
-                                                    <polyline points="21 15 16 10 5 21" />
-                                                </svg>
-                                                <div>
-                                                    <span className="adm-editor-file-name">{imageFile.name}</span>
-                                                    <span className="adm-editor-file-size">{(imageFile.size / 1024).toFixed(1)} KB</span>
-                                                </div>
-                                            </div>
-                                            <button onClick={handleRemoveImage} className="adm-editor-file-remove" aria-label="Remove image">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                                            </button>
-                                        </div>
-                                    )}
-                                </>
-                            )}
-
-                            {/* URL Mode */}
-                            {imageMode === 'url' && (
+            <main className="adm-editor-viewport">
+                {activeTab === 'edit' ? (
+                    <div className="adm-editor-grid">
+                        {/* Write Column */}
+                        <div className="adm-editor-main-col">
+                            <motion.div layout className="adm-editor-glass-card main-writing-card">
                                 <input
                                     type="text"
-                                    placeholder="https://example.com/cover.jpg"
-                                    className="adm-editor-text-input mono"
-                                    value={formData.featured_image}
-                                    onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
+                                    placeholder="REPORT HEADLINE..."
+                                    className="adm-editor-input-hero"
+                                    value={formData.title}
+                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 />
-                            )}
-
-                            {/* Preview */}
-                            {formData.featured_image && (
-                                <div className="adm-editor-image-preview">
-                                    <img src={formData.featured_image} alt="Cover preview" />
-                                    <div className="adm-editor-image-preview-label">Cover Preview</div>
+                                <div className="adm-editor-field">
+                                    <div className="field-header">
+                                        <label>EXECUTIVE SUMMARY</label>
+                                        <span className="char-count">{formData.excerpt.length}/300</span>
+                                    </div>
+                                    <textarea
+                                        placeholder="Briefly describe the report scope..."
+                                        className="adm-editor-text-area-minimal"
+                                        rows={2}
+                                        value={formData.excerpt}
+                                        onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                                    />
                                 </div>
-                            )}
+                                <div className="adm-editor-field editor-body-field">
+                                    <label>INTELLIGENCE BODY</label>
+                                    <div className="rich-editor-container-styled">
+                                        <RichTextEditor 
+                                            content={formData.content} 
+                                            onChange={(html) => setFormData({ ...formData, content: html })} 
+                                        />
+                                    </div>
+                                </div>
+                            </motion.div>
                         </div>
 
-                        {/* Divider */}
-                        <div className="adm-editor-divider" />
+                        {/* Config Sidebar */}
+                        <AnimatePresence>
+                            {!isZenMode && (
+                                <motion.aside 
+                                    initial={{ opacity: 0, x: 40 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 40 }}
+                                    className="adm-editor-side-col"
+                                >
+                                    <div className="adm-editor-glass-card sidebar-config">
+                                        <div className="adm-editor-field">
+                                            <label>CLASSIFICATION</label>
+                                            <div className="adm-editor-custom-select">
+                                                <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })}>
+                                                    {categories.map(c => <option key={c.id} value={c.id}>{c.name.toUpperCase()}</option>)}
+                                                </select>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m6 9 6 6 6-6"/></svg>
+                                            </div>
+                                        </div>
 
-                        {/* Submit */}
-                        <button
-                            onClick={handleSave}
-                            disabled={isSaving || !formData.title.trim()}
-                            className="adm-editor-submit"
-                        >
-                            <span className="adm-editor-submit-text">
-                                {isSaving ? (
-                                    <>
-                                        <svg className="adm-editor-spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round" /></svg>
-                                        Synchronizing…
-                                    </>
-                                ) : (
-                                    <>
-                                        {formData.status === 'published' ? 'EXECUTE & PUBLISH' : 'SAVE DRAFT'}
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                    </>
-                                )}
-                            </span>
-                            <div className="adm-editor-submit-shimmer" />
-                        </button>
-                    </motion.div>
-                </div>
-            </div>
-            ) : (
-                <div className="bg-[#f8f9fa] rounded-2xl overflow-hidden shadow-2xl pb-20">
-                    {/* Preview Mode */}
-                    <div className="relative w-full h-[50vh] min-h-[400px] overflow-hidden">
-                        <div
-                            className="absolute inset-0 bg-cover bg-center"
-                            style={{
-                                backgroundImage: `url(${formData.featured_image || '/logo.png'})`,
-                                filter: 'grayscale(0.5) brightness(0.6)',
-                                transform: 'scale(1.05)'
-                            }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#f8f9fa] via-transparent to-black/40" />
-        
-                        <div className="absolute inset-0 flex flex-col items-center justify-end pb-16 px-6 z-10 text-center container-custom">
-                            <span className="text-[#00d1ff] font-bold tracking-[0.3em] text-[10px] uppercase mb-4 bg-black/40 px-3 py-1.5 rounded-sm backdrop-blur-md border border-white/10">
-                                {categories.find(c => c.id === formData.category)?.name || formData.category}
-                            </span>
-                            <h1 className="text-3xl md:text-5xl lg:text-5xl font-serif text-white max-w-4xl leading-tight mb-6 drop-shadow-xl">
-                                {formData.title || 'Untitled Article'}
-                            </h1>
-                            <div className="flex items-center gap-4 text-white/70 font-sans tracking-wide text-xs uppercase">
-                                <span>By <strong className="text-white">Author Preview</strong></span>
-                                <span className="w-1 h-1 bg-[#00d1ff] rounded-full" />
-                                <span>{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-                                <span className="w-1 h-1 bg-[#00d1ff] rounded-full" />
-                                <span>{formData.read_time || 5} MIN READ</span>
+                                        <div className="adm-editor-field">
+                                            <label>TAGS</label>
+                                            <div className="tag-input-wrap">
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="ADD TAG..." 
+                                                    value={tagInput}
+                                                    onChange={e => setTagInput(e.target.value)}
+                                                    onKeyDown={e => {
+                                                        if (e.key === 'Enter') {
+                                                            const val = tagInput.trim()
+                                                            if (val && !formData.tags.includes(val)) {
+                                                                setFormData(p => ({ ...p, tags: [...p.tags, val] }))
+                                                                setTagInput('')
+                                                            }
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="tag-list">
+                                                {formData.tags.map(t => (
+                                                    <span key={t} className="tag-pill">
+                                                        {t}
+                                                        <button onClick={() => setFormData(p => ({ ...p, tags: p.tags.filter(tg => tg !== t) }))}>×</button>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="adm-editor-field">
+                                            <label>COVER INTEL (IMAGE)</label>
+                                            <div className="adm-editor-dropzone-tech" onClick={() => fileInputRef.current?.click()}>
+                                                {formData.featured_image ? (
+                                                    <div className="image-filled">
+                                                        <img src={formData.featured_image} alt="Cover" />
+                                                        <button onClick={(e) => { e.stopPropagation(); setFormData({...formData, featured_image: ''}); setImageFile(null); }}>REMOVE</button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="dropzone-empty">
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                                                        <span>DROP SCAN</span>
+                                                    </div>
+                                                )}
+                                                <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={e => {
+                                                    const f = e.target.files?.[0]
+                                                    if(f) {
+                                                        setImageFile(f)
+                                                        setFormData({...formData, featured_image: URL.createObjectURL(f)})
+                                                    }
+                                                }} />
+                                            </div>
+                                        </div>
+
+                                        <div className="sidebar-metrics">
+                                            <div className="metric">
+                                                <span className="label">WORD COUNT</span>
+                                                <span className="val">{metrics.wordCount}</span>
+                                            </div>
+                                            <div className="metric">
+                                                <span className="label">READ TIME</span>
+                                                <span className="val">{metrics.readTime}M</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.aside>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                ) : (
+                    <div className="adm-editor-preview-frame">
+                         {/* Re-use preview block from original code but wrapped in premium container */}
+                         <div className="preview-inner">
+                            <div className="preview-hero" style={{ backgroundImage: `url(${formData.featured_image || '/logo.png'})` }}>
+                                <div className="hero-overlay" />
+                                <div className="hero-content">
+                                    <span className="cat">{categories.find(c => c.id === formData.category)?.name}</span>
+                                    <h1>{formData.title || 'UNTITLED REPORT'}</h1>
+                                    <div className="meta">{metrics.readTime} MIN READ • PREVIEW MODE</div>
+                                </div>
                             </div>
+                            <div className="preview-body">
+                                {formData.excerpt && <p className="excerpt">"{formData.excerpt}"</p>}
+                                <div className="content prose prose-invert" dangerouslySetInnerHTML={{ __html: formData.content }} />
+                            </div>
+                         </div>
+                    </div>
+                )}
+            </main>
+
+            {/* Global Executive HUD (Floating Bar) */}
+            <motion.div 
+                initial={{ y: 100 }}
+                animate={{ y: 0 }}
+                className="adm-editor-exec-hud"
+            >
+                <div className="exec-hud-inner">
+                    <div className="exec-left">
+                        {isZenMode && (
+                            <button onClick={() => setIsZenMode(false)} className="exit-zen-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m15 18-6-6 6-6"/></svg>
+                                EXIT ZEN
+                            </button>
+                        )}
+                        <span className="save-status">
+                            <span className="status-dot pulsing" />
+                            {isSaving ? 'SYNCING...' : 'LOCAL CACHE READY'}
+                        </span>
+                    </div>
+
+                    <div className="exec-center">
+                        <div className="status-segment-mini">
+                            <div className="seg-bg" style={{ transform: `translateX(${formData.status === 'draft' ? '0%' : '100%'})` }} />
+                            <button onClick={() => setFormData({...formData, status: 'draft'})} className={formData.status === 'draft' ? 'active' : ''}>DRAFT</button>
+                            <button onClick={() => setFormData({...formData, status: 'published'})} className={formData.status === 'published' ? 'active' : ''}>LIVE</button>
                         </div>
                     </div>
-        
-                    <div className="container-custom max-w-4xl mx-auto py-12 px-6 flex flex-col relative">
-                        <div className="w-full">
-                            {formData.excerpt && (
-                                <p className="text-xl font-serif text-[#1152d4] italic mb-10 leading-relaxed border-l-4 border-[#00d1ff] pl-5 text-black/70 font-semibold shadow-[calc(-10px)_0_20px_rgba(0,209,255,0.05)]">
-                                    &ldquo;{formData.excerpt}&rdquo;
-                                </p>
-                            )}
-        
-                            {formData.content ? (
-                                <div
-                                    className={`prose prose-md prose-slate max-w-none 
-                                               prose-p:font-sans prose-p:text-black/80 prose-p:leading-loose prose-p:tracking-wide
-                                               prose-headings:font-serif prose-headings:text-black prose-headings:tracking-tight
-                                               prose-a:text-[#1152d4] prose-a:no-underline hover:prose-a:underline
-                                               prose-strong:text-black
-                                               prose-li:text-black/80 prose-li:leading-loose`}
-                                    dangerouslySetInnerHTML={{ __html: formData.content }}
-                                />
-                            ) : (
-                                <p className="text-center text-black/30 font-sans mt-20 italic">No content written yet.</p>
-                            )}
-                        </div>
+
+                    <div className="exec-right">
+                        <button 
+                            disabled={isSaving || !formData.title.trim()} 
+                            onClick={() => handleSave()}
+                            className="exec-submit-btn"
+                        >
+                            {formData.status === 'published' ? 'EXECUTE PUBLISH' : 'FINALIZE DRAFT'}
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                        </button>
                     </div>
                 </div>
-            )}
+            </motion.div>
 
             <style jsx global>{`
-                .adm-editor {
-                    max-width: 1100px;
+                :root {
+                    --c-cyan: #00d1ff;
+                    --c-blue: #1152d4;
+                    --glass: rgba(255,255,255,0.02);
+                    --glass-border: rgba(255,255,255,0.06);
+                }
+
+                .adm-editor-root {
+                    min-height: 100vh;
+                    padding: 40px 20px 120px;
+                    max-width: 1300px;
                     margin: 0 auto;
+                    transition: padding 0.5s ease;
+                }
+                .adm-editor-root.zen-active {
+                    max-width: 800px;
+                    padding-top: 80px;
                 }
 
-                .adm-editor-header {
-                    margin-bottom: 36px;
-                }
-
-                .adm-editor-back {
+                /* ══ Header HUD ══ */
+                .adm-editor-header { margin-bottom: 40px; }
+                .adm-editor-back-hud {
                     display: inline-flex;
                     align-items: center;
                     gap: 8px;
-                    text-decoration: none;
-                    font-family: var(--font-sans);
                     font-size: 0.65rem;
-                    font-weight: 700;
+                    font-weight: 800;
                     letter-spacing: 0.2em;
-                    text-transform: uppercase;
                     color: rgba(255,255,255,0.3);
-                    margin-bottom: 16px;
-                    transition: color 0.2s;
+                    margin-bottom: 8px;
+                    transition: color 0.3s;
                 }
-                .adm-editor-back:hover { color: #00d1ff; }
-
-                .adm-editor-title {
+                .adm-editor-back-hud:hover { color: var(--c-cyan); }
+                .adm-editor-title-main {
                     font-family: var(--font-serif);
-                    font-size: clamp(2rem, 4vw, 3rem);
+                    font-size: 2.2rem;
                     font-weight: 700;
-                    color: #fff;
                     letter-spacing: -0.02em;
-                    margin: 0 0 6px;
-                }
-
-                .adm-editor-desc {
-                    font-family: var(--font-sans);
-                    font-size: 0.85rem;
-                    font-weight: 500;
-                    color: rgba(255,255,255,0.3);
-                    margin: 0;
-                }
-
-                .adm-editor-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 340px;
-                    gap: 28px;
-                    align-items: start;
-                }
-                @media (max-width: 1024px) {
-                    .adm-editor-grid { grid-template-columns: 1fr; }
-                }
-
-                /* ══ Content Card ══ */
-                .adm-editor-content-card {
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 20px;
-                    padding: 40px;
-                }
-
-                .adm-editor-headline {
-                    width: 100%;
-                    font-family: var(--font-serif);
-                    font-size: clamp(1.8rem, 3vw, 3rem);
-                    font-weight: 700;
                     color: #fff;
-                    background: transparent;
-                    border: none;
-                    outline: none;
-                    margin-bottom: 32px;
-                    letter-spacing: -0.02em;
-                }
-                .adm-editor-headline::placeholder {
-                    color: rgba(255,255,255,0.08);
                 }
 
-                .adm-editor-field-group {
-                    margin-bottom: 24px;
-                }
-                .adm-editor-field-group:last-child {
-                    margin-bottom: 0;
-                }
-
-                .adm-editor-label {
-                    display: block;
-                    font-family: var(--font-sans);
-                    font-size: 0.6rem;
-                    font-weight: 700;
-                    letter-spacing: 0.2em;
-                    text-transform: uppercase;
-                    color: rgba(255,255,255,0.25);
-                    margin-bottom: 10px;
-                }
-
-                .adm-editor-textarea {
-                    width: 100%;
-                    padding: 16px 20px;
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 14px;
-                    font-family: var(--font-sans);
-                    font-size: 0.9rem;
-                    font-weight: 500;
-                    color: rgba(255,255,255,0.8);
-                    outline: none;
-                    resize: vertical;
-                    line-height: 1.7;
-                    transition: all 0.3s ease;
-                }
-                .adm-editor-textarea.mono {
-                    font-family: 'SF Mono', 'Fira Code', monospace;
-                    font-size: 0.82rem;
-                    line-height: 1.6;
-                }
-                .adm-editor-textarea::placeholder {
-                    color: rgba(255,255,255,0.15);
-                }
-                .adm-editor-textarea:focus {
-                    background: rgba(255,255,255,0.05);
-                    border-color: rgba(0,209,255,0.25);
-                    box-shadow: 0 0 0 3px rgba(0,209,255,0.05);
-                }
-
-                /* ══ Sidebar Card ══ */
-                .adm-editor-sidebar-card {
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 20px;
-                    padding: 32px;
-                    position: sticky;
-                    top: 24px;
-                }
-
-                .adm-editor-status-toggle {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 8px;
-                }
-
-                .adm-editor-status-btn {
+                .adm-editor-top-actions {
                     display: flex;
                     align-items: center;
-                    justify-content: center;
+                    gap: 16px;
+                }
+                .adm-editor-tool-btn {
+                    display: flex;
+                    align-items: center;
                     gap: 8px;
-                    padding: 12px;
+                    padding: 10px 16px;
+                    background: var(--glass);
+                    border: 1px solid var(--glass-border);
                     border-radius: 12px;
-                    border: 1px solid rgba(255,255,255,0.06);
-                    background: rgba(255,255,255,0.02);
-                    color: rgba(255,255,255,0.3);
-                    font-family: var(--font-sans);
-                    font-size: 0.7rem;
-                    font-weight: 700;
+                    color: rgba(255,255,255,0.4);
+                    font-size: 0.65rem;
+                    font-weight: 800;
                     letter-spacing: 0.1em;
-                    text-transform: uppercase;
-                    cursor: pointer;
-                    transition: all 0.25s ease;
-                }
-                .adm-editor-status-btn:hover {
-                    background: rgba(255,255,255,0.04);
-                    color: rgba(255,255,255,0.5);
-                }
-                .adm-editor-status-btn.active {
-                    background: rgba(255,255,255,0.06);
-                    border-color: rgba(255,255,255,0.12);
-                    color: rgba(255,255,255,0.8);
-                }
-                .adm-editor-status-btn.publish.active {
-                    background: rgba(0,209,255,0.08);
-                    border-color: rgba(0,209,255,0.2);
-                    color: #00d1ff;
-                }
-
-                .adm-editor-select-wrap {
-                    position: relative;
-                }
-
-                .adm-editor-select {
-                    width: 100%;
-                    padding: 14px 40px 14px 16px;
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 12px;
-                    font-family: var(--font-sans);
-                    font-size: 0.82rem;
-                    font-weight: 600;
-                    color: rgba(255,255,255,0.7);
-                    appearance: none;
-                    outline: none;
-                    cursor: pointer;
-                    transition: all 0.25s;
-                }
-                .adm-editor-select option {
-                    background: #1a2d42;
-                    color: #fff;
-                }
-                .adm-editor-select:focus {
-                    border-color: rgba(0,209,255,0.3);
-                }
-
-                .adm-editor-select-chevron {
-                    position: absolute;
-                    right: 14px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    color: rgba(255,255,255,0.25);
-                    pointer-events: none;
-                }
-
-                .adm-editor-number-input {
-                    width: 100%;
-                    padding: 14px 16px;
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 12px;
-                    font-family: var(--font-serif);
-                    font-size: 1.6rem;
-                    font-weight: 700;
-                    color: #00d1ff;
-                    text-align: center;
-                    outline: none;
-                    letter-spacing: -0.02em;
-                    transition: border-color 0.3s;
-                }
-                .adm-editor-number-input:focus {
-                    border-color: rgba(0,209,255,0.3);
-                }
-
-                .adm-editor-text-input {
-                    width: 100%;
-                    padding: 14px 16px;
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 12px;
-                    font-family: var(--font-sans);
-                    font-size: 0.8rem;
-                    font-weight: 500;
-                    color: rgba(255,255,255,0.6);
-                    outline: none;
-                    transition: border-color 0.3s;
-                }
-                .adm-editor-text-input.mono {
-                    font-family: 'SF Mono', 'Fira Code', monospace;
-                    font-size: 0.75rem;
-                    letter-spacing: -0.01em;
-                }
-                .adm-editor-text-input::placeholder {
-                    color: rgba(255,255,255,0.15);
-                }
-                .adm-editor-text-input:focus {
-                    border-color: rgba(0,209,255,0.3);
-                }
-
-                .adm-editor-image-preview {
-                    margin-top: 12px;
-                    width: 100%;
-                    height: 160px;
-                    border-radius: 14px;
-                    overflow: hidden;
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    position: relative;
-                }
-                .adm-editor-image-preview img {
-                    width: 100%; height: 100%;
-                    object-fit: cover;
-                }
-                .adm-editor-image-preview-label {
-                    position: absolute;
-                    bottom: 8px; left: 8px;
-                    padding: 4px 10px;
-                    background: rgba(0,0,0,0.5);
-                    backdrop-filter: blur(8px);
-                    border-radius: 8px;
-                    font-size: 0.55rem;
-                    font-weight: 700;
-                    letter-spacing: 0.15em;
-                    text-transform: uppercase;
-                    color: rgba(255,255,255,0.7);
-                }
-
-                /* ══ Image Upload ══ */
-                .adm-editor-img-mode-toggle {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 6px;
-                    margin-bottom: 12px;
-                }
-
-                .adm-editor-img-mode-btn {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 8px;
-                    padding: 10px;
-                    border-radius: 10px;
-                    border: 1px solid rgba(255,255,255,0.06);
-                    background: rgba(255,255,255,0.02);
-                    color: rgba(255,255,255,0.3);
-                    font-family: var(--font-sans);
-                    font-size: 0.62rem;
-                    font-weight: 700;
-                    letter-spacing: 0.08em;
-                    text-transform: uppercase;
-                    cursor: pointer;
-                    transition: all 0.25s ease;
-                }
-                .adm-editor-img-mode-btn:hover {
-                    color: rgba(255,255,255,0.5);
-                    background: rgba(255,255,255,0.04);
-                }
-                .adm-editor-img-mode-btn.active {
-                    color: #00d1ff;
-                    background: rgba(0,209,255,0.08);
-                    border-color: rgba(0,209,255,0.2);
-                }
-
-                .adm-editor-file-hidden {
-                    display: none;
-                }
-
-                .adm-editor-dropzone {
-                    padding: 32px 20px;
-                    border: 2px dashed rgba(255,255,255,0.1);
-                    border-radius: 14px;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 10px;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    background: transparent;
-                }
-                .adm-editor-dropzone:hover,
-                .adm-editor-dropzone.dragging {
-                    border-color: rgba(0,209,255,0.35);
-                    background: rgba(0,209,255,0.04);
-                }
-
-                .adm-editor-dropzone-icon {
-                    width: 48px; height: 48px;
-                    border-radius: 14px;
-                    background: rgba(255,255,255,0.04);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: rgba(255,255,255,0.2);
                     transition: all 0.3s;
                 }
-                .adm-editor-dropzone:hover .adm-editor-dropzone-icon {
-                    color: rgba(0,209,255,0.5);
-                    background: rgba(0,209,255,0.06);
-                    border-color: rgba(0,209,255,0.15);
-                }
+                .adm-editor-tool-btn:hover { color: var(--c-cyan); border-color: rgba(0,209,255,0.3); background: rgba(0,209,255,0.04); }
 
-                .adm-editor-dropzone-text {
-                    font-size: 0.78rem;
-                    font-weight: 600;
-                    color: rgba(255,255,255,0.35);
-                    margin: 0;
-                }
-                .adm-editor-dropzone-text span {
-                    color: #00d1ff;
-                    text-decoration: underline;
-                    text-underline-offset: 2px;
-                }
-
-                .adm-editor-dropzone-hint {
-                    font-size: 0.62rem;
-                    font-weight: 600;
-                    color: rgba(255,255,255,0.15);
-                    letter-spacing: 0.06em;
-                    margin: 0;
-                }
-
-                .adm-editor-file-info {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 14px 16px;
-                    background: rgba(0,209,255,0.04);
-                    border: 1px solid rgba(0,209,255,0.12);
-                    border-radius: 12px;
-                }
-
-                .adm-editor-file-info-left {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    color: rgba(0,209,255,0.6);
-                }
-                .adm-editor-file-info-left div {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 2px;
-                }
-
-                .adm-editor-file-name {
-                    font-size: 0.75rem;
-                    font-weight: 600;
-                    color: rgba(255,255,255,0.7);
-                    max-width: 180px;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
-
-                .adm-editor-file-size {
-                    font-size: 0.6rem;
-                    font-weight: 600;
-                    color: rgba(255,255,255,0.25);
-                    letter-spacing: 0.05em;
-                }
-
-                .adm-editor-file-remove {
-                    width: 28px; height: 28px;
-                    border-radius: 8px;
-                    border: 1px solid rgba(255,100,100,0.15);
-                    background: rgba(255,100,100,0.06);
-                    color: rgba(255,100,100,0.6);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                }
-                .adm-editor-file-remove:hover {
-                    color: #ff6b6b;
-                    background: rgba(255,100,100,0.12);
-                    border-color: rgba(255,100,100,0.3);
-                }
-
-                .adm-editor-divider {
-                    height: 1px;
-                    background: linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent);
-                    margin: 28px 0;
-                }
-
-                .adm-editor-submit {
+                .adm-editor-tab-hud {
                     position: relative;
-                    overflow: hidden;
-                    width: 100%;
-                    padding: 17px 28px;
-                    background: linear-gradient(135deg, #00d1ff, #1152d4);
-                    border: none;
-                    border-radius: 14px;
-                    cursor: pointer;
-                    transition: box-shadow 0.3s, transform 0.3s;
+                    display: flex;
+                    background: var(--glass);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 12px;
+                    padding: 4px;
+                    height: 42px;
                 }
-                .adm-editor-submit:hover {
-                    box-shadow: 0 12px 40px rgba(0,209,255,0.25);
-                    transform: translateY(-2px);
+                .adm-editor-tab-hud .tab-slider {
+                    position: absolute; top: 4px; bottom: 4px; left: 4px;
+                    width: calc(50% - 4px);
+                    background: rgba(255,255,255,0.08);
+                    border-radius: 8px;
+                    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
                 }
-                .adm-editor-submit:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
-                    transform: none;
-                    box-shadow: none;
-                }
-
-                .adm-editor-submit-text {
+                .adm-editor-tab-hud button {
                     position: relative;
                     z-index: 1;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                    font-family: var(--font-sans);
+                    width: 70px;
+                    font-size: 0.6rem;
+                    font-weight: 800;
+                    color: rgba(255,255,255,0.25);
+                    transition: color 0.3s;
+                }
+                .adm-editor-tab-hud button.active { color: var(--c-cyan); }
+
+                /* ══ Layout ══ */
+                .adm-editor-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 320px;
+                    gap: 40px;
+                    align-items: start;
+                }
+                .zen-active .adm-editor-grid { grid-template-columns: 1fr; }
+
+                .adm-editor-glass-card {
+                    background: rgba(255,255,255,0.015);
+                    backdrop-filter: blur(20px);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 28px;
+                    padding: 48px;
+                    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.5);
+                }
+                .sidebar-config { padding: 32px; position: sticky; top: 40px; }
+
+                /* ══ Input Styling ══ */
+                .adm-editor-input-hero {
+                    width: 100%;
+                    background: transparent;
+                    border: none;
+                    outline: none;
+                    font-family: var(--font-serif);
+                    font-size: 3.5rem;
+                    font-weight: 700;
+                    color: #fff;
+                    margin-bottom: 40px;
+                    letter-spacing: -0.03em;
+                }
+                .adm-editor-input-hero::placeholder { color: rgba(255,255,255,0.05); }
+
+                .adm-editor-field { margin-bottom: 32px; }
+                .adm-editor-field label {
+                    display: block;
+                    font-size: 0.6rem;
+                    font-weight: 800;
+                    letter-spacing: 0.25em;
+                    color: rgba(255,255,255,0.2);
+                    margin-bottom: 12px;
+                }
+                .field-header { display: flex; justify-content: space-between; align-items: baseline; }
+                .char-count { font-size: 0.6rem; color: rgba(255,255,255,0.1); font-weight: 700; }
+
+                .adm-editor-text-area-minimal {
+                    width: 100%;
+                    background: rgba(255,255,255,0.02);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 12px;
+                    padding: 16px;
+                    color: rgba(255,255,255,0.7);
+                    font-size: 0.95rem;
+                    line-height: 1.6;
+                    outline: none;
+                    resize: none;
+                    transition: border-color 0.3s;
+                }
+                .adm-editor-text-area-minimal:focus { border-color: rgba(0,209,255,0.3); }
+
+                /* Sidebar Select */
+                .adm-editor-custom-select {
+                    position: relative;
+                }
+                .adm-editor-custom-select select {
+                    width: 100%;
+                    height: 48px;
+                    background: var(--glass);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 12px;
+                    padding: 0 16px;
                     font-size: 0.75rem;
                     font-weight: 700;
-                    letter-spacing: 0.12em;
-                    text-transform: uppercase;
                     color: #fff;
+                    appearance: none;
+                    outline: none;
+                }
+                .adm-editor-custom-select select option { background: #0a1120; }
+                .adm-editor-custom-select svg {
+                    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+                    color: rgba(255,255,255,0.2); pointer-events: none;
                 }
 
-                .adm-editor-submit-shimmer {
-                    position: absolute; inset: 0;
-                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-                    transform: translateX(-100%);
-                    transition: transform 0.55s ease;
+                /* Tags */
+                .tag-input-wrap input {
+                    width: 100%; height: 44px;
+                    background: var(--glass);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 10px;
+                    padding: 0 14px;
+                    font-size: 0.7rem;
+                    font-weight: 700;
+                    color: var(--c-cyan);
+                    outline: none;
                 }
-                .adm-editor-submit:hover .adm-editor-submit-shimmer {
-                    transform: translateX(100%);
+                .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+                .tag-pill {
+                    display: flex; align-items: center; gap: 8px;
+                    padding: 6px 12px;
+                    background: rgba(0,209,255,0.08);
+                    border: 1px solid rgba(0,209,255,0.15);
+                    border-radius: 8px;
+                    font-size: 0.6rem; font-weight: 800; color: var(--c-cyan);
+                }
+                .tag-pill button { color: rgba(255,255,255,0.3); font-size: 1rem; line-height: 1; }
+
+                /* Dropzone Tech */
+                .adm-editor-dropzone-tech {
+                    position: relative;
+                    width: 100%; height: 160px;
+                    background: rgba(255,255,255,0.01);
+                    border: 1px dashed var(--glass-border);
+                    border-radius: 16px;
+                    cursor: pointer;
+                    overflow: hidden;
+                    transition: all 0.3s;
+                }
+                .adm-editor-dropzone-tech:hover { border-color: var(--c-cyan); background: rgba(0,209,255,0.02); }
+                .dropzone-empty {
+                    height: 100%; width: 100%;
+                    display: flex; flex-direction: column; align-items: center; justify-content: center;
+                    gap: 12px; color: rgba(255,255,255,0.1);
+                }
+                .dropzone-empty span { font-size: 0.6rem; font-weight: 900; letter-spacing: 0.2em; }
+                .image-filled { width: 100%; height: 100%; position: relative; }
+                .image-filled img { width: 100%; height: 100%; object-fit: cover; }
+                .image-filled button {
+                    position: absolute; top: 12px; right: 12px;
+                    padding: 6px 12px; background: rgba(0,0,0,0.6); color: #fff;
+                    font-size: 0.55rem; font-weight: 900; border-radius: 6px; backdrop-filter: blur(4px);
                 }
 
-                .adm-editor-spinner {
-                    animation: adm-editor-spin 0.75s linear infinite;
+                /* Metrics */
+                .sidebar-metrics {
+                    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+                    margin-top: 40px; border-top: 1px solid var(--glass-border); padding-top: 24px;
                 }
-                @keyframes adm-editor-spin { to { transform: rotate(360deg); } }
+                .metric .label { font-size: 0.55rem; color: rgba(255,255,255,0.1); display: block; margin-bottom: 4px; }
+                .metric .val { font-size: 1.2rem; font-family: var(--font-serif); color: var(--c-cyan); font-weight: 700; }
 
-                @media (max-width: 640px) {
-                    .adm-editor-content-card { padding: 24px 20px; }
-                    .adm-editor-sidebar-card { padding: 24px 20px; }
+                /* ══ Executive HUD ══ */
+                .adm-editor-exec-hud {
+                    position: fixed; left: 0; right: 0; bottom: 0; 
+                    height: 90px;
+                    background: rgba(0,0,0,0.2);
+                    backdrop-filter: blur(30px);
+                    border-top: 1px solid var(--glass-border);
+                    display: flex; align-items: center;
+                    z-index: 100;
+                    padding: 0 40px;
                 }
+                .exec-hud-inner {
+                    max-width: 1300px; width: 100%; margin: 0 auto;
+                    display: flex; align-items: center; justify-content: space-between;
+                }
+                .exec-left { display: flex; align-items: center; gap: 24px; }
+                .exit-zen-btn {
+                    display: flex; align-items: center; gap: 8px;
+                    color: rgba(255,255,255,0.4); font-size: 0.65rem; font-weight: 900;
+                }
+                .save-status {
+                    display: flex; align-items: center; gap: 10px;
+                    font-size: 0.6rem; font-weight: 800; color: rgba(255,255,255,0.2); letter-spacing: 0.1em;
+                }
+                .status-dot { width: 6px; height: 6px; background: var(--c-cyan); border-radius: 50%; }
+                .pulsing { animation: dot-pulse 2s infinite; }
+                @keyframes dot-pulse { 0% { opacity:1; } 50% { opacity:0.3; } 100% { opacity:1; } }
+
+                .status-segment-mini {
+                    position: relative; display: flex;
+                    background: rgba(255,255,255,0.03); border-radius: 12px; padding: 4px;
+                }
+                .status-segment-mini .seg-bg {
+                    position: absolute; top: 4px; bottom: 4px; left: 4px; 
+                    width: calc(50% - 4px);
+                    background: var(--c-cyan); border-radius: 8px;
+                    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                    opacity: 0.15;
+                }
+                .status-segment-mini button {
+                    position: relative; z-index: 1; min-width: 80px; padding: 10px;
+                    font-size: 0.65rem; font-weight: 900; color: rgba(255,255,255,0.2); transition: color 0.3s;
+                }
+                .status-segment-mini button.active { color: var(--c-cyan); }
+
+                .exec-submit-btn {
+                    display: flex; align-items: center; gap: 12px;
+                    padding: 14px 32px;
+                    background: linear-gradient(135deg, var(--c-cyan), var(--c-blue));
+                    border-radius: 14px; color: #fff;
+                    font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em;
+                    box-shadow: 0 10px 30px -10px var(--c-cyan);
+                    transition: all 0.3s;
+                }
+                .exec-submit-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px -10px var(--c-cyan); }
+                .exec-submit-btn:disabled { opacity: 0.4; transform: none; box-shadow: none; }
+
+                /* ══ Preview Frame ══ */
+                .adm-editor-preview-frame {
+                    background: #fff; border-radius: 32px; overflow: hidden; color: #000;
+                }
+                .preview-zero { padding: 80px; text-align: center; color: #000; }
+                .preview-hero { height: 400px; background-size: cover; background-position: center; position: relative; }
+                .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #fff, transparent); }
+                .hero-content { position: absolute; bottom: 40px; left: 40px; color: #000; }
+                .hero-content h1 { font-family: var(--font-serif); font-size: 3rem; margin: 10px 0; font-weight: 700; }
+                .preview-body { max-width: 800px; margin: 0 auto; padding: 60px 40px; }
+                .preview-body .excerpt { font-style: italic; color: #666; font-size: 1.2rem; margin-bottom: 40px; border-left: 4px solid var(--c-cyan); padding-left: 20px; }
             `}</style>
         </div>
     )

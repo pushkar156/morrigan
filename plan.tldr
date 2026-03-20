@@ -273,6 +273,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "home page blog sections"
 												}
 											]
@@ -603,6 +608,26 @@
 											"content": [
 												{
 													"type": "text",
+													"text": "chatbot answering format"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
 													"text": "chatbot testing and working"
 												}
 											]
@@ -747,7 +772,7 @@
 			"typeName": "instance"
 		},
 		{
-			"editingShapeId": null,
+			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
 			"croppingShapeId": null,
 			"selectedShapeIds": [
 				"shape:LnL7WgtCHXucFLuKWC5AW"

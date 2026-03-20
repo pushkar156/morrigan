@@ -12,6 +12,7 @@ export default function AdminDashboard() {
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all')
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+    const [isSelectionMode, setIsSelectionMode] = useState(false)
 
     useEffect(() => {
         loadBlogs()
@@ -169,6 +170,16 @@ export default function AdminDashboard() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-sm text-[rgba(255,255,255,0.8)] outline-none focus:border-[#00d1ff]/40 transition-colors w-full md:w-64"
                         />
+                        <button
+                            onClick={() => {
+                                setIsSelectionMode(!isSelectionMode);
+                                if (isSelectionMode) setSelectedIds(new Set()); // Clear selection when turning off
+                            }}
+                            className={`px-4 py-2 text-xs font-bold tracking-widest uppercase transition-all rounded-lg border flex items-center gap-2 ${isSelectionMode ? 'bg-[#00d1ff]/10 border-[#00d1ff]/30 text-[#00d1ff]' : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.4)] hover:text-white'}`}
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 11l3 3L22 4" strokeLinecap="round" strokeLinejoin="round" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                            {isSelectionMode ? 'FINISH' : 'SELECT'}
+                        </button>
                         <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value as any)}
@@ -194,12 +205,16 @@ export default function AdminDashboard() {
                         <thead>
                             <tr>
                                 <th style={{ width: 40, paddingLeft: 24, paddingRight: 0 }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedIds.size === filteredBlogs.length && filteredBlogs.length > 0}
-                                        onChange={toggleSelectAll}
-                                        className="w-4 h-4 rounded border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] cursor-pointer accent-[#00d1ff]"
-                                    />
+                                    {isSelectionMode ? (
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedIds.size === filteredBlogs.length && filteredBlogs.length > 0}
+                                            onChange={toggleSelectAll}
+                                            className="w-4 h-4 rounded border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] cursor-pointer accent-[#00d1ff]"
+                                        />
+                                    ) : (
+                                        "No."
+                                    )}
                                 </th>
                                 <th>Title & Details</th>
                                 <th>Category</th>
@@ -215,15 +230,19 @@ export default function AdminDashboard() {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredBlogs.map((blog) => (
+                                filteredBlogs.map((blog, i) => (
                                     <tr key={blog.id} className="adm-dash-row">
                                         <td style={{ width: 40, paddingLeft: 24, paddingRight: 0 }}>
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedIds.has(blog.id)}
-                                                onChange={() => toggleSelectOne(blog.id)}
-                                                className="w-4 h-4 rounded border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] cursor-pointer accent-[#00d1ff]"
-                                            />
+                                            {isSelectionMode ? (
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedIds.has(blog.id)}
+                                                    onChange={() => toggleSelectOne(blog.id)}
+                                                    className="w-4 h-4 rounded border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.05)] cursor-pointer accent-[#00d1ff]"
+                                                />
+                                            ) : (
+                                                <span className="adm-dash-index">{i + 1}</span>
+                                            )}
                                         </td>
                                         <td className="adm-dash-td-title">
                                             <span className="adm-dash-blog-title">{blog.title}</span>
@@ -497,6 +516,14 @@ export default function AdminDashboard() {
                     text-transform: uppercase;
                     color: rgba(0,209,255,0.7);
                     white-space: nowrap;
+                }
+
+                .adm-dash-index {
+                    font-family: var(--font-sans);
+                    font-size: 0.65rem;
+                    font-weight: 700;
+                    color: rgba(255,255,255,0.15);
+                    letter-spacing: 0.05em;
                 }
 
                 .adm-dash-status {

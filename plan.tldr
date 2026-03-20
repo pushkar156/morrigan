@@ -34,8 +34,8 @@
 	},
 	"records": [
 		{
-			"x": -1451.9159713751073,
-			"y": -492.5087088624365,
+			"x": -2152.79216880457,
+			"y": -499.33885287439807,
 			"rotation": 5.551115123125783e-16,
 			"isLocked": false,
 			"opacity": 1,
@@ -747,7 +747,7 @@
 			"typeName": "instance"
 		},
 		{
-			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
+			"editingShapeId": null,
 			"croppingShapeId": null,
 			"selectedShapeIds": [
 				"shape:LnL7WgtCHXucFLuKWC5AW"
@@ -762,9 +762,9 @@
 			"typeName": "instance_page_state"
 		},
 		{
-			"x": 1842.0076006143017,
-			"y": 648.7291209540664,
-			"z": 0.4096775776168179,
+			"x": 2311.8449906728906,
+			"y": 660.6349360180077,
+			"z": 0.3806663664722533,
 			"meta": {},
 			"id": "camera:page:page",
 			"typeName": "camera"

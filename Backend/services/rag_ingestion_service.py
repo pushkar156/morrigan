@@ -11,11 +11,37 @@ load_dotenv()
 EMBEDDING_MODEL = "models/gemini-embedding-001"
 CHUNK_SIZE = 1500
 CHUNK_OVERLAP = 200
-gemini_key = os.getenv("GEMINI_API_KEY")
+from google.api_core.exceptions import ResourceExhausted, RetryError
+
+gemini_keys = [
+    os.getenv(f"GEMINI_API_KEY_{i}") for i in range(1, 10)
+]
+gemini_keys = [k for k in gemini_keys if k and k != "your_actual_gemini_key_here"]
+if not gemini_keys and os.getenv("GEMINI_API_KEY"):
+    gemini_keys = [os.getenv("GEMINI_API_KEY")]
+
+def execute_with_fallback(action_name, func, *args, **kwargs):
+    if not gemini_keys:
+        raise Exception("No Gemini keys available")
+    
+    last_error = None
+    for i, key in enumerate(gemini_keys):
+        try:
+            genai.configure(api_key=key)
+            if i > 0: time.sleep(1.5)
+            return func(*args, **kwargs)
+        except (ResourceExhausted, RetryError) as e:
+            print(f"[RAG] Key #{i+1} failed ({type(e).__name__}). Falling back...")
+            last_error = e
+        except Exception as e:
+            print(f"[RAG] Key #{i+1} encountered error: {e}. Falling back...")
+            last_error = e
+            
+    raise last_error or Exception("All Gemini keys exhausted or failed.")
+
 pinecone_key = os.getenv("PINECONE_API_KEY")
 index_name = os.getenv("PINECONE_INDEX_NAME")
-if gemini_key:
-    genai.configure(api_key=gemini_key)
+
 pc = None
 index = None
 if pinecone_key and index_name:
@@ -59,7 +85,8 @@ def chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVE
 def generate_embedding(text: str) -> List[float]:
     try:
         time.sleep(1)
-        response = genai.embed_content(
+        response = execute_with_fallback("Embed Chunk", 
+            genai.embed_content,
             model=EMBEDDING_MODEL,
             content=text,
             task_type="retrieval_document"

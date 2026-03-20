@@ -61,7 +61,10 @@ export default function Chatbot() {
   // Auto-scroll on new message
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+      const timer = setTimeout(() => {
+        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+      }, 100)
+      return () => clearTimeout(timer)
     }
   }, [messages, isTyping])
 
@@ -96,10 +99,11 @@ export default function Chatbot() {
       }
 
       // If we're on a blog page, try to get the article content for context
-      if (pathname?.startsWith('/blog/')) {
-        const article = document.querySelector('article')
-        if (article) {
-          payload.page_content = article.innerText.slice(0, 5000) // limit context size
+      if (pathname?.includes('/blog/')) {
+        // Try to get the specific prose area first for cleaner content, fallback to entire article
+        const prose = document.querySelector('.prose') || document.querySelector('article')
+        if (prose) {
+          payload.page_content = (prose as HTMLElement).innerText.slice(0, 5000)
         }
       }
 
@@ -552,14 +556,30 @@ export default function Chatbot() {
           position: relative; z-index: 10;
           flex: 1;
           overflow-y: auto;
+          overflow-x: hidden;
           padding: 20px 18px;
           display: flex;
           flex-direction: column;
           gap: 16px;
           min-height: 0;
-          scrollbar-width: none;
+          /* Premium scrollbar styling */
+          scrollbar-width: thin;
+          scrollbar-color: rgba(17, 82, 212, 0.2) transparent;
         }
-        .cb-messages::-webkit-scrollbar { display: none; }
+        .cb-messages::-webkit-scrollbar { 
+          width: 5px;
+        }
+        .cb-messages::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .cb-messages::-webkit-scrollbar-thumb {
+          background: rgba(17, 82, 212, 0.15);
+          border-radius: 10px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .cb-messages::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 209, 255, 0.3);
+        }
 
         .cb-msg-row {
           display: flex;

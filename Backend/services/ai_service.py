@@ -1,16 +1,45 @@
 import os
 import time
+import random
 from typing import Optional
 import google.generativeai as genai
+from google.api_core.exceptions import ResourceExhausted, RetryError
 from pinecone import Pinecone
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
 load_dotenv()
 
-gemini_key = os.getenv("GEMINI_API_KEY")
-if gemini_key and gemini_key != "your_actual_gemini_key_here":
-    genai.configure(api_key=gemini_key)
+gemini_keys = [
+    os.getenv(f"GEMINI_API_KEY_{i}") for i in range(1, 10)
+]
+gemini_keys = [k for k in gemini_keys if k and k != "your_actual_gemini_key_here"]
+if not gemini_keys and os.getenv("GEMINI_API_KEY"):
+    gemini_keys = [os.getenv("GEMINI_API_KEY")]
+
+def execute_with_fallback(action_name, func, *args, **kwargs):
+    """Executes a Gemini function, falling back to next keys sequentially on failure."""
+    if not gemini_keys:
+        raise Exception("No Gemini keys available")
+    
+    last_error = None
+    for i, key in enumerate(gemini_keys):
+        try:
+            genai.configure(api_key=key)
+            print(f"[AI] Attempting {action_name} with Key #{i+1}...")
+            # Sleep slightly to avoid spamming if rapidly cycling
+            if i > 0: time.sleep(1.5)
+            result = func(*args, **kwargs)
+            return result
+        except (ResourceExhausted, RetryError) as e:
+            print(f"[AI] Key #{i+1} failed ({type(e).__name__}). Falling back to next...")
+            last_error = e
+        except Exception as e:
+            # For other errors, we might still want to retry or just fail. Let's retry just in case it's a 500
+            print(f"[AI] Key #{i+1} encountered error: {e}. Falling back...")
+            last_error = e
+            
+    raise last_error or Exception("All Gemini keys exhausted or failed.")
 
 pinecone_key = os.getenv("PINECONE_API_KEY")
 pinecone_index_name = os.getenv("PINECONE_INDEX_NAME")
@@ -24,13 +53,13 @@ if pinecone_key and pinecone_key != "your_actual_pinecone_key_here" and pinecone
     except Exception as e:
         print(f"Warning: Failed to initialize Pinecone: {e}")
 
-CHAT_MODEL = 'models/gemini-2.0-flash'
+CHAT_MODEL = 'models/gemini-2.5-flash'
 EMBEDDING_MODEL = "models/gemini-embedding-001"
 
 
 def is_service_available() -> bool:
     return all([
-        gemini_key and gemini_key != "your_actual_gemini_key_here",
+        len(gemini_keys) > 0,
         pinecone_key and pinecone_key != "your_actual_pinecone_key_here",
         pinecone_index_name,
         index is not None
@@ -51,10 +80,12 @@ async def ask_morrigan(
         time.sleep(1)
         print(f"[DEBUG] Query: {query[:50]}...")
 
-        if page_content and is_page_specific_question(query, page_url):
+        if page_content and (is_page_specific_question(query, page_url) or "/blog/" in (page_url or "")):
+            # If on a blog, prioritize the local page context for better relevance
             return await answer_page_question_dynamic(query, page_content, page_url)
 
-        res = genai.embed_content(
+        res = execute_with_fallback("Embed Content", 
+            genai.embed_content,
             model=EMBEDDING_MODEL,
             content=query,
             task_type="retrieval_query"
@@ -106,8 +137,11 @@ INSTRUCTIONS:
 - If you cannot answer from the context, say "I don't have enough information in our published articles to answer that fully."
 """
 
-        model = genai.GenerativeModel(CHAT_MODEL)
-        response = model.generate_content(final_prompt)
+        def generate():
+            model = genai.GenerativeModel(CHAT_MODEL)
+            return model.generate_content(final_prompt)
+            
+        response = execute_with_fallback("Generate Content", generate)
         return response.text
 
     except Exception as e:
@@ -132,7 +166,11 @@ def get_page_context(page_url: Optional[str], query: str) -> dict:
 
 def is_page_specific_question(query: str, page_url: Optional[str]) -> bool:
     query_lower = query.lower()
-    keywords = ["this page", "this site", "homepage", "what is this", "navigate", "sections", "where am i"]
+    keywords = [
+        "this page", "this site", "homepage", "what is this", "navigate", 
+        "sections", "where am i", "summarise", "summarize", "about this",
+        "this blog", "this article", "read this", "what does it say"
+    ]
     return any(kw in query_lower for kw in keywords)
 
 
@@ -161,8 +199,11 @@ USER QUESTION: {query}
 
 Answer the question based on what you can see on the page. Be helpful and specific."""
 
-        model = genai.GenerativeModel(CHAT_MODEL)
-        response = model.generate_content(prompt)
+        def generate_dynamic():
+            model = genai.GenerativeModel(CHAT_MODEL)
+            return model.generate_content(prompt)
+            
+        response = execute_with_fallback("Dynamic Content", generate_dynamic)
         return response.text
     except Exception as e:
         print(f"Error in dynamic response: {e}")

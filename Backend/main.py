@@ -75,7 +75,7 @@ def health_check():
 
 @app.get("/api/status")
 def api_status():
-    gemini_key = os.getenv("GEMINI_API_KEY")
+    gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY_1")
     pinecone_key = os.getenv("PINECONE_API_KEY")
 
     return {

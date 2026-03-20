@@ -11,6 +11,8 @@ export default function AdminDashboard() {
 
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all')
+    const [categoryFilter, setCategoryFilter] = useState('all')
+    const [showFilters, setShowFilters] = useState(false)
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
     const [isSelectionMode, setIsSelectionMode] = useState(false)
 
@@ -89,7 +91,8 @@ export default function AdminDashboard() {
         const matchesSearch = b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             b.category.toLowerCase().includes(searchQuery.toLowerCase())
         const matchesStatus = statusFilter === 'all' || b.status === statusFilter
-        return matchesSearch && matchesStatus
+        const matchesCategory = categoryFilter === 'all' || b.category === categoryFilter
+        return matchesSearch && matchesStatus && matchesCategory
     })
 
     return (
@@ -163,13 +166,26 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
-                        <input
-                            type="text"
-                            placeholder="Search titles or categories..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-sm text-[rgba(255,255,255,0.8)] outline-none focus:border-[#00d1ff]/40 transition-colors w-full md:w-64"
-                        />
+                        <div className="flex bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] rounded-lg px-3 items-center w-full md:w-64 focus-within:border-[#00d1ff]/40 transition-colors">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-[rgba(255,255,255,0.2)]"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="bg-transparent border-none px-2 py-2 text-sm text-[rgba(255,255,255,0.8)] outline-none w-full"
+                            />
+                        </div>
+
+                        <button
+                            onClick={() => setShowFilters(!showFilters)}
+                            className={`px-4 py-2 text-xs font-bold tracking-widest uppercase transition-all rounded-lg border flex items-center gap-2 ${showFilters || statusFilter !== 'all' || categoryFilter !== 'all' ? 'bg-[#00d1ff]/10 border-[#00d1ff]/30 text-[#00d1ff]' : 'bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.4)] hover:text-white'}`}
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                            FILTERS
+                            {(statusFilter !== 'all' || categoryFilter !== 'all') && <span className="w-1.5 h-1.5 bg-[#00d1ff] rounded-full" />}
+                        </button>
+
                         <button
                             onClick={() => {
                                 setIsSelectionMode(!isSelectionMode);
@@ -180,15 +196,6 @@ export default function AdminDashboard() {
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 11l3 3L22 4" strokeLinecap="round" strokeLinejoin="round" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" strokeLinecap="round" strokeLinejoin="round" /></svg>
                             {isSelectionMode ? 'FINISH' : 'SELECT'}
                         </button>
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value as any)}
-                            className="bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-sm text-[rgba(255,255,255,0.8)] outline-none focus:border-[#00d1ff]/40 transition-colors"
-                        >
-                            <option value="all">All Status</option>
-                            <option value="published">Published</option>
-                            <option value="draft">Drafts</option>
-                        </select>
                         {selectedIds.size > 0 && (
                             <button
                                 onClick={handleBulkDelete}
@@ -199,6 +206,69 @@ export default function AdminDashboard() {
                         )}
                     </div>
                 </div>
+
+                {/* Expanded Filter Panel */}
+                {showFilters && (
+                    <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        className="overflow-hidden border-b border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.01)]"
+                    >
+                        <div className="p-8 flex flex-col gap-6">
+                            {/* Status Filters */}
+                            <div>
+                                <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-[rgba(255,255,255,0.2)] mb-4">Availability Status</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {['all', 'published', 'draft'].map((s) => (
+                                        <button
+                                            key={s}
+                                            onClick={() => setStatusFilter(s as any)}
+                                            className={`px-4 py-2 rounded-full text-[10px] font-bold tracking-widest uppercase transition-all border ${statusFilter === s ? 'bg-[#142c53] border-[#00d1ff]/40 text-[#00d1ff]' : 'bg-transparent border-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.3)] hover:border-[rgba(255,255,255,0.15)]'}`}
+                                        >
+                                            {s}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            {/* Category Filters */}
+                            <div>
+                                <h3 className="text-[10px] font-bold tracking-[0.2em] uppercase text-[rgba(255,255,255,0.2)] mb-4">Classification Area</h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {[
+                                        { id: 'all', name: 'All Categories' },
+                                        { id: 'back-to-basics', name: 'Back to Basics' },
+                                        { id: 'case-studies', name: 'Case Studies' },
+                                        { id: 'stock-analysis', name: 'Stock Analysis' },
+                                        { id: '100-days-challenge', name: '100 Days Challenge' },
+                                        { id: 'ma-diaries', name: 'M&A Diaries' }
+                                    ].map((c) => (
+                                        <button
+                                            key={c.id}
+                                            onClick={() => setCategoryFilter(c.id)}
+                                            className={`px-4 py-2 rounded-full text-[10px] font-bold tracking-widest uppercase transition-all border ${categoryFilter === c.id ? 'bg-[#142c53] border-[#00d1ff]/40 text-[#00d1ff]' : 'bg-transparent border-[rgba(255,255,255,0.06)] text-[rgba(255,255,255,0.3)] hover:border-[rgba(255,255,255,0.15)]'}`}
+                                        >
+                                            {c.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Clear All */}
+                            {(statusFilter !== 'all' || categoryFilter !== 'all') && (
+                                <div className="mt-2 text-right">
+                                    <button 
+                                        onClick={() => { setStatusFilter('all'); setCategoryFilter('all'); }}
+                                        className="text-[9px] font-bold tracking-[0.2em] uppercase text-[#ff6b6b] hover:text-[#ff4d4d] transition-colors flex items-center gap-2 ml-auto"
+                                    >
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                                        Purge All Filters
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
 
                 <div className="adm-dash-table-scroll">
                     <table className="adm-dash-table">

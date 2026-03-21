@@ -32,7 +32,16 @@ function AdminEditor() {
     const [isDragging, setIsDragging] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [tagInput, setTagInput] = useState('')
+    const titleRef = useRef<HTMLTextAreaElement>(null)
     
+    // Recalculate title height when switching back from preview
+    useEffect(() => {
+        if (activeTab === 'edit' && titleRef.current) {
+            const el = titleRef.current
+            el.style.height = 'auto'
+            el.style.height = el.scrollHeight + 'px'
+        }
+    }, [activeTab])
     const [formData, setFormData] = useState({
         title: '',
         excerpt: '',
@@ -177,6 +186,7 @@ function AdminEditor() {
                         <div className="adm-editor-main-col">
                             <motion.div layout className="adm-editor-glass-card main-writing-card">
                                 <textarea
+                                    ref={titleRef}
                                     placeholder="REPORT HEADLINE..."
                                     className="adm-editor-input-hero"
                                     rows={1}
@@ -192,19 +202,19 @@ function AdminEditor() {
                                 <div className="adm-editor-field">
                                     <div className="field-header">
                                         <label>EXECUTIVE SUMMARY</label>
-                                        <span className="char-count">{formData.excerpt.length}/300</span>
+                                        <span className="char-count">{formData.excerpt.length}/400</span>
                                     </div>
                                     <textarea
                                         placeholder="Briefly describe the report scope..."
                                         className="adm-editor-text-area-minimal"
                                         rows={4}
                                         value={formData.excerpt}
-                                        onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                                        onChange={(e) => setFormData({ ...formData, excerpt: e.target.value.substring(0, 400) })}
                                         data-lenis-prevent
                                     />
                                 </div>
                                 <div className="adm-editor-field editor-body-field">
-                                    <label>INTELLIGENCE BODY</label>
+                                    <label>INTELLIGENCE BODY (MARKDOWN CODE)</label>
                                     <div 
                                         className="rich-editor-container-styled"
                                         data-lenis-prevent
@@ -372,7 +382,7 @@ function AdminEditor() {
                             </div>
                             <div className="preview-body">
                                 {formData.excerpt && <p className="excerpt">"{formData.excerpt}"</p>}
-                                <div className="content prose prose-invert max-w-none">
+                                <div className="content prose max-w-none">
                                     <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
                                         {formData.content}
                                     </ReactMarkdown>
@@ -526,6 +536,31 @@ function AdminEditor() {
                 }
                 .zen-active .adm-editor-grid { grid-template-columns: 1fr; }
 
+                .adm-editor-preview-frame {
+                    background-color: #e8f0fc !important;
+                    min-height: 100vh;
+                    padding: 0;
+                    color: #000;
+                    margin: -40px -20px -120px; /* Offset root padding */
+                    padding-bottom: 200px;
+                }
+                .preview-inner {
+                    background: transparent !important;
+                    color: black;
+                    width: 100%;
+                    margin: 0;
+                    border-radius: 0;
+                    box-shadow: none;
+                }
+                .hero-content {
+                    max-width: 900px;
+                    margin: 0 auto;
+                }
+                .preview-body {
+                    padding: 60px;
+                    max-width: 900px;
+                    margin: 0 auto;
+                }
                 .adm-editor-glass-card {
                     background: rgba(255,255,255,0.015);
                     backdrop-filter: blur(20px);
@@ -780,15 +815,21 @@ function AdminEditor() {
 
                 /* ══ Preview Frame ══ */
                 .adm-editor-preview-frame {
-                    background: #fff; border-radius: 32px; overflow: hidden; color: #000;
+                    background: #e8f0fc !important; border-radius: 32px; overflow: hidden; color: #000;
+                    margin: -40px -20px -120px;
+                    padding-bottom: 200px;
                 }
                 .preview-zero { padding: 80px; text-align: center; color: #000; }
                 .preview-hero { height: 400px; background-size: cover; background-position: center; position: relative; }
-                .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #fff, transparent); }
-                .hero-content { position: absolute; bottom: 40px; left: 40px; color: #000; }
-                .hero-content h1 { font-family: var(--font-serif); font-size: 3rem; margin: 10px 0; font-weight: 700; }
-                .preview-body { max-width: 800px; margin: 0 auto; padding: 60px 40px; }
-                .preview-body .excerpt { font-style: italic; color: #666; font-size: 1.2rem; margin-bottom: 40px; border-left: 4px solid var(--c-cyan); padding-left: 20px; }
+                .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #e8f0fc, transparent); }
+                .hero-content { 
+                    position: absolute; bottom: 60px; left: 0; right: 0; 
+                    max-width: 900px; margin: 0 auto; padding: 0 40px; 
+                    color: #000; 
+                }
+                .hero-content h1 { font-family: var(--font-serif); font-size: 3.5rem; margin: 15px 0; font-weight: 700; color: #000; letter-spacing: -0.02em; }
+                .preview-body { max-width: 900px; margin: 0 auto; padding: 80px 40px; background: transparent; }
+                .preview-body .excerpt { font-style: italic; color: #333; font-size: 1.4rem; margin-bottom: 60px; border-left: 4px solid var(--c-cyan); padding-left: 30px; font-family: var(--font-serif); }
             `}</style>
         </div>
     )

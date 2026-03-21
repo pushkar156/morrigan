@@ -34,8 +34,8 @@
 	},
 	"records": [
 		{
-			"x": -2152.79216880457,
-			"y": -499.33885287439807,
+			"x": -2901.420759501988,
+			"y": -482.44836022438085,
 			"rotation": 5.551115123125783e-16,
 			"isLocked": false,
 			"opacity": 1,
@@ -733,11 +733,13 @@
 		{
 			"followingUserId": null,
 			"opacityForNextShape": 1,
-			"stylesForNextShape": {},
+			"stylesForNextShape": {
+				"tldraw:textAlign": "start"
+			},
 			"brush": null,
 			"scribbles": [],
 			"cursor": {
-				"type": "default",
+				"type": "move",
 				"rotation": 0
 			},
 			"isFocusMode": false,
@@ -765,7 +767,7 @@
 			"isFocused": true,
 			"devicePixelRatio": 1.25,
 			"isCoarsePointer": false,
-			"isHoveringCanvas": false,
+			"isHoveringCanvas": true,
 			"openMenus": [],
 			"isChangingStyle": false,
 			"isReadonly": false,
@@ -777,12 +779,12 @@
 			"typeName": "instance"
 		},
 		{
-			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
+			"editingShapeId": null,
 			"croppingShapeId": null,
 			"selectedShapeIds": [
 				"shape:LnL7WgtCHXucFLuKWC5AW"
 			],
-			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
+			"hoveredShapeId": null,
 			"erasingShapeIds": [],
 			"hintingShapeIds": [],
 			"focusedGroupId": null,
@@ -792,9 +794,9 @@
 			"typeName": "instance_page_state"
 		},
 		{
-			"x": 2311.8449906728906,
-			"y": 660.6349360180077,
-			"z": 0.3806663664722533,
+			"x": 3056.231667581331,
+			"y": 673.6919821110126,
+			"z": 0.3670711290368962,
 			"meta": {},
 			"id": "camera:page:page",
 			"typeName": "camera"

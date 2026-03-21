@@ -26,7 +26,7 @@ export default function BlogPost() {
 
     if (isLoading) {
         return (
-            <article className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
+            <article className="min-h-screen bg-[#e8f0fc] flex items-center justify-center">
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
                     <div style={{
                         width: '40px', height: '40px',
@@ -46,7 +46,7 @@ export default function BlogPost() {
 
     if (!blog) {
         return (
-            <article className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
+            <article className="min-h-screen bg-[#e8f0fc] flex items-center justify-center">
                 <div style={{ textAlign: 'center' }}>
                     <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', color: '#1a1a2e', marginBottom: '16px' }}>
                         Article Not Found
@@ -75,7 +75,7 @@ export default function BlogPost() {
     const categoryDisplay = (blog.category || '').replace(/-/g, ' ').toUpperCase()
 
     return (
-        <article className="min-h-screen bg-[#f8f9fa] selection:bg-[#00d1ff] selection:text-black">
+        <article className="min-h-screen bg-[#e8f0fc] selection:bg-[#00d1ff] selection:text-black">
             {/* Immersive Parallax Header */}
             <div className="relative w-full h-[70vh] min-h-[500px] overflow-hidden">
                 <div
@@ -86,7 +86,7 @@ export default function BlogPost() {
                         transform: 'scale(1.05)'
                     }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#f8f9fa] via-transparent to-black/40" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#e8f0fc] via-transparent to-black/40" />
 
                 <div className="absolute inset-0 flex flex-col items-center justify-end pb-24 px-6 z-10 text-center container-custom">
                     <span className="text-[#00d1ff] font-bold tracking-[0.3em] text-xs uppercase mb-6 bg-black/40 px-4 py-2 rounded-sm backdrop-blur-md border border-white/10">

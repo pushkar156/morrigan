@@ -553,7 +553,7 @@ function AdminEditor() {
 
                 .adm-editor-text-area-minimal {
                     width: 100%;
-                    height: 120px;
+                    min-height: 120px;
                     overflow-y: auto;
                     background: rgba(255,255,255,0.02);
                     border: 1px solid var(--glass-border);

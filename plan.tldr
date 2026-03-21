@@ -253,7 +253,37 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "footer links and images"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
+													"text": "privacy and terms page"
 												}
 											]
 										}
@@ -423,6 +453,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "magnetic cursor working"
 												}
 											]
@@ -463,6 +498,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "404 page design"
 												}
 											]
@@ -829,7 +869,7 @@
 			"selectedShapeIds": [
 				"shape:LnL7WgtCHXucFLuKWC5AW"
 			],
-			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
+			"hoveredShapeId": null,
 			"erasingShapeIds": [],
 			"hintingShapeIds": [],
 			"focusedGroupId": null,

@@ -486,7 +486,11 @@ function AdminEditor() {
                                 <div className="hero-content">
                                     <span className="cat">{categories.find(c => c.id === formData.category)?.name}</span>
                                     <h1>{formData.title || 'UNTITLED REPORT'}</h1>
-                                    <div className="meta">{formData.read_time} MIN READ • PREVIEW MODE</div>
+                                    <div className="flex items-center justify-center gap-6 mt-6 text-[#1152d4] font-sans tracking-wide text-sm uppercase font-bold drop-shadow-sm">
+                                        <span>{formData.read_time || '0'} MIN READ</span>
+                                        <span className="w-1.5 h-1.5 bg-[#1152d4] rounded-full opacity-80" />
+                                        <span>PREVIEW MODE</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -562,15 +566,15 @@ function AdminEditor() {
                                 <aside className="hidden xl:flex flex-col w-[320px] shrink-0 gap-12 lg:pl-4 mt-8">
 
                                     <div className="flex flex-col gap-6">
-                                        <h3 className="text-[10px] font-bold text-black/40 uppercase tracking-widest border-b border-black/5 pb-2">Further Analysis</h3>
+                                        <h3 className="text-[12px] font-bold text-black/50 uppercase tracking-widest border-b border-black/5 pb-2">Further Analysis</h3>
                                         <div className="flex flex-col gap-7">
                                             {/* Mock Related Report */}
                                             <div className="group block cursor-pointer opactity-50">
                                                 <div className="aspect-[16/9] w-full mb-4 rounded-lg bg-[#e8f0fc] border border-black/5"></div>
-                                                <div className="flex flex-col gap-2 relative">
-                                                    <p className="text-[10px] font-bold text-[#1152d4] tracking-widest uppercase">MOCK CATEGORY</p>
-                                                    <h4 className="text-[15px] font-serif font-bold text-black/70 leading-[1.35]">Sample Related Briefing Will Appear Here</h4>
-                                                    <p className="text-[11.5px] text-black/40 leading-relaxed mt-1 font-medium">This is a dynamic section that will populate with similar reports upon publication.</p>
+                                                <div className="flex flex-col gap-0.5 relative">
+                                                    <p className="text-[10px] font-bold text-[#1152d4] tracking-widest uppercase mb-0.5">MOCK CATEGORY</p>
+                                                    <h4 className="text-[16px] font-serif font-bold text-black/80 leading-[1.25]">Sample Related Briefing Will Appear Here</h4>
+                                                    <p className="text-[12.5px] text-black/60 leading-snug font-medium mt-1">This is a dynamic section that will populate with similar reports upon publication.</p>
                                                 </div>
                                             </div>
                                         </div>

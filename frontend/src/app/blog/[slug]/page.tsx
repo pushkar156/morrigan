@@ -214,11 +214,11 @@ export default function BlogPost() {
                     <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-white max-w-5xl leading-tight mb-8 drop-shadow-xl">
                         {blog.title}
                     </h1>
-                    <div className="flex items-center gap-6 text-white/70 font-sans tracking-wide text-sm uppercase">
-                        <span>By <strong className="text-white">{blog.author}</strong></span>
-                        <span className="w-1 h-1 bg-[#00d1ff] rounded-full" />
+                    <div className="flex items-center gap-6 text-[#1152d4] font-sans tracking-wide text-sm uppercase font-bold drop-shadow-sm">
+                        <span>By <strong className="text-[#1152d4] font-black">{blog.author}</strong></span>
+                        <span className="w-1.5 h-1.5 bg-[#1152d4] rounded-full opacity-80" />
                         <span>{date}</span>
-                        <span className="w-1 h-1 bg-[#00d1ff] rounded-full" />
+                        <span className="w-1.5 h-1.5 bg-[#1152d4] rounded-full opacity-80" />
                         <span>{blog.read_time} MIN READ</span>
                     </div>
                 </div>
@@ -300,7 +300,7 @@ export default function BlogPost() {
 
                     {relatedBlogs.length > 0 && (
                         <div className="flex flex-col gap-6">
-                            <h3 className="text-[10px] font-bold text-black/40 uppercase tracking-widest border-b border-black/5 pb-2">Further Analysis</h3>
+                            <h3 className="text-[12px] font-bold text-black/50 uppercase tracking-widest border-b border-black/5 pb-2">Further Analysis</h3>
                             <div className="flex flex-col gap-7">
                                 {relatedBlogs.map((related) => (
                                     <Link key={related.id} href={`/blog/${related.slug}`} className="group block">
@@ -313,10 +313,10 @@ export default function BlogPost() {
                                                 />
                                             )}
                                         </div>
-                                        <div className="flex flex-col gap-2 relative">
-                                            <p className="text-[10px] font-bold text-[#1152d4] tracking-widest uppercase">{related.category?.replace(/-/g, ' ')}</p>
-                                            <h4 className="text-[15px] font-serif font-bold text-black/80 group-hover:text-[#1152d4] transition-colors leading-[1.35]">{related.title}</h4>
-                                            <p className="text-[11.5px] text-black/50 xl:line-clamp-2 leading-relaxed mt-1 font-medium">{related.excerpt}</p>
+                                        <div className="flex flex-col gap-0.5 relative">
+                                            <p className="text-[10px] font-bold text-[#1152d4] tracking-widest uppercase mb-0.5">{related.category?.replace(/-/g, ' ')}</p>
+                                            <h4 className="text-[16px] font-serif font-bold text-black/80 group-hover:text-[#1152d4] transition-colors leading-[1.25]">{related.title}</h4>
+                                            <p className="text-[12.5px] text-black/60 xl:line-clamp-2 leading-snug font-medium mt-1">{related.excerpt}</p>
                                         </div>
                                     </Link>
                                 ))}

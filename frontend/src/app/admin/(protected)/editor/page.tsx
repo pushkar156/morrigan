@@ -189,14 +189,18 @@ function AdminEditor() {
                                     <textarea
                                         placeholder="Briefly describe the report scope..."
                                         className="adm-editor-text-area-minimal"
-                                        rows={2}
+                                        rows={4}
                                         value={formData.excerpt}
                                         onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                                        data-lenis-prevent
                                     />
                                 </div>
                                 <div className="adm-editor-field editor-body-field">
                                     <label>INTELLIGENCE BODY</label>
-                                    <div className="rich-editor-container-styled">
+                                    <div 
+                                        className="rich-editor-container-styled"
+                                        data-lenis-prevent
+                                    >
                                         <RichTextEditor 
                                             content={formData.content} 
                                             onChange={(html) => setFormData({ ...formData, content: html })} 
@@ -409,6 +413,9 @@ function AdminEditor() {
             </motion.div>
 
             <style jsx global>{`
+                body.lock-page-scroll {
+                    overflow: hidden !important;
+                }
                 :root {
                     --c-cyan: #00d1ff;
                     --c-blue: #1152d4;
@@ -546,6 +553,8 @@ function AdminEditor() {
 
                 .adm-editor-text-area-minimal {
                     width: 100%;
+                    height: 120px;
+                    overflow-y: auto;
                     background: rgba(255,255,255,0.02);
                     border: 1px solid var(--glass-border);
                     border-radius: 12px;
@@ -558,6 +567,27 @@ function AdminEditor() {
                     transition: border-color 0.3s;
                 }
                 .adm-editor-text-area-minimal:focus { border-color: rgba(0,209,255,0.3); }
+
+                /* Premium Internal Scrollbars */
+                .adm-editor-text-area-minimal::-webkit-scrollbar,
+                .rich-editor-internal-scroll::-webkit-scrollbar {
+                    width: 4px;
+                }
+                .adm-editor-text-area-minimal::-webkit-scrollbar-track,
+                .rich-editor-internal-scroll::-webkit-scrollbar-track {
+                    background: rgba(255,255,255,0.02);
+                }
+                .adm-editor-text-area-minimal::-webkit-scrollbar-thumb,
+                .rich-editor-internal-scroll::-webkit-scrollbar-thumb {
+                    background: var(--c-cyan);
+                    border-radius: 10px;
+                }
+
+                .rich-editor-container-styled {
+                    border-radius: 12px;
+                    overflow: hidden;
+                    border: 1px solid var(--glass-border);
+                }
 
                 /* Custom Cat Dropdown */
                 .adm-editor-cat-dropdown-root {

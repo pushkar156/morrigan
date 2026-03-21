@@ -155,7 +155,10 @@ export default function RichTextEditor({
             </div>
             
             {/* Editor Content Area */}
-            <div className="p-5 flex-grow overflow-y-auto min-h-[400px] max-h-[800px] custom-prose">
+            <div 
+                className="p-5 flex-grow overflow-y-auto rich-editor-internal-scroll custom-prose"
+                style={{ maxHeight: '600px' }}
+            >
                 <EditorContent editor={editor} />
             </div>
 

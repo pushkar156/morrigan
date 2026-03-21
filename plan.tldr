@@ -298,7 +298,7 @@
 											"content": [
 												{
 													"type": "text",
-													"text": "latest 4 cards to be shown in home page"
+													"text": "latest 5 cards to be shown in home page"
 												}
 											]
 										}
@@ -458,11 +458,6 @@
 											"content": [
 												{
 													"type": "text",
-													"marks": [
-														{
-															"type": "highlight"
-														}
-													],
 													"text": "admin panel"
 												}
 											]
@@ -483,11 +478,6 @@
 											"content": [
 												{
 													"type": "text",
-													"marks": [
-														{
-															"type": "highlight"
-														}
-													],
 													"text": "editor space"
 												}
 											]
@@ -548,6 +538,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "backend"
 												}
 											]
@@ -568,6 +563,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "fastapi setup"
 												}
 											]
@@ -588,6 +588,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "database"
 												}
 											]
@@ -760,7 +765,7 @@
 			"isFocused": true,
 			"devicePixelRatio": 1.25,
 			"isCoarsePointer": false,
-			"isHoveringCanvas": true,
+			"isHoveringCanvas": false,
 			"openMenus": [],
 			"isChangingStyle": false,
 			"isReadonly": false,

@@ -298,6 +298,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "latest 5 cards to be shown in home page"
 												}
 											]
@@ -438,7 +443,7 @@
 											"content": [
 												{
 													"type": "text",
-													"text": "contact page email connectio"
+													"text": "contact page email connection"
 												}
 											]
 										}
@@ -478,6 +483,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "admin panel"
 												}
 											]
@@ -498,6 +508,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "editor space"
 												}
 											]
@@ -518,6 +533,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "admin panel connections"
 												}
 											]
@@ -538,6 +558,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "search bar and category filter in admin panel"
 												}
 											]

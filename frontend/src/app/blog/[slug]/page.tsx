@@ -159,26 +159,20 @@ export default function BlogPost() {
 
     if (!blog) {
         return (
-            <article className="min-h-screen bg-[#e8f0fc] flex items-center justify-center">
-                <div style={{ textAlign: 'center' }}>
-                    <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', color: '#1a1a2e', marginBottom: '16px' }}>
-                        Article Not Found
-                    </h1>
-                    <p style={{ fontFamily: 'var(--font-sans)', color: 'rgba(0,0,0,0.5)', marginBottom: '24px' }}>
-                        The article you&apos;re looking for doesn&apos;t exist or has been removed.
-                    </p>
-                    <Link href="/journal" style={{
-                        fontFamily: 'var(--font-sans)',
-                        color: '#1152d4',
-                        fontWeight: 600,
-                        textDecoration: 'none',
-                        borderBottom: '2px solid #00d1ff',
-                        paddingBottom: '2px',
-                    }}>
-                        ← Back to Journal
-                    </Link>
-                </div>
-            </article>
+            <div className="min-h-screen bg-[#e8f0fc] flex flex-col items-center justify-center font-sans px-6 text-center">
+                <h1 className="text-[120px] md:text-[160px] leading-none font-bold text-[#1152d4] mb-4 font-serif drop-shadow-sm">
+                    404
+                </h1>
+                <p className="text-xl md:text-2xl text-black/60 mb-10 font-medium tracking-tight">
+                    Article Not Found
+                </p>
+                <Link 
+                    href="/journal" 
+                    className="bg-[#1152d4] text-white px-8 py-3.5 rounded text-[11px] font-bold uppercase tracking-widest hover:bg-[#0c3e98] transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-[#1152d4]/50"
+                >
+                    Return to Journal
+                </Link>
+            </div>
         )
     }
 

@@ -176,12 +176,18 @@ function AdminEditor() {
                         {/* Write Column */}
                         <div className="adm-editor-main-col">
                             <motion.div layout className="adm-editor-glass-card main-writing-card">
-                                <input
-                                    type="text"
+                                <textarea
                                     placeholder="REPORT HEADLINE..."
                                     className="adm-editor-input-hero"
+                                    rows={1}
                                     value={formData.title}
-                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, title: e.target.value });
+                                        // Auto-resize
+                                        e.target.style.height = 'auto';
+                                        e.target.style.height = e.target.scrollHeight + 'px';
+                                    }}
+                                    data-lenis-prevent
                                 />
                                 <div className="adm-editor-field">
                                     <div className="field-header">
@@ -542,6 +548,9 @@ function AdminEditor() {
                     color: #fff;
                     margin-bottom: 40px;
                     letter-spacing: -0.03em;
+                    resize: none;
+                    overflow-y: hidden;
+                    line-height: 1.1;
                 }
                 .adm-editor-input-hero::placeholder { color: rgba(255,255,255,0.05); }
 

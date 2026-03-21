@@ -438,6 +438,26 @@
 											"content": [
 												{
 													"type": "text",
+													"text": "contact page email connectio"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
 													"text": "404 page design"
 												}
 											]
@@ -739,7 +759,7 @@
 			"brush": null,
 			"scribbles": [],
 			"cursor": {
-				"type": "move",
+				"type": "default",
 				"rotation": 0
 			},
 			"isFocusMode": false,
@@ -779,12 +799,12 @@
 			"typeName": "instance"
 		},
 		{
-			"editingShapeId": null,
+			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
 			"croppingShapeId": null,
 			"selectedShapeIds": [
 				"shape:LnL7WgtCHXucFLuKWC5AW"
 			],
-			"hoveredShapeId": null,
+			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
 			"erasingShapeIds": [],
 			"hintingShapeIds": [],
 			"focusedGroupId": null,
@@ -794,9 +814,9 @@
 			"typeName": "instance_page_state"
 		},
 		{
-			"x": 3056.231667581331,
-			"y": 673.6919821110126,
-			"z": 0.3670711290368962,
+			"x": 3064.889507453318,
+			"y": 688.4896391440477,
+			"z": 0.35976641356906197,
 			"meta": {},
 			"id": "camera:page:page",
 			"typeName": "camera"

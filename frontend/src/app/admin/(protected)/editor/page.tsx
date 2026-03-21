@@ -490,7 +490,7 @@ function AdminEditor() {
                                 </div>
                             </div>
 
-                            <div className="container-custom max-w-7xl mx-auto py-20 px-6 flex flex-col lg:flex-row gap-20 relative">
+                            <div className="container-custom max-w-[85rem] mx-auto py-20 px-6 flex flex-col xl:flex-row gap-12 lg:gap-16 relative">
                                 {/* TOC Sidebar */}
                                 <aside className="hidden lg:flex flex-col w-56 shrink-0 relative">
                                     <div className="sticky top-40 flex flex-col gap-12">
@@ -557,6 +557,25 @@ function AdminEditor() {
                                         <span className="w-1.5 h-1.5 bg-black rounded-full" />
                                     </div>
                                 </div>
+
+                                {/* Right Sidebar Preview (Mock) */}
+                                <aside className="hidden xl:flex flex-col w-[320px] shrink-0 gap-12 lg:pl-4 mt-8">
+
+                                    <div className="flex flex-col gap-6">
+                                        <h3 className="text-[10px] font-bold text-black/40 uppercase tracking-widest border-b border-black/5 pb-2">Further Analysis</h3>
+                                        <div className="flex flex-col gap-7">
+                                            {/* Mock Related Report */}
+                                            <div className="group block cursor-pointer opactity-50">
+                                                <div className="aspect-[16/9] w-full mb-4 rounded-lg bg-[#e8f0fc] border border-black/5"></div>
+                                                <div className="flex flex-col gap-2 relative">
+                                                    <p className="text-[10px] font-bold text-[#1152d4] tracking-widest uppercase">MOCK CATEGORY</p>
+                                                    <h4 className="text-[15px] font-serif font-bold text-black/70 leading-[1.35]">Sample Related Briefing Will Appear Here</h4>
+                                                    <p className="text-[11.5px] text-black/40 leading-relaxed mt-1 font-medium">This is a dynamic section that will populate with similar reports upon publication.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </aside>
                             </div>
                         </div>
                     </div>

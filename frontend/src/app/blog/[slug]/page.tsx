@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { fetchBlog } from '@/lib/api'
+import { fetchBlog, fetchBlogs } from '@/lib/api'
 import type { Blog } from '@/lib/types'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -19,13 +19,23 @@ export default function BlogPost() {
     const [isLoading, setIsLoading] = useState(true)
     const [activeId, setActiveId] = useState<string>('')
 
+    const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([])
+
     const { scrollYProgress } = useScroll()
     const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
 
     useEffect(() => {
         if (slug) {
             fetchBlog(slug)
-                .then(data => setBlog(data))
+                .then(data => {
+                    setBlog(data)
+                    // Fetch related blogs from the same category
+                    if (data?.category) {
+                        fetchBlogs(data.category).then(related => {
+                            setRelatedBlogs(related.filter(b => b.slug !== slug).slice(0, 3))
+                        })
+                    }
+                })
                 .catch(err => console.error('Failed to load blog:', err))
                 .finally(() => setIsLoading(false))
         }
@@ -214,7 +224,7 @@ export default function BlogPost() {
                 </div>
             </div>
 
-            <div className="container-custom max-w-7xl mx-auto py-20 px-6 flex flex-col lg:flex-row gap-20 relative">
+            <div className="container-custom max-w-[85rem] mx-auto py-20 px-6 flex flex-col xl:flex-row gap-12 lg:gap-16 relative">
                 <aside className="hidden lg:flex flex-col w-56 shrink-0 relative">
                     <div className="sticky top-40 flex flex-col gap-12">
                         {/* Directory Root */}
@@ -284,6 +294,36 @@ export default function BlogPost() {
                         <span className="w-1.5 h-1.5 bg-black rounded-full" />
                     </div>
                 </div>
+
+                {/* Right Sidebar: Related Analysis & Additional Info */}
+                <aside className="hidden xl:flex flex-col w-[320px] shrink-0 gap-12 lg:pl-4">
+
+                    {relatedBlogs.length > 0 && (
+                        <div className="flex flex-col gap-6">
+                            <h3 className="text-[10px] font-bold text-black/40 uppercase tracking-widest border-b border-black/5 pb-2">Further Analysis</h3>
+                            <div className="flex flex-col gap-7">
+                                {relatedBlogs.map((related) => (
+                                    <Link key={related.id} href={`/blog/${related.slug}`} className="group block">
+                                        <div className="aspect-[16/9] w-full mb-4 rounded-lg overflow-hidden bg-black/5 relative shadow-sm border border-black/5">
+                                            {related.featured_image && (
+                                                <img 
+                                                    src={related.featured_image} 
+                                                    alt={related.title} 
+                                                    className="w-full h-full object-cover filter grayscale transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-105 group-hover:grayscale-0"
+                                                />
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col gap-2 relative">
+                                            <p className="text-[10px] font-bold text-[#1152d4] tracking-widest uppercase">{related.category?.replace(/-/g, ' ')}</p>
+                                            <h4 className="text-[15px] font-serif font-bold text-black/80 group-hover:text-[#1152d4] transition-colors leading-[1.35]">{related.title}</h4>
+                                            <p className="text-[11.5px] text-black/50 xl:line-clamp-2 leading-relaxed mt-1 font-medium">{related.excerpt}</p>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </aside>
             </div>
 
             <style jsx global>{`

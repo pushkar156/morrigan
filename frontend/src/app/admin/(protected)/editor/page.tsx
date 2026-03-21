@@ -1057,18 +1057,21 @@ function AdminEditor() {
                     padding: 1.2rem 1rem;
                     border-bottom: 1px solid #e8f0fc;
                     color: rgba(0, 0, 0, 0.7);
+                    font-variant-numeric: tabular-nums;
                 }
+                .analyst-table tr:nth-child(even) { background: #fcfdfe; }
 
                 .primary-excerpt {
-                    font-size: 1.5rem;
-                    line-height: 1.6;
                     font-family: var(--font-serif);
-                    color: #1152d4;
                     font-style: italic;
-                    margin-bottom: 4rem;
-                    border-left: 5px solid #00d1ff;
-                    padding-left: 2.5rem;
-                    font-weight: 600;
+                    color: #333;
+                    font-size: 1.4rem;
+                    line-height: 1.6;
+                    margin-bottom: 60px;
+                    border-left: 4px solid #00d1ff;
+                    padding-left: 30px;
+                    font-weight: 500;
+                    text-align: left;
                 }
 
                 /* ══ Preview Layout ══ */

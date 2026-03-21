@@ -6,6 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { createBlog, updateBlog, uploadImage, fetchAdminBlogs } from '@/lib/api'
 import type { Blog } from '@/lib/types'
 import RichTextEditor from '@/components/RichTextEditor'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
 
 export default function AdminEditorPage() {
     return (
@@ -45,8 +48,7 @@ function AdminEditor() {
 
     // -- Metrics --
     const metrics = useMemo(() => {
-        const text = formData.content.replace(/<[^>]*>?/gm, ' ') // Replace tags with space
-        const words = text.trim().split(/\s+/).filter(w => w.length > 0)
+        const words = formData.content.trim().split(/\s+/).filter(w => w.length > 0)
         return { wordCount: words.length }
     }, [formData.content])
 
@@ -364,7 +366,11 @@ function AdminEditor() {
                             </div>
                             <div className="preview-body">
                                 {formData.excerpt && <p className="excerpt">"{formData.excerpt}"</p>}
-                                <div className="content prose prose-invert" dangerouslySetInnerHTML={{ __html: formData.content }} />
+                                <div className="content prose prose-invert max-w-none">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                                        {formData.content}
+                                    </ReactMarkdown>
+                                </div>
                             </div>
                          </div>
                     </div>

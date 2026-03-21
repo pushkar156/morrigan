@@ -5,6 +5,9 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { fetchBlog } from '@/lib/api'
 import type { Blog } from '@/lib/types'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
 
 export default function BlogPost() {
     const params = useParams()
@@ -142,15 +145,20 @@ export default function BlogPost() {
                         </p>
                     )}
 
-                    <div
-                        className="prose prose-lg prose-slate max-w-none 
+                    <div className="prose prose-lg prose-slate max-w-none 
                                    prose-p:font-sans prose-p:text-black/80 prose-p:leading-loose prose-p:tracking-wide
                                    prose-headings:font-serif prose-headings:text-black prose-headings:tracking-tight
                                    prose-a:text-[#1152d4] prose-a:no-underline hover:prose-a:underline
                                    prose-strong:text-black
                                    prose-li:text-black/80 prose-li:leading-loose"
-                        dangerouslySetInnerHTML={{ __html: blog.content }}
-                    />
+                    >
+                        <ReactMarkdown 
+                            remarkPlugins={[remarkGfm]} 
+                            rehypePlugins={[rehypeRaw]}
+                        >
+                            {blog.content}
+                        </ReactMarkdown>
+                    </div>
 
                     {/* End mark */}
                     <div className="flex items-center justify-center gap-4 my-20 opacity-20">

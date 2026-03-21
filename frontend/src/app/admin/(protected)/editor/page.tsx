@@ -1,6 +1,6 @@
 "use client"
 import { useState, useRef, useCallback, useEffect, Suspense, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createBlog, updateBlog, uploadImage, fetchAdminBlogs } from '@/lib/api'
@@ -9,6 +9,8 @@ import RichTextEditor from '@/components/RichTextEditor'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github-dark.css'
 
 export default function AdminEditorPage() {
     return (
@@ -33,15 +35,6 @@ function AdminEditor() {
     const fileInputRef = useRef<HTMLInputElement>(null)
     const [tagInput, setTagInput] = useState('')
     const titleRef = useRef<HTMLTextAreaElement>(null)
-    
-    // Recalculate title height when switching back from preview
-    useEffect(() => {
-        if (activeTab === 'edit' && titleRef.current) {
-            const el = titleRef.current
-            el.style.height = 'auto'
-            el.style.height = el.scrollHeight + 'px'
-        }
-    }, [activeTab])
     const [formData, setFormData] = useState({
         title: '',
         excerpt: '',
@@ -83,6 +76,79 @@ function AdminEditor() {
             }).catch(err => console.error('Failed to load blog:', err))
         }
     }, [editId])
+
+    // Recalculate title height when switching back from preview
+    useEffect(() => {
+        if (activeTab === 'edit' && titleRef.current) {
+            const el = titleRef.current
+            el.style.height = 'auto'
+            el.style.height = el.scrollHeight + 'px'
+        }
+    }, [activeTab])
+
+    const { scrollYProgress } = useScroll()
+    const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
+
+    const toc = useMemo(() => {
+        if (!formData.content) return []
+        const lines = formData.content.split('\n')
+        return lines
+            .filter(line => line.startsWith('#'))
+            .map(line => {
+                const level = line.match(/^#+/)?.[0].length || 1
+                const text = line.replace(/^#+\s*/, '')
+                const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
+                return { level, text, id }
+            })
+    }, [formData.content])
+
+    const markdownComponents = {
+        code({ className, children, ...props }: any) {
+            const match = /language-(\w+)/.exec(className || '')
+            const language = match ? match[1] : ''
+            return language ? (
+                <div className="syntax-highlighter-block">
+                    <pre>
+                        <code 
+                            className={`hljs language-${language}`}
+                            dangerouslySetInnerHTML={{ 
+                                __html: hljs.highlight(String(children).replace(/\n$/, ''), { language }).value 
+                            }}
+                        />
+                    </pre>
+                </div>
+            ) : (
+                <code className="inline-code-intel" {...props}>{children}</code>
+            )
+        },
+        blockquote({ children }: any) {
+            return (
+                <div className="intel-callout-box">
+                    <div className="pulse-indicator" />
+                    <div className="callout-inner">{children}</div>
+                </div>
+            )
+        },
+        table({ children }: any) {
+            return (
+                <div className="analyst-table-scroll">
+                    <table className="analyst-table">{children}</table>
+                </div>
+            )
+        },
+        h1: ({ children }: any) => {
+            const id = String(children).toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
+            return <h1 id={id} className="markdown-h-intel">{children}</h1>
+        },
+        h2: ({ children }: any) => {
+            const id = String(children).toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
+            return <h2 id={id} className="markdown-h-intel">{children}</h2>
+        },
+        h3: ({ children }: any) => {
+            const id = String(children).toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
+            return <h3 id={id} className="markdown-h-intel-sub">{children}</h3>
+        }
+    }
 
     const handleSave = async (e?: React.FormEvent) => {
         if (e) e.preventDefault()
@@ -370,8 +436,13 @@ function AdminEditor() {
                     </div>
                 ) : (
                     <div className="adm-editor-preview-frame">
-                         {/* Re-use preview block from original code but wrapped in premium container */}
-                         <div className="preview-inner">
+                        {/* Reading Progress Bar */}
+                        <motion.div 
+                            className="fixed top-0 left-0 right-0 h-1 bg-[#00d1ff] z-[1001] origin-left"
+                            style={{ scaleX }}
+                        />
+
+                        <div className="preview-inner">
                             <div className="preview-hero" style={{ backgroundImage: `url(${formData.featured_image || '/logo.png'})` }}>
                                 <div className="hero-overlay" />
                                 <div className="hero-content">
@@ -380,15 +451,61 @@ function AdminEditor() {
                                     <div className="meta">{formData.read_time} MIN READ • PREVIEW MODE</div>
                                 </div>
                             </div>
-                            <div className="preview-body">
-                                {formData.excerpt && <p className="excerpt">"{formData.excerpt}"</p>}
-                                <div className="content prose max-w-none">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-                                        {formData.content}
-                                    </ReactMarkdown>
+
+                            <div className="container-custom max-w-7xl mx-auto py-20 px-6 flex flex-col lg:flex-row gap-20 relative">
+                                {/* TOC Sidebar */}
+                                <aside className="hidden lg:flex flex-col w-56 shrink-0 relative">
+                                    <div className="sticky top-40 flex flex-col gap-10">
+                                        <div className="text-[10px] font-black tracking-widest text-black/30 uppercase flex items-center gap-2">
+                                            <span>INTEL</span>
+                                            <span>/</span>
+                                            <span>{categories.find(c => c.id === formData.category)?.name?.toUpperCase()}</span>
+                                        </div>
+
+                                        {toc.length > 0 && (
+                                            <div>
+                                                <p className="text-xs font-bold text-black/40 uppercase tracking-widest mb-6 border-b border-black/5 pb-2">Execution Path</p>
+                                                <ul className="flex flex-col gap-3">
+                                                    {toc.map((item, i) => (
+                                                        <li key={i} style={{ paddingLeft: `${(item.level - 1) * 12}px` }}>
+                                                            <span className="block text-[11px] font-bold text-black/40 uppercase tracking-tight">
+                                                                {item.text}
+                                                            </span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
+                                </aside>
+
+                                <div className="w-full max-w-[70ch] mx-auto lg:mx-0">
+                                    <div className="briefing-content">
+                                        {formData.excerpt && (
+                                            <p className="primary-excerpt">
+                                                &ldquo;{formData.excerpt}&rdquo;
+                                            </p>
+                                        )}
+
+                                        <div className="prose-intel-root">
+                                            <ReactMarkdown 
+                                                remarkPlugins={[remarkGfm]} 
+                                                rehypePlugins={[rehypeRaw]}
+                                                components={markdownComponents}
+                                            >
+                                                {formData.content}
+                                            </ReactMarkdown>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-center gap-4 my-24 opacity-10">
+                                        <span className="w-1.5 h-1.5 bg-black rounded-full" />
+                                        <span className="w-2 h-2 bg-black rounded-full" />
+                                        <span className="w-1.5 h-1.5 bg-black rounded-full" />
+                                    </div>
                                 </div>
                             </div>
-                         </div>
+                        </div>
                     </div>
                 )}
             </main>
@@ -806,30 +923,218 @@ function AdminEditor() {
                     padding: 14px 32px;
                     background: linear-gradient(135deg, var(--c-cyan), var(--c-blue));
                     border-radius: 14px; color: #fff;
-                    font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em;
+                    border-radius: 14px;
+                    color: #fff;
+                    font-size: 0.75rem;
+                    font-weight: 800;
+                    letter-spacing: 0.1em;
                     box-shadow: 0 10px 30px -10px var(--c-cyan);
                     transition: all 0.3s;
                 }
-                .exec-submit-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px -10px var(--c-cyan); }
-                .exec-submit-btn:disabled { opacity: 0.4; transform: none; box-shadow: none; }
+                .exec-submit-btn:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 15px 40px -10px var(--c-cyan);
+                }
+                .exec-submit-btn:disabled {
+                    opacity: 0.4;
+                    transform: none;
+                    box-shadow: none;
+                }
 
-                /* ══ Preview Frame ══ */
+                /* ══ Reading Suite Core Styling ══ */
+                .prose-intel-root {
+                    font-family: var(--font-sans);
+                    font-size: 1.15rem;
+                    line-height: 1.9;
+                    color: rgba(0, 0, 0, 0.8);
+                }
+                .prose-intel-root p {
+                    margin-bottom: 2.2rem;
+                }
+                .markdown-h-intel {
+                    font-family: var(--font-serif);
+                    font-size: 2.6rem;
+                    font-weight: 700;
+                    color: #000;
+                    margin: 4.5rem 0 1.8rem;
+                    letter-spacing: -0.03em;
+                    scroll-margin-top: 100px;
+                    line-height: 1.2;
+                }
+                .markdown-h-intel-sub {
+                    font-family: var(--font-serif);
+                    font-size: 1.9rem;
+                    font-weight: 700;
+                    color: #1a1a2e;
+                    margin: 3.5rem 0 1.4rem;
+                }
+                .inline-code-intel {
+                    background: rgba(0, 209, 255, 0.08);
+                    color: #1152d4;
+                    padding: 0.2rem 0.5rem;
+                    border-radius: 6px;
+                    font-family: var(--font-mono);
+                    font-size: 0.85em;
+                }
+                .syntax-highlighter-block {
+                    background: #030711 !important;
+                    padding: 1.5rem;
+                    border-radius: 16px;
+                    margin: 3rem 0;
+                    border: 1px solid rgba(255, 255, 255, 0.05);
+                    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+                }
+                .syntax-highlighter-block pre {
+                    margin: 0;
+                    padding: 0;
+                    overflow-x: auto;
+                }
+                .syntax-highlighter-block code {
+                    font-family: var(--font-mono) !important;
+                    font-size: 0.9rem !important;
+                    line-height: 1.6 !important;
+                }
+
+                .intel-callout-box {
+                    position: relative;
+                    background: white;
+                    border-left: 4px solid #00d1ff;
+                    padding: 2.5rem 3rem;
+                    margin: 3.5rem 0;
+                    border-radius: 4px 16px 16px 4px;
+                    box-shadow: 0 10px 40px rgba(0, 209, 255, 0.04);
+                }
+                .pulse-indicator {
+                    position: absolute;
+                    top: 1.5rem;
+                    left: -10px;
+                    width: 16px;
+                    height: 16px;
+                    background: #00d1ff;
+                    border-radius: 50%;
+                    box-shadow: 0 0 15px #00d1ff;
+                    animation: callout-pulse 2s infinite;
+                }
+                @keyframes callout-pulse {
+                    0% {
+                        transform: scale(1);
+                        opacity: 0.8;
+                    }
+                    50% {
+                        transform: scale(1.8);
+                        opacity: 0;
+                    }
+                    100% {
+                        transform: scale(1);
+                        opacity: 0.8;
+                    }
+                }
+
+                .analyst-table-scroll {
+                    width: 100%;
+                    overflow-x: auto;
+                    margin: 3.5rem 0;
+                    border-radius: 12px;
+                    border: 1px solid rgba(0, 0, 0, 0.08);
+                }
+                .analyst-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    background: white;
+                    font-family: var(--font-mono);
+                    font-size: 0.85rem;
+                }
+                .analyst-table th {
+                    background: #f8faff;
+                    padding: 1.2rem 1rem;
+                    text-align: left;
+                    font-weight: 800;
+                    border-bottom: 2px solid #e8f0fc;
+                    color: #1152d4;
+                    text-transform: uppercase;
+                }
+                .analyst-table td {
+                    padding: 1.2rem 1rem;
+                    border-bottom: 1px solid #e8f0fc;
+                    color: rgba(0, 0, 0, 0.7);
+                }
+
+                .primary-excerpt {
+                    font-size: 1.5rem;
+                    line-height: 1.6;
+                    font-family: var(--font-serif);
+                    color: #1152d4;
+                    font-style: italic;
+                    margin-bottom: 4rem;
+                    border-left: 5px solid #00d1ff;
+                    padding-left: 2.5rem;
+                    font-weight: 600;
+                }
+
+                /* ══ Preview Layout ══ */
                 .adm-editor-preview-frame {
-                    background: #e8f0fc !important; border-radius: 32px; overflow: hidden; color: #000;
+                    background: #e8f0fc !important;
+                    border-radius: 32px;
+                    overflow: hidden;
+                    color: #000;
                     margin: -40px -20px -120px;
                     padding-bottom: 200px;
                 }
-                .preview-zero { padding: 80px; text-align: center; color: #000; }
-                .preview-hero { height: 400px; background-size: cover; background-position: center; position: relative; }
-                .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #e8f0fc, transparent); }
-                .hero-content { 
-                    position: absolute; bottom: 60px; left: 0; right: 0; 
-                    max-width: 900px; margin: 0 auto; padding: 0 40px; 
-                    color: #000; 
+                .preview-inner {
+                    background: transparent !important;
+                    width: 100%;
+                    margin: 0;
                 }
-                .hero-content h1 { font-family: var(--font-serif); font-size: 3.5rem; margin: 15px 0; font-weight: 700; color: #000; letter-spacing: -0.02em; }
-                .preview-body { max-width: 900px; margin: 0 auto; padding: 80px 40px; background: transparent; }
-                .preview-body .excerpt { font-style: italic; color: #333; font-size: 1.4rem; margin-bottom: 60px; border-left: 4px solid var(--c-cyan); padding-left: 30px; font-family: var(--font-serif); }
+                .hero-content {
+                    max-width: 900px;
+                    margin: 0 auto;
+                    position: absolute;
+                    bottom: 60px;
+                    left: 0;
+                    right: 0;
+                    padding: 0 40px;
+                    color: #000;
+                }
+                .hero-content h1 {
+                    font-family: var(--font-serif);
+                    font-size: 3.5rem;
+                    margin: 15px 0;
+                    font-weight: 700;
+                    color: #000;
+                    letter-spacing: -0.02em;
+                }
+                .hero-content .cat {
+                    text-[#00d1ff] font-bold tracking-[0.3em] text-[10px] uppercase mb-4;
+                }
+                .hero-content .meta {
+                    text-black/40 font-bold tracking-widest text-[10px] uppercase;
+                }
+                .preview-hero {
+                    height: 400px;
+                    background-size: cover;
+                    background-position: center;
+                    position: relative;
+                }
+                .hero-overlay {
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(to top, #e8f0fc, transparent);
+                }
+                .preview-body {
+                    max-width: 900px;
+                    margin: 0 auto;
+                    padding: 80px 40px;
+                    background: transparent;
+                }
+                .preview-body .excerpt {
+                    font-style: italic;
+                    color: #333;
+                    font-size: 1.4rem;
+                    margin-bottom: 60px;
+                    border-left: 4px solid var(--c-cyan);
+                    padding-left: 30px;
+                    font-family: var(--font-serif);
+                }
             `}</style>
         </div>
     )

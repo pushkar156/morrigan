@@ -256,15 +256,6 @@ export default function BlogPost() {
                     color: rgba(0,0,0,0.8);
                 }
                 .prose-intel-root p { margin-bottom: 2.2rem; }
-                .prose-intel-root p:first-of-type::first-letter {
-                    float: left;
-                    font-family: var(--font-serif);
-                    font-size: 4.8rem;
-                    line-height: 1;
-                    padding: 0.1rem 1rem 0 0;
-                    color: #1152d4;
-                    font-weight: 700;
-                }
                 .markdown-h-intel {
                     font-family: var(--font-serif);
                     font-size: 2.6rem;

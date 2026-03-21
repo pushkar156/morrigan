@@ -1,13 +1,11 @@
 "use client"
 import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion'
 import { useEffect, useState, useRef } from 'react'
-import { usePathname } from 'next/navigation'
 
 export default function CustomCursor() {
     const [isVisible, setIsVisible] = useState(false)
     const [isHovering, setIsHovering] = useState(false)
     const [hoverText, setHoverText] = useState('')
-    const pathname = usePathname()
 
     const cursorX = useMotionValue(-100)
     const cursorY = useMotionValue(-100)
@@ -21,53 +19,38 @@ export default function CustomCursor() {
         const updateMousePosition = (e: MouseEvent) => {
             cursorX.set(e.clientX)
             cursorY.set(e.clientY)
-            if (!isVisible) setIsVisible(true)
+            setIsVisible(true)
+
+            const target = e.target as HTMLElement
+            // Event delegation to detect hover on interactive elements dynamically
+            const interactable = target?.closest?.('a, button, input, [role="button"]')
+            
+            if (interactable) {
+                setIsHovering(true)
+                if (interactable.getAttribute('href')?.includes('/journal?')) {
+                    setHoverText('Read')
+                } else {
+                    setHoverText('')
+                }
+            } else {
+                setIsHovering(false)
+                setHoverText('')
+            }
         }
 
         const handleMouseLeave = () => setIsVisible(false)
         const handleMouseEnter = () => setIsVisible(true)
 
-        // Setup listeners for interactive elements
-        const setupInteractiveElements = () => {
-            const interactables = document.querySelectorAll('a, button, input, [role="button"]')
-
-            interactables.forEach((el) => {
-                const element = el as HTMLElement
-                // Avoid attaching multiple event listeners
-                if (element.dataset.cursorAttached) return
-                element.dataset.cursorAttached = "true"
-
-                element.addEventListener('mouseenter', () => {
-                    setIsHovering(true)
-                    // If it's a journal link, show "Read", else just expand
-                    if (element.getAttribute('href')?.includes('/journal?')) {
-                        setHoverText('Read')
-                    } else if (element.tagName === 'A' || element.tagName === 'BUTTON') {
-                        setHoverText('')
-                    }
-                })
-
-                element.addEventListener('mouseleave', () => {
-                    setIsHovering(false)
-                    setHoverText('')
-                })
-            })
-        }
-
         window.addEventListener('mousemove', updateMousePosition)
-        window.addEventListener('mouseout', handleMouseLeave)
-        window.addEventListener('mouseover', handleMouseEnter)
-
-        // Give Next.js a moment to mount the DOM, then attach hover listeners
-        const timeout = setTimeout(setupInteractiveElements, 500)
+        document.addEventListener('mouseleave', handleMouseLeave)
+        document.addEventListener('mouseenter', handleMouseEnter)
 
         return () => {
             window.removeEventListener('mousemove', updateMousePosition)
-            window.removeEventListener('mouseout', handleMouseLeave)
-            window.removeEventListener('mouseover', handleMouseEnter)
-            clearTimeout(timeout)
+            document.removeEventListener('mouseleave', handleMouseLeave)
+            document.removeEventListener('mouseenter', handleMouseEnter)
         }
-    }, [pathname]) // Re-run when navigation changes
+    }, [])
 
     return (
         <motion.div

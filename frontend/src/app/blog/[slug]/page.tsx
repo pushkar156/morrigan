@@ -17,6 +17,7 @@ export default function BlogPost() {
     const slug = params.slug as string
     const [blog, setBlog] = useState<Blog | null>(null)
     const [isLoading, setIsLoading] = useState(true)
+    const [activeId, setActiveId] = useState<string>('')
 
     const { scrollYProgress } = useScroll()
     const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
@@ -43,6 +44,39 @@ export default function BlogPost() {
                 return { level, text, id }
             })
     }, [blog])
+
+    // ScrollSpy Logic
+    useEffect(() => {
+        const handleScroll = () => {
+            const headingElements = toc.map(item => {
+                const el = document.getElementById(item.id)
+                return { id: item.id, top: el ? el.getBoundingClientRect().top : Infinity }
+            })
+            // Find the last heading that is above the trigger line (e.g., top 40% of screen)
+            const activeHeader = headingElements.filter(h => h.top < window.innerHeight * 0.4).pop()
+            
+            if (activeHeader) {
+                setActiveId(activeHeader.id)
+            } else if (headingElements.length > 0 && headingElements[0].top >= window.innerHeight * 0.4) {
+                // If we're above the first heading
+                setActiveId('')
+            }
+        }
+
+        window.addEventListener('scroll', handleScroll, { passive: true })
+        handleScroll() // Trigger on mount
+
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [toc])
+
+    const handleTocClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+        e.preventDefault()
+        const el = document.getElementById(id)
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth' })
+            setActiveId(id)
+        }
+    }
 
     // Custom Components for ReactMarkdown
     const components = {
@@ -182,28 +216,43 @@ export default function BlogPost() {
 
             <div className="container-custom max-w-7xl mx-auto py-20 px-6 flex flex-col lg:flex-row gap-20 relative">
                 <aside className="hidden lg:flex flex-col w-56 shrink-0 relative">
-                    <div className="sticky top-40 flex flex-col gap-10">
-                        <div className="text-[10px] font-black tracking-widest text-black/30 uppercase flex items-center gap-2">
-                            <Link href="/journal" className="hover:text-[#1152d4]">INTEL</Link>
-                            <span>/</span>
-                            <span>{categoryDisplay}</span>
+                    <div className="sticky top-40 flex flex-col gap-12">
+                        {/* Directory Root */}
+                        <div className="flex flex-col gap-3">
+                            <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest border-b border-black/5 pb-2">Analysis Root</p>
+                            <nav className="flex items-center text-[11.5px] font-medium text-black/40">
+                                <Link href="/journal" className="hover:text-[#1152d4] transition-colors">Intel</Link>
+                                <svg className="mx-2 w-3 h-3 opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                <span className="text-[#1152d4] font-semibold">{categoryDisplay}</span>
+                            </nav>
                         </div>
 
+                        {/* Execution Path (TOC) */}
                         {toc.length > 0 && (
-                            <div>
-                                <p className="text-xs font-bold text-black/40 uppercase tracking-widest mb-6 border-b border-black/5 pb-2">Execution Path</p>
-                                <ul className="flex flex-col gap-3">
-                                    {toc.map((item, i) => (
-                                        <li key={i} style={{ paddingLeft: `${(item.level - 1) * 12}px` }}>
-                                            <a 
-                                                href={`#${item.id}`} 
-                                                className="block text-[11px] font-bold text-black/40 hover:text-[#1152d4] transition-colors uppercase tracking-tight"
-                                            >
-                                                {item.text}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
+                            <div className="flex flex-col gap-4">
+                                <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest border-b border-black/5 pb-2">Execution Path</p>
+                                <div className="border-l border-black/10 ml-1.5">
+                                    <ul className="flex flex-col gap-3 py-1">
+                                        {toc.map((item, i) => {
+                                            const isActive = activeId === item.id;
+                                            return (
+                                                <li key={i} style={{ paddingLeft: `${14 + (item.level - 1) * 16}px` }} className="relative group">
+                                                    <div 
+                                                        className={`absolute left-0 top-[9px] h-px transition-colors ${isActive ? 'bg-[#1152d4]' : 'bg-black/10 group-hover:bg-[#1152d4]'}`} 
+                                                        style={{ width: `${8 + (item.level - 1) * 16}px` }}
+                                                    />
+                                                    <a 
+                                                        href={`#${item.id}`} 
+                                                        onClick={(e) => handleTocClick(e, item.id)}
+                                                        className={`block text-[12px] transition-colors tracking-tight leading-snug cursor-pointer ${isActive ? 'font-bold text-[#1152d4]' : item.level === 1 ? 'font-semibold text-black/70 hover:text-[#1152d4]' : 'font-medium text-black/45 hover:text-[#1152d4]'}`}
+                                                    >
+                                                        {item.text}
+                                                    </a>
+                                                </li>
+                                            )
+                                        })}
+                                    </ul>
+                                </div>
                             </div>
                         )}
 

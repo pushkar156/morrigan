@@ -3,12 +3,49 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
     const router = useRouter()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true)
     const { isAuthenticated, isLoading, logout, token } = useAuth()
+    const [editorDirty, setEditorDirty] = useState(false)
+    const [showGuardModal, setShowGuardModal] = useState<{ active: boolean, targetPath: string }>({ active: false, targetPath: '' })
+    const [isSavingEmergency, setIsSavingEmergency] = useState(false)
+
+    // Listen for editor status changes
+    useEffect(() => {
+        const handleStatus = (e: any) => setEditorDirty(e.detail.isDirty)
+        const handleInterceptedNav = (e: any) => setShowGuardModal({ active: true, targetPath: e.detail.targetPath })
+
+        window.addEventListener('editor-integrity-change', handleStatus)
+        window.addEventListener('editor-intercepted-nav', handleInterceptedNav)
+        
+        return () => {
+            window.removeEventListener('editor-integrity-change', handleStatus)
+            window.removeEventListener('editor-intercepted-nav', handleInterceptedNav)
+        }
+    }, [])
+
+    const handleIntercept = (e: React.MouseEvent, target: string) => {
+        if (editorDirty) {
+            e.preventDefault()
+            setShowGuardModal({ active: true, targetPath: target })
+        }
+    }
+
+    const confirmSave = () => {
+        setIsSavingEmergency(true)
+        window.dispatchEvent(new CustomEvent('editor-emergency-save', { detail: { targetPath: showGuardModal.targetPath } }))
+        // The editor will handle the actual API call and redirect
+    }
+
+    const discardChanges = () => {
+        setEditorDirty(false) // Bypass for next render
+        router.push(showGuardModal.targetPath)
+        setShowGuardModal({ active: false, targetPath: '' })
+    }
 
     const handleLogout = () => {
         logout()
@@ -78,6 +115,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                 <Link
                                     key={link.href}
                                     href={link.href}
+                                    onClick={(e) => handleIntercept(e, link.href)}
                                     className={`adm-sidebar-link ${isActive ? 'active' : ''} ${!isSidebarOpen ? 'icon-only' : ''}`}
                                 >
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="adm-sidebar-link-icon">
@@ -93,7 +131,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                 {/* Bottom Actions */}
                 <div className="adm-sidebar-footer">
-                    <button onClick={handleLogout} className={`adm-sidebar-logout ${!isSidebarOpen ? 'icon-only' : ''}`}>
+                    <button onClick={(e) => {
+                        if (editorDirty) {
+                            e.preventDefault();
+                            setShowGuardModal({ active: true, targetPath: '/admin/login' });
+                        } else {
+                            handleLogout();
+                        }
+                    }} className={`adm-sidebar-logout ${!isSidebarOpen ? 'icon-only' : ''}`}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="adm-sidebar-link-icon">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4 M16 17l5-5-5-5 M21 12H9" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
@@ -106,6 +151,54 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <main className={`adm-main ${isSidebarOpen ? '' : 'sidebar-collapsed'}`}>
                 {children}
             </main>
+
+            {/* Navigation Guard Modal */}
+            <AnimatePresence>
+                {showGuardModal.active && (
+                    <div className="guard-overlay">
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="guard-card"
+                        >
+                            <div className="guard-header">
+                                <div className="guard-icon-box">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00d1ff" strokeWidth="2.5">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    </svg>
+                                </div>
+                                <h2 className="guard-title">Integrity Check</h2>
+                                <p className="guard-subtitle">Your editorial changes are currently unsaved. How would you like to proceed?</p>
+                            </div>
+
+                            <div className="guard-actions">
+                                <button 
+                                    className="g-btn g-btn-primary" 
+                                    onClick={confirmSave}
+                                    disabled={isSavingEmergency}
+                                >
+                                    {isSavingEmergency ? 'Writing to Vault...' : 'Save Draft & Exit'}
+                                </button>
+                                <button 
+                                    className="g-btn g-btn-ghost" 
+                                    onClick={discardChanges}
+                                    disabled={isSavingEmergency}
+                                >
+                                    Discard Changes
+                                </button>
+                                <button 
+                                    className="g-btn g-btn-cancel" 
+                                    onClick={() => setShowGuardModal({ active: false, targetPath: '' })}
+                                    disabled={isSavingEmergency}
+                                >
+                                    Stay Here
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
 
             <style jsx global>{`
                 .adm-layout {
@@ -319,6 +412,105 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                 @media (max-width: 768px) {
                     .adm-main { padding: 24px 20px 60px; }
+                }
+
+                /* ══ Navigation Guard Custom Styles ══ */
+                .guard-overlay {
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(4, 10, 20, 0.85);
+                    backdrop-filter: blur(12px);
+                    z-index: 9999;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                }
+
+                .guard-card {
+                    background: #0d1b2a;
+                    border: 1px solid rgba(0, 209, 255, 0.15);
+                    border-radius: 24px;
+                    width: 100%;
+                    max-width: 440px;
+                    padding: 40px;
+                    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 209, 255, 0.05);
+                    text-align: center;
+                }
+
+                .guard-icon-box {
+                    width: 60px; height: 60px;
+                    background: rgba(0, 209, 255, 0.06);
+                    border-radius: 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 24px;
+                }
+
+                .guard-title {
+                    font-family: var(--font-serif);
+                    font-size: 1.5rem;
+                    color: #fff;
+                    margin-bottom: 12px;
+                }
+
+                .guard-subtitle {
+                    font-size: 0.9rem;
+                    color: rgba(255, 255, 255, 0.5);
+                    line-height: 1.6;
+                    margin-bottom: 32px;
+                }
+
+                .guard-actions {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                }
+
+                .g-btn {
+                    padding: 14px;
+                    border-radius: 12px;
+                    font-size: 0.85rem;
+                    font-weight: 700;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    border: 1px solid transparent;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                }
+
+                .g-btn:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+
+                .g-btn-primary {
+                    background: #00d1ff;
+                    color: #000;
+                }
+                .g-btn-primary:hover:not(:disabled) {
+                    background: #33daff;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(0, 209, 255, 0.3);
+                }
+
+                .g-btn-ghost {
+                    background: rgba(255, 100, 100, 0.06);
+                    color: #ff6b6b;
+                    border-color: rgba(255, 100, 100, 0.15);
+                }
+                .g-btn-ghost:hover:not(:disabled) {
+                    background: rgba(255, 100, 100, 0.1);
+                    color: #ff5252;
+                }
+
+                .g-btn-cancel {
+                    background: transparent;
+                    color: rgba(255, 255, 255, 0.4);
+                }
+                .g-btn-cancel:hover:not(:disabled) {
+                    color: #fff;
                 }
             `}</style>
         </div>

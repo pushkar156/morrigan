@@ -49,6 +49,46 @@ function AdminEditor() {
         tags: [] as string[]
     })
 
+    // Track the data as it was when loaded (to detect changes)
+    const [initialData, setInitialData] = useState<string>('')
+    const isDirty = useMemo(() => {
+        return initialData !== '' && JSON.stringify(formData) !== initialData
+    }, [formData, initialData])
+
+    // Signal the layout about our "Dirty" state
+    useEffect(() => {
+        window.dispatchEvent(new CustomEvent('editor-integrity-change', { detail: { isDirty } }))
+        
+        // Browser-level security for closing tabs
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isDirty) {
+                e.preventDefault()
+                e.returnValue = ''
+            }
+        }
+
+        // Trap the browser's Back Button
+        const handlePopState = (e: PopStateEvent) => {
+            if (isDirty) {
+                // Instantly push the current URL back to the history to "stay" here
+                window.history.pushState(null, '', window.location.href)
+                // Signal the layout to show the modal
+                window.dispatchEvent(new CustomEvent('editor-intercepted-nav', { detail: { targetPath: '/admin/dashboard' } }))
+            }
+        }
+
+        window.addEventListener('beforeunload', handleBeforeUnload)
+        window.addEventListener('popstate', handlePopState)
+        
+        // Push an initial dummy state so there's always a "previous" page to catch
+        if (isDirty) window.history.pushState(null, '', window.location.href)
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload)
+            window.removeEventListener('popstate', handlePopState)
+        }
+    }, [isDirty])
+
     // -- Metrics --
     const metrics = useMemo(() => {
         const words = formData.content.trim().split(/\s+/).filter(w => w.length > 0)
@@ -61,7 +101,7 @@ function AdminEditor() {
             fetchAdminBlogs().then(blogs => {
                 const blog = blogs.find(b => b.id === editId)
                 if (blog) {
-                    setFormData({
+                    const data = {
                         title: blog.title,
                         excerpt: blog.excerpt || '',
                         author: blog.author || '',
@@ -72,11 +112,27 @@ function AdminEditor() {
                         content: blog.content,
                         status: blog.status,
                         tags: blog.tags || []
-                    })
+                    }
+                    setFormData(data)
+                    setInitialData(JSON.stringify(data))
                 }
             }).catch(err => console.error('Failed to load blog:', err))
+        } else {
+            // New blog initialization
+            setInitialData(JSON.stringify(formData))
         }
     }, [editId])
+
+    // Listen for "Save Emergency" signals from the Layout
+    useEffect(() => {
+        const handleEmergencySave = async (e: any) => {
+            const { targetPath } = e.detail
+            await handleSave()
+            router.push(targetPath)
+        }
+        window.addEventListener('editor-emergency-save', handleEmergencySave)
+        return () => window.removeEventListener('editor-emergency-save', handleEmergencySave)
+    }, [formData, imageFile, editId])
 
     // Recalculate title height when switching back from preview
     useEffect(() => {

@@ -19,10 +19,10 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Morrigan | Perspectives on Modern Intelligence",
+  title: "The Morrigan",
   description: "AI-powered editorial platform focused on finance, business strategy, and technology.",
   openGraph: {
-    title: "Morrigan | Perspectives on Modern Intelligence",
+    title: "The Morrigan",
     description: "AI-powered editorial platform focused on finance, business strategy, and technology.",
     url: 'https://themorrigan.com', // Replace with your actual domain
     siteName: 'The Morrigan',
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Morrigan | Perspectives on Modern Intelligence",
+    title: "The Morrigan",
     description: "AI-powered editorial platform focused on finance, business strategy, and technology.",
     images: ['/logo.png'],
   },

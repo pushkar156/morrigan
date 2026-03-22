@@ -31,7 +31,12 @@ function TypingMessage({ text }: { text: string }) {
   return (
     <div className="relative">
       <div className="markdown-chat">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+        <ReactMarkdown 
+          remarkPlugins={[remarkGfm]}
+          components={{
+             a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" />
+          }}
+        >
           {displayed + (done ? '' : ' ▮')}
         </ReactMarkdown>
       </div>
@@ -85,6 +90,15 @@ export default function Chatbot() {
       document.documentElement.style.overflow = ''
     }
   }, [isOpen])
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false)
+    }
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
+  }, [])
 
   // Auto-resize textarea
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -237,7 +251,16 @@ export default function Chatbot() {
                       {m.role === 'bot' ? (
                           i === messages.length - 1 
                             ? <TypingMessage text={m.text} />
-                            : <div className="markdown-chat"><ReactMarkdown remarkPlugins={[remarkGfm]}>{m.text}</ReactMarkdown></div>
+                            : <div className="markdown-chat">
+                                <ReactMarkdown 
+                                  remarkPlugins={[remarkGfm]}
+                                  components={{
+                                    a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" />
+                                  }}
+                                >
+                                  {m.text}
+                                </ReactMarkdown>
+                              </div>
                       ) : (
                           m.text
                       )}
@@ -432,6 +455,22 @@ export default function Chatbot() {
             0 32px 80px -16px rgba(0,0,0,0.22),
             0 0 1px rgba(0,0,0,0.1),
             0 0 48px rgba(0,209,255,0.06);
+        }
+
+        @media (max-width: 640px) {
+          .cb-container {
+            bottom: 16px; 
+            right: 16px;
+          }
+          .cb-panel {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100dvh;
+            max-height: 100dvh;
+            border-radius: 0;
+            border: none;
+            z-index: 2000;
+          }
         }
 
         .cb-ambient {

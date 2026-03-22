@@ -49,7 +49,7 @@ export default function Chatbot() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'bot', text: 'Hello! I\'m the Morrigan AI — your guide to financial intelligence. Ask me anything about markets, strategy, or our journal.', timestamp: new Date() },
+    { role: 'bot', text: 'Hello! I\'m The Morrigan assistant - your guide to financial intelligence. How can I help you today?', timestamp: new Date() },
   ])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -104,9 +104,10 @@ export default function Chatbot() {
       // If we're on a blog page, try to get the article content for context
       if (pathname?.includes('/blog/')) {
         // Try to get the specific prose area first for cleaner content, fallback to entire article
-        const prose = document.querySelector('.prose') || document.querySelector('article')
+        const prose = document.querySelector('.prose-intel-root') || document.querySelector('article')
         if (prose) {
-          payload.page_content = (prose as HTMLElement).innerText.slice(0, 5000)
+          // Increased limit to 50k characters to support deep Morrigan financial reports
+          payload.page_content = (prose as HTMLElement).innerText.slice(0, 50000)
         }
       }
 

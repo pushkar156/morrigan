@@ -1,5 +1,14 @@
 # 🏛️ The Morrigan: Elite Financial Intelligence Platform
 
+![Next.js 15](https://img.shields.io/badge/Next.js-15-000000?style=for-the-badge&logo=next.js&logoColor=white)
+![React 19](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Python 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Gemini AI](https://img.shields.io/badge/Gemini_AI-4285F4?style=for-the-badge&logo=google-gemini&logoColor=white)
+![Pinecone](https://img.shields.io/badge/Pinecone-000000?style=for-the-badge&logo=pinecone&logoColor=white)
+
 **The Morrigan** is a state-of-the-art editorial and news platform designed for the Indian financial market. Built with a "Security-First" philosophy, it offers in-depth case studies, market analysis, and startup growth journeys, powered by a sophisticated Retrieval-Augmented Generation (RAG) AI engine.
 
 ---
@@ -59,17 +68,31 @@ We recently completed a **Security & SEO Sprint** to ensure Morrigan is producti
 
 ---
 
-## 👥 Contributors
+## 👥 The Morrigan Team
 
-This platform is a collaborative effort between:
+This platform is a collaborative effort between dedicated intelligence and engineering teams:
 
-*   **[Pushkar](https://github.com/pushkar156)** — Lead Architect, Full-Stack Developer, and Content Strategist.
-*   **Antigravity (AI Assistant)** — Security Audit Specialist, Backend Hardening, and SEO Strategist (Designed by Google DeepMind).
+### **🏗️ Frontend (Client Intelligence)**
+*   **[Pushkar Gangurde](https://github.com/pushkar156)** — Team Head & Full-Stack Architect
+*   **[Aarush Verma](https://github.com/Hunt2806)**
+*   **[Tanay Chaudhari](https://github.com/Tan-code1310)**
+*   **[Sharvani Walawalkar](https://github.com/vani-walkar)**
+
+### **🧠 Chatbot & Knowledge Extraction (RAG)**
+*   **[Ruchi Chandak](https://github.com/chandakruchi85-beep)** — Team Head
+*   **[Hrushikesh Kapre](https://github.com/Hrushi027-mitwpu)**
+*   **[Himanshu Raghav](https://github.com/Himanshu-Raghav1)**
+*   **[Rashi Malpani](https://github.com/rashimalpani)**
+
+### **🧱 Backend & Security Architecture**
+*   **[Pushkar](https://github.com/pushkar156)** — Lead Backend Engineer & Security Strategist
 
 ---
 
 ## ⚖️ License
-Distributed under the **MIT License**. See `LICENSE` for more information.
+Proprietary — **All Rights Reserved**.
+
+Unauthorized copying, modification, or distribution of this code via any medium is strictly prohibited. Produced for **The Morrigan** editorial platform.
 
 ---
 **Vault Status:** 🟢 **HARDENED** | **Rank:** 📈 **SEO OPTIMIZED**

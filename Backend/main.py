@@ -29,7 +29,8 @@ app.add_middleware(
     allow_origins=ALLOWED_ORIGINS or ["*"],
     allow_credentials=ALLOW_CREDENTIALS,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "Access-Control-Allow-Origin"],
+    expose_headers=["Content-Length", "Authorization"],
 )
 
 # ── 🗄️ 2. DATABASE INIT (DEFERRED) ─────────────────────────────────────────────

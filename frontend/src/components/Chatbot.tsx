@@ -2,6 +2,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Lottie from 'lottie-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import chatbotAnimation from '../../public/chatbot.json'
 import { usePathname } from 'next/navigation'
 import { sendChatMessage } from '@/lib/api'
@@ -27,16 +29,13 @@ function TypingMessage({ text }: { text: string }) {
   }, [text])
 
   return (
-    <span>
-      {displayed}
-      {!done && (
-        <motion.span
-          animate={{ opacity: [1, 0] }}
-          transition={{ repeat: Infinity, duration: 0.5 }}
-          className="cb-typing-cursor"
-        />
-      )}
-    </span>
+    <div className="relative">
+      <div className="markdown-chat">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {displayed + (done ? '' : ' ▮')}
+        </ReactMarkdown>
+      </div>
+    </div>
   )
 }
 
@@ -221,11 +220,14 @@ export default function Chatbot() {
                   )}
 
                   <div className="cb-msg-content-col">
-                    <div className={`cb-msg-bubble ${m.role}`}>
-                      {m.role === 'bot' && i === messages.length - 1
-                        ? <TypingMessage text={m.text} />
-                        : m.text
-                      }
+                    <div className={`cb-msg-bubble ${m.role} ${m.role === 'bot' ? 'bot-markdown-container' : ''}`}>
+                      {m.role === 'bot' ? (
+                          i === messages.length - 1 
+                            ? <TypingMessage text={m.text} />
+                            : <div className="markdown-chat"><ReactMarkdown remarkPlugins={[remarkGfm]}>{m.text}</ReactMarkdown></div>
+                      ) : (
+                          m.text
+                      )}
                     </div>
                     <span className="cb-msg-time">{formatTime(m.timestamp)}</span>
                   </div>
@@ -637,6 +639,54 @@ export default function Chatbot() {
           border-radius: 20px 20px 20px 6px;
           color: #000309;
           box-shadow: 0 2px 12px rgba(0,3,9,0.05);
+        }
+        
+        .bot-markdown-container .markdown-chat {
+          display: flex;
+          flex-direction: column;
+          gap: 0.65rem;
+          font-size: 0.85rem;
+          line-height: 1.6;
+        }
+        .markdown-chat p { margin: 0; }
+        .markdown-chat strong { font-weight: 700; color: #000; }
+        .markdown-chat em { font-style: italic; }
+        .markdown-chat code {
+          background: rgba(0,0,0,0.06);
+          padding: 0.15rem 0.35rem;
+          border-radius: 4px;
+          font-family: monospace;
+          font-size: 0.75rem;
+        }
+        .markdown-chat pre {
+          background: rgba(0,0,0,0.06);
+          padding: 0.8rem;
+          border-radius: 6px;
+          overflow-x: auto;
+        }
+        .markdown-chat pre code {
+          background: transparent;
+          padding: 0;
+        }
+        .markdown-chat ul {
+          list-style-type: disc;
+          padding-left: 1.2rem;
+        }
+        .markdown-chat ol {
+          list-style-type: decimal;
+          padding-left: 1.2rem;
+        }
+        .markdown-chat h1, .markdown-chat h2, .markdown-chat h3 {
+          font-family: var(--font-serif);
+          font-weight: 700;
+          color: #000;
+          margin-top: 0.3rem;
+          margin-bottom: 0.2rem;
+        }
+        .markdown-chat h3 { font-size: 1rem; }
+        .markdown-chat a {
+          color: #1152d4;
+          text-decoration: underline;
         }
         .cb-msg-bubble.user {
           background: linear-gradient(135deg, #00d1ff 0%, #0088bb 100%);

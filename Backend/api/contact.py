@@ -15,7 +15,7 @@ def send_email_notification(name: str, email: str, subject: str, message: str):
     app_password = os.getenv("GMAIL_APP_PASSWORD")
     
     # Send it directly to you
-    receiver_email = "pushkargangurde156@gmail.com"
+    receiver_email = "the.morrigan.news@gmail.com"
 
     if not sender_email or not app_password:
         print("Note: GMAIL_ADDRESS or GMAIL_APP_PASSWORD not set in .env. Skipping email dispatch.")

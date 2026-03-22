@@ -1,35 +1,75 @@
-# Finance & IPO Journal 
+# 🏛️ The Morrigan: Elite Financial Intelligence Platform
 
-This is a frontend web project created to serve as a comprehensive blog and news platform focusing on the Indian financial market. It covers in-depth case studies, recent IPOs, and the growth journeys of major Indian startups.
+**The Morrigan** is a state-of-the-art editorial and news platform designed for the Indian financial market. Built with a "Security-First" philosophy, it offers in-depth case studies, market analysis, and startup growth journeys, powered by a sophisticated Retrieval-Augmented Generation (RAG) AI engine.
 
-## Project Overview & Workflow
-The goal of this project was to build a clean, interactive blog website with a fully functional content management flow and AI integration. It is divided into two main parts: a public-facing website for readers and a private admin interface.
+---
 
-**How it works:**
-1. **Content Management:** Admins log into the panel to draft and upload blogs.
-2. **State Tagging:** When an admin uploads a blog, they tag it as either `Published` or `Archived`. The main website dynamically fetches and displays only the blogs tagged as `Published`.
-3. **AI Chatbot (RAG):** We implemented a smart chatbot for readers. When a user asks a question about a specific blog, the system uses a RAG (Retrieval-Augmented Generation) approach. It extracts chunks of text from the article being read and passes them to the **Gemini API**, which then generates an accurate, context-aware answer for the user.
+## 🚀 The Vision & Workflow
 
-## Key Features
-* **Public Reader Interface:** * Home page (`index.html`) highlighting featured articles and market trends.
-  * A Journal feed (`journal.html`) that only displays `Published` posts.
-  * Dedicated `about.html` and `contact.html` pages.
-  * **Interactive AI Chatbot:** Readers can ask questions about the current article and get instant, context-specific answers.
-* **Admin Management Panel:**
-  * Secure login portal (`admin/login.html`).
-  * Admin dashboard (`admin/dashboard.html`) to oversee the blog and manage states (Publish/Archive).
-  * Built-in text editor (`admin/editor.html`) to draft new articles.
-* **Pre-loaded Case Studies:** Includes highly detailed, custom-written HTML pages and Word documents covering real-world Indian market events.
+**Morrigan** isn't just a blog; it's a "Hardened Intelligence Repository."
+1. **Dynamic Content Hub:** Admins manage a real-time feed of market intel with a "Zen-Mode" editor.
+2. **State-Gate System:** Blogs are dynamically tagged (`Published`, `Draft`, `Archived`). The public frontend live-syncs with the backend to display only verified intelligence.
+3. **The Mind of Morrigan (RAG AI):** We've implemented a custom RAG (Retrieval-Augmented Generation) pipeline. Using **Pinecone Vector Database** and **Gemini 2.5 Flash**, our chatbot doesn't just "talk"—it "analyzes." It reads the article you are viewing to provide pinpoint accurate financial insights.
 
-## Folder Structure
-Here is a quick overview of how the repository is organized:
-```text
-├── index.html          # Main landing page
-├── journal.html        # Main feed of all published blog posts
-├── about.html          # About the website/team
-├── contact.html        # Contact form page
-├── styles.css          # Core stylesheet for the entire website
-├── script.js           # Frontend logic, AI chatbot integration, and UI interactivity
-├── demo-data.js        # Handles the dummy data and state tagging for the blog feed
-├── admin/              # Folder containing backend UI (login, dashboard, editor)
-└── [Article Files]     # Individual HTML/DOCX files for each company case study
+---
+
+## 🛡️ Engineering Excellence (Hardened & Optimized)
+
+We recently completed a **Security & SEO Sprint** to ensure Morrigan is production-ready:
+*   **Security:**
+    *   **XSS Shield:** Armed with `DOMPurify` to block malicious script injections.
+    *   **Auth Vault:** Strictly hashed passwords (PBKDF2) and JWT-protected admin routes (No plain-text fallbacks).
+    *   **CORS & DoS:** Whitelisted origin policies and strict payload length validation.
+*   **SEO Mastery:**
+    *   **Rich Snippets:** Dynamic JSON-LD (BlogPosting) injection for Google Rich Results.
+    *   **Automated Sitemap:** Dynamic `sitemap.xml` and `robots.ts` generation via Next.js 15 Metadata API.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+### **Frontend (Next.js 15)**
+*   **Language:** TypeScript
+*   **Styling:** Tailwind CSS + Vanilla CSS (Premium Custom Aesthetics)
+*   **Animations:** Framer Motion (Micro-interactions) + Lenis (Smooth Scroll)
+*   **State:** React Metadata API (SEO) + Custom Event-driven Logic
+
+### **Backend (FastAPI)**
+*   **Engine:** Python 3.10+ / FastAPI
+*   **Database:** SQLAlchemy (ORM) + SQLite/PostgreSQL
+*   **Auth:** JWT (Jose) + Passlib (PBKDF2 Hashing)
+*   **AI Stack:** Google Gemini 2.5 Flash + Pinecone (Vector Search)
+
+---
+
+## 📁 Repository Structure
+
+```asl
+├── frontend/               # Next.js 15 Application
+│   ├── src/app/            # App Router (Pages, Layouts, API Routes)
+│   ├── src/components/     # UI Component Library (RichTextEditor, 3D Layers)
+│   └── src/lib/            # API Clients & Utilities
+├── backend/                # FastAPI Application
+│   ├── api/                # Endpoints (Blogs, Chat, Auth, Contact, Upload)
+│   ├── database/           # Models & Schemas (SQLAlchemy)
+│   ├── services/           # Business Logic (AI Service, RAG, Image Management)
+│   └── uploads/            # Secure local image storage
+└── README.md               # You are here
+```
+
+---
+
+## 👥 Contributors
+
+This platform is a collaborative effort between:
+
+*   **[Pushkar](https://github.com/pushkar156)** — Lead Architect, Full-Stack Developer, and Content Strategist.
+*   **Antigravity (AI Assistant)** — Security Audit Specialist, Backend Hardening, and SEO Strategist (Designed by Google DeepMind).
+
+---
+
+## ⚖️ License
+Distributed under the **MIT License**. See `LICENSE` for more information.
+
+---
+**Vault Status:** 🟢 **HARDENED** | **Rank:** 📈 **SEO OPTIMIZED**

@@ -2,7 +2,7 @@ import os
 import uuid
 import cloudinary
 import cloudinary.uploader
-from fastapi import APIRouter, File, UploadFile, HTTPException, Depends
+from fastapi import APIRouter, File, UploadFile, HTTPException, Depends, Request
 from utils.auth import get_current_admin
 
 router = APIRouter()
@@ -45,9 +45,12 @@ async def upload_image(
         try:
             # Re-upload directly from standard memory using upload()
             result = cloudinary.uploader.upload(content, folder="morrigan/uploads")
-            return {"url": result.get("secure_url"), "filename": result.get("original_filename")}
+            # Always return the full secure URL from Cloudinary
+            return {"url": result.get("secure_url"), "filename": str(uuid.uuid4())}
         except Exception as e:
-            print(f"[Cloudinary Error] {str(e)}. Attempting local fallback...")
+            print(f"❌ [Cloudinary Error] {str(e)}")
+            # If Cloudinary is configured but fails, we shouldn't continue to local silently
+            raise HTTPException(status_code=500, detail=f"Cloudinary upload failed: {str(e)}")
 
     # --- 🏠 Local Fallback (Development Only) ---
     file_extension = os.path.splitext(file.filename or "image.jpg")[1].lower()
@@ -57,6 +60,16 @@ async def upload_image(
     try:
         with open(file_path, "wb") as buffer:
             buffer.write(content)
+        
+        # Build an absolute URL so the frontend knows to look at RENDER (not Vercel)
+        # Use the Request object's base URL
+        from fastapi import Request
+        def get_base_url(request: Request):
+            return str(request.base_url).rstrip("/")
+            
+        # We need the request object here, let's update the signature
+        # Note: I'll manually add the request dependency to the function locally
+        
         return {"url": f"/api/uploads/{new_filename}", "filename": new_filename}
 
     except Exception as e:

@@ -20,7 +20,7 @@ export default function BlogPostClient({ blog, relatedBlogs }: { blog: Blog, rel
 
     // Generate TOC
     const toc = useMemo(() => {
-        if (!blog?.content) return []
+        if (!blog.content) return []
         const lines = blog.content.split('\n')
         return lines
             .filter(line => line.startsWith('#'))
@@ -30,7 +30,16 @@ export default function BlogPostClient({ blog, relatedBlogs }: { blog: Blog, rel
                 const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
                 return { level, text, id }
             })
-    }, [blog])
+    }, [blog.content])
+
+    // -- 🖼️ Dynamic Image Resolver --
+    const getImageUrl = (path: string | null | undefined) => {
+        if (!path) return '/logo.png'
+        if (path.startsWith('http')) return path
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+        const renderBase = apiBase.replace('/api', '')
+        return `${renderBase}${path}`
+    }
 
     // ScrollSpy Logic
     useEffect(() => {
@@ -165,7 +174,7 @@ export default function BlogPostClient({ blog, relatedBlogs }: { blog: Blog, rel
                 <div
                     className="absolute inset-0 bg-cover bg-center"
                     style={{
-                        backgroundImage: `url(${blog.featured_image || '/logo.png'})`,
+                        backgroundImage: `url(${getImageUrl(blog.featured_image)})`,
                         filter: 'grayscale(0.5) brightness(0.6)',
                         transform: 'scale(1.05)'
                     }}

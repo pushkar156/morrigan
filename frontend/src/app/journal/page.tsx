@@ -22,6 +22,15 @@ function JournalCard({ blog, index }: { blog: Blog; index: number }) {
         day: 'numeric', month: 'short', year: 'numeric'
     })
     const categoryDisplay = (blog.category || '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+    
+    // -- 🖼️ Dynamic Image Resolver --
+    const getImageUrl = (path: string | null | undefined) => {
+        if (!path) return '/logo.png'
+        if (path.startsWith('http')) return path
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+        const renderBase = apiBase.replace('/api', '')
+        return `${renderBase}${path}`
+    }
 
     return (
         <motion.div
@@ -34,7 +43,7 @@ function JournalCard({ blog, index }: { blog: Blog; index: number }) {
                 <article className="journal-card">
                     <div className="journal-card-img-wrap">
                         <img
-                            src={blog.featured_image || '/logo.png'}
+                            src={getImageUrl(blog.featured_image)}
                             alt={blog.title}
                             className="journal-card-img"
                             onError={(e) => { (e.target as HTMLImageElement).src = '/logo.png' }}

@@ -254,8 +254,13 @@ function AdminEditor() {
             let imageUrl = formData.featured_image
             if (imageFile) {
                 const uploadRes = await uploadImage(imageFile)
-                const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
-                imageUrl = `${apiBase.replace('/api', '')}${uploadRes.url}`
+                // If the URL from backend is already absolute (Cloudinary or our specific Render URL), use it as is.
+                if (uploadRes.url.startsWith('http')) {
+                    imageUrl = uploadRes.url
+                } else {
+                    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+                    imageUrl = `${apiBase.replace('/api', '')}${uploadRes.url}`
+                }
             }
 
             const payload = {

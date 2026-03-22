@@ -21,6 +21,15 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
     const [expandedIndex, setExpandedIndex] = useState<number>(0)
     const [isPaused, setIsPaused] = useState(false)
 
+    // -- 🖼️ Dynamic Image Resolver --
+    const getImageUrl = (path: string | null | undefined) => {
+        if (!path) return '/logo.png'
+        if (path.startsWith('http')) return path
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+        const renderBase = apiBase.replace('/api', '')
+        return `${renderBase}${path}`
+    }
+
     // Autoplay Logic
     useEffect(() => {
         if (isPaused) return
@@ -141,7 +150,7 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
                                     {/* background image */}
                                     <div className="absolute inset-0">
                                         <img
-                                            src={blog.featured_image || '/logo.png'}
+                                            src={getImageUrl(blog.featured_image)}
                                             alt={blog.title}
                                             className="w-full h-full object-cover grayscale-[0.2] transition-all duration-1000 ease-out group-hover:grayscale-0 group-hover:scale-[1.35]"
                                         />

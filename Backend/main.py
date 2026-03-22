@@ -23,15 +23,18 @@ app = FastAPI(
 )
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
-_origins_env = os.getenv("ALLOWED_ORIGINS")
-if not _origins_env:
-    # If in dev, we can fallback, but in prod we MUST have a whitelist.
-    if os.getenv("ENV") != "dev":
-        ALLOWED_ORIGINS = [] # Lock the door!
-    else:
-        ALLOWED_ORIGINS = ["http://localhost:3000"]
+# Dynamic CORS Origins based on Environment
+env = os.getenv("ENV", "development")
+if env == "production":
+    # In production, ONLY allow your official Vercel domain
+    # Provide this via environment variable: e.g., "https://themorrigan.vercel.app"
+    # We strip whitespace and trailing slashes for robustness
+    origins_raw = os.getenv("ALLOWED_ORIGINS", "").split(",")
+    ALLOWED_ORIGINS = [o.strip().rstrip("/") for o in origins_raw if o.strip()]
 else:
-    ALLOWED_ORIGINS = [o.strip() for o in _origins_env.split(",") if o.strip()]
+    # In development, allow localhost
+    # Also strip for consistency
+    ALLOWED_ORIGINS = ["http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,

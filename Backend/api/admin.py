@@ -10,8 +10,11 @@ load_dotenv()
 
 router = APIRouter()
 
-ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD_HASH = os.getenv("ADMIN_PASSWORD_HASH", "")
+# 🔐 Security Configuration
+# These are loaded from .env or your Hosting Dashboard (Render/Railway)
+ADMIN_USERNAMES_RAW = os.getenv("ADMIN_USERNAMES", "admin,Admin,ADMIN,Morrigan,MORRIGAN")
+ADMIN_USERNAMES = [u.strip() for u in ADMIN_USERNAMES_RAW.split(",") if u.strip()]
+ADMIN_PASSWORD_HASH = os.getenv("ADMIN_PASSWORD_HASH")
 
 
 class LoginRequest(BaseModel):
@@ -33,7 +36,7 @@ async def login_form(form_data: OAuth2PasswordRequestForm = Depends()):
 
 def _authenticate(username: str, password: str) -> dict:
     """Shared authentication logic."""
-    if username != ADMIN_USERNAME:
+    if username not in ADMIN_USERNAMES:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",

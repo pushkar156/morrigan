@@ -11,6 +11,7 @@ import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
+import DOMPurify from 'isomorphic-dompurify'
 
 export default function AdminEditorPage() {
     return (
@@ -606,7 +607,7 @@ function AdminEditor() {
                                                 rehypePlugins={[rehypeRaw]}
                                                 components={markdownComponents}
                                             >
-                                                {formData.content}
+                                                {DOMPurify.sanitize(formData.content)}
                                             </ReactMarkdown>
                                         </div>
                                     </div>

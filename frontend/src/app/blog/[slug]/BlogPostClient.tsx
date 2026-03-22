@@ -10,6 +10,7 @@ import rehypeRaw from 'rehype-raw'
 import { motion, useScroll, useSpring } from 'framer-motion'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css' 
+import DOMPurify from 'isomorphic-dompurify'
 
 export default function BlogPostClient({ blog, relatedBlogs }: { blog: Blog, relatedBlogs: Blog[] }) {
     const [activeId, setActiveId] = useState<string>('')
@@ -215,7 +216,7 @@ export default function BlogPostClient({ blog, relatedBlogs }: { blog: Blog, rel
                                 rehypePlugins={[rehypeRaw]}
                                 components={components}
                             >
-                                {blog.content}
+                                {DOMPurify.sanitize(blog.content)}
                             </ReactMarkdown>
                         </div>
                     </div>

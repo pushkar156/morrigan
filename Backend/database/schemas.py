@@ -5,15 +5,15 @@ import json
 
 
 class BlogBase(BaseModel):
-    title: str
-    content: str
-    excerpt: Optional[str] = None
-    author: Optional[str] = "Pushkar"
-    category: Optional[str] = None
+    title: str = Field(..., max_length=500)
+    content: str = Field(..., max_length=100000)
+    excerpt: Optional[str] = Field(None, max_length=1000)
+    author: Optional[str] = Field("Pushkar", max_length=100)
+    category: Optional[str] = Field(None, max_length=100)
     tags: Optional[List[str]] = None
-    featured_image: Optional[str] = None
-    read_time: Optional[int] = 5
-    status: str = "draft"
+    featured_image: Optional[str] = Field(None, max_length=2000)
+    read_time: Optional[int] = Field(5, ge=1, le=60)
+    status: str = Field("draft", pattern="^(draft|published|archived)$")
 
 
 class BlogCreate(BlogBase):
@@ -56,10 +56,10 @@ class BlogResponse(BlogBase):
 
 
 class ContactCreate(BaseModel):
-    name: str
-    email: str
-    subject: str
-    message: str
+    name: str = Field(..., max_length=100)
+    email: str = Field(..., max_length=150)
+    subject: str = Field(..., max_length=200)
+    message: str = Field(..., max_length=10000)
 
 
 class Token(BaseModel):

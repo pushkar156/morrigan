@@ -23,7 +23,15 @@ app = FastAPI(
 )
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+_origins_env = os.getenv("ALLOWED_ORIGINS")
+if not _origins_env:
+    # If in dev, we can fallback, but in prod we MUST have a whitelist.
+    if os.getenv("ENV") != "dev":
+        ALLOWED_ORIGINS = [] # Lock the door!
+    else:
+        ALLOWED_ORIGINS = ["http://localhost:3000"]
+else:
+    ALLOWED_ORIGINS = [o.strip() for o in _origins_env.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,

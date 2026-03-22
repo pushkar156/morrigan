@@ -12,8 +12,6 @@ router = APIRouter()
 
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD_HASH = os.getenv("ADMIN_PASSWORD_HASH", "")
-# Fallback plain-text password for development when no hash is configured
-ADMIN_PASSWORD_PLAIN = os.getenv("ADMIN_PASSWORD", "admin")
 
 
 class LoginRequest(BaseModel):
@@ -44,16 +42,11 @@ def _authenticate(username: str, password: str) -> dict:
 
     # Try hash-based verification first, fall back to plaintext for dev
     authenticated = False
-    if ADMIN_PASSWORD_HASH and not ADMIN_PASSWORD_HASH.startswith("your_"):
+    if ADMIN_PASSWORD_HASH:
         try:
             authenticated = verify_password(password, ADMIN_PASSWORD_HASH)
         except Exception:
             authenticated = False
-
-    if not authenticated:
-        # Fallback: check plain-text dev password
-        if password == ADMIN_PASSWORD_PLAIN:
-            authenticated = True
 
     if not authenticated:
         raise HTTPException(

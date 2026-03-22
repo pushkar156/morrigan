@@ -9,9 +9,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-here-for-development-only")
+# ── Config ───────────────────────────────────────────────────────────────────
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+
+if not SECRET_KEY:
+    # Security fail-safe for production
+    if os.getenv("ENV") != "dev":
+        raise RuntimeError("CRITICAL ERROR: 'SECRET_KEY' environment variable is missing for production! Access tokens cannot be forged.")
+    else:
+        # Permitted ONLY for local dev
+        SECRET_KEY = "dev-danger-key-unsecure"
 
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")

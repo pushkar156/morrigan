@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { Blog } from '@/lib/demo-data'
+import type { Blog } from '@/lib/types'
+import Skeleton, { CategorySkeleton } from '@/components/Skeleton'
 
 interface CategoryAccordionProps {
     title: string
@@ -11,9 +12,10 @@ interface CategoryAccordionProps {
     blogs: Blog[]
     theme: "light" | "dark"
     index: number
+    isLoading?: boolean
 }
 
-export default function CategoryScroll({ title, subtitle, category, blogs, theme, index }: CategoryAccordionProps) {
+export default function CategoryScroll({ title, subtitle, category, blogs, theme, index, isLoading }: CategoryAccordionProps) {
     const filteredBlogs = blogs.filter(b => b.category === category)
     const isDark = theme === "dark"
     const [expandedIndex, setExpandedIndex] = useState<number>(0)
@@ -29,6 +31,33 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
 
         return () => clearInterval(interval)
     }, [isPaused, filteredBlogs.length])
+
+    // Show skeleton if loading and no blogs yet
+    if (isLoading && filteredBlogs.length === 0) {
+        return (
+            <section
+                data-theme={isDark ? 'dark' : 'light'}
+                className={`relative w-full transition-colors duration-700 ${isDark ? 'text-white' : 'text-black'}`}
+                style={{
+                    backgroundColor: isDark ? '#000511' : '#f8f9fa',
+                    paddingTop: index === 0 ? '80px' : '30px',
+                    paddingBottom: '50px'
+                }}
+            >
+                <div className="container-custom relative z-10 w-full px-6 mb-[20px]">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
+                        <div className="max-w-2xl w-full">
+                            <Skeleton width="60%" height="60px" borderRadius="1rem" className="mb-4" />
+                            <Skeleton width="40%" height="24px" borderRadius="0.5rem" />
+                        </div>
+                    </div>
+                </div>
+                <div className="container-custom px-6 h-[500px] md:h-[600px]">
+                    <CategorySkeleton />
+                </div>
+            </section>
+        )
+    }
 
     if (filteredBlogs.length === 0) return null
 
@@ -86,7 +115,7 @@ export default function CategoryScroll({ title, subtitle, category, blogs, theme
                 <div className="flex w-full h-full gap-5 md:gap-8 items-stretch">
                     {filteredBlogs.slice(0, 5).map((blog, idx) => {
                         const isExpanded = expandedIndex === idx
-                        const date = new Date(blog.published_at).toLocaleDateString('en-US', {
+                        const date = new Date(blog.published_at || blog.created_at).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric'
                         })

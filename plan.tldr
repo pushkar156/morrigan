@@ -14,7 +14,7 @@
 			"com.tldraw.pointer": 1,
 			"com.tldraw.shape": 4,
 			"com.tldraw.asset.bookmark": 2,
-			"com.tldraw.asset.image": 5,
+			"com.tldraw.asset.image": 6,
 			"com.tldraw.asset.video": 5,
 			"com.tldraw.shape.group": 0,
 			"com.tldraw.shape.text": 4,
@@ -34,8 +34,8 @@
 	},
 	"records": [
 		{
-			"x": -778.4771081886854,
-			"y": -477.09712284674197,
+			"x": -2901.420759501988,
+			"y": -482.44836022438085,
 			"rotation": 5.551115123125783e-16,
 			"isLocked": false,
 			"opacity": 1,
@@ -253,6 +253,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "footer links and images"
 												}
 											]
@@ -273,6 +278,36 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
+													"text": "privacy and terms page"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "home page blog sections"
 												}
 											]
@@ -293,7 +328,12 @@
 											"content": [
 												{
 													"type": "text",
-													"text": "latest 4 cards to be shown in home page"
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
+													"text": "latest 5 cards to be shown in home page"
 												}
 											]
 										}
@@ -338,6 +378,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "about page"
 												}
 											]
@@ -383,6 +428,36 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
+													"text": "loading skeleton"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "magnetic cursor working"
 												}
 											]
@@ -403,6 +478,61 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
+													"text": "contact page email connection"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
+													"text": "404 page design"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "admin panel"
 												}
 											]
@@ -423,6 +553,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "editor space"
 												}
 											]
@@ -443,6 +578,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "admin panel connections"
 												}
 											]
@@ -463,6 +603,36 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
+													"text": "search bar and category filter in admin panel"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "backend"
 												}
 											]
@@ -483,6 +653,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "fastapi setup"
 												}
 											]
@@ -503,6 +678,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "database"
 												}
 											]
@@ -523,6 +703,61 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
+													"text": "chatbot ui"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
+													"text": "chatbot answering format"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "chatbot testing and working"
 												}
 											]
@@ -543,7 +778,52 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
+													"text": "responsive website"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
 													"text": "Remove the files dont need (Cleaning codebase)"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "shareable link with custom cards"
 												}
 											]
 										}
@@ -599,37 +879,6 @@
 			"typeName": "shape"
 		},
 		{
-			"x": 0,
-			"y": 0,
-			"lastActivityTimestamp": 0,
-			"meta": {},
-			"id": "pointer:pointer",
-			"typeName": "pointer"
-		},
-		{
-			"x": 815.4437321991015,
-			"y": 609.8078229720411,
-			"z": 0.5138995875665446,
-			"meta": {},
-			"id": "camera:page:page",
-			"typeName": "camera"
-		},
-		{
-			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
-			"croppingShapeId": null,
-			"selectedShapeIds": [
-				"shape:LnL7WgtCHXucFLuKWC5AW"
-			],
-			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
-			"erasingShapeIds": [],
-			"hintingShapeIds": [],
-			"focusedGroupId": null,
-			"meta": {},
-			"id": "instance_page_state:page:page",
-			"pageId": "page:page",
-			"typeName": "instance_page_state"
-		},
-		{
 			"meta": {},
 			"id": "page:page",
 			"name": "todos",
@@ -644,10 +893,18 @@
 			"typeName": "document"
 		},
 		{
+			"x": 0,
+			"y": 0,
+			"lastActivityTimestamp": 0,
+			"meta": {},
+			"id": "pointer:pointer",
+			"typeName": "pointer"
+		},
+		{
 			"followingUserId": null,
 			"opacityForNextShape": 1,
 			"stylesForNextShape": {
-				"tldraw:color": "black"
+				"tldraw:textAlign": "start"
 			},
 			"brush": null,
 			"scribbles": [],
@@ -662,7 +919,7 @@
 			"screenBounds": {
 				"x": 0,
 				"y": 0,
-				"w": 1194.4000244140625,
+				"w": 894.4000244140625,
 				"h": 441.6000061035156
 			},
 			"insets": [
@@ -690,6 +947,29 @@
 			"id": "instance:instance",
 			"currentPageId": "page:page",
 			"typeName": "instance"
+		},
+		{
+			"editingShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
+			"croppingShapeId": null,
+			"selectedShapeIds": [
+				"shape:LnL7WgtCHXucFLuKWC5AW"
+			],
+			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
+			"erasingShapeIds": [],
+			"hintingShapeIds": [],
+			"focusedGroupId": null,
+			"meta": {},
+			"id": "instance_page_state:page:page",
+			"pageId": "page:page",
+			"typeName": "instance_page_state"
+		},
+		{
+			"x": 3891.881135271676,
+			"y": 377.3694667858693,
+			"z": 0.34259972504436315,
+			"meta": {},
+			"id": "camera:page:page",
+			"typeName": "camera"
 		}
 	]
 }

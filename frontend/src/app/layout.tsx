@@ -21,6 +21,28 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Morrigan | Perspectives on Modern Intelligence",
   description: "AI-powered editorial platform focused on finance, business strategy, and technology.",
+  openGraph: {
+    title: "Morrigan | Perspectives on Modern Intelligence",
+    description: "AI-powered editorial platform focused on finance, business strategy, and technology.",
+    url: 'https://themorrigan.com', // Replace with your actual domain
+    siteName: 'The Morrigan',
+    images: [
+      {
+        url: '/logo.png', // Replace with a custom OG banner image URL ideally
+        width: 1200,
+        height: 630,
+        alt: 'Morrigan Logo',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Morrigan | Perspectives on Modern Intelligence",
+    description: "AI-powered editorial platform focused on finance, business strategy, and technology.",
+    images: ['/logo.png'],
+  },
 };
 
 export default function RootLayout({

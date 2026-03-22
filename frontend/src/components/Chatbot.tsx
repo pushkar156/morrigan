@@ -2,8 +2,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Lottie from 'lottie-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import chatbotAnimation from '../../public/chatbot.json'
 import { usePathname } from 'next/navigation'
+import { sendChatMessage } from '@/lib/api'
+import type { ChatPayload } from '@/lib/types'
 
 type Message = { role: 'bot' | 'user'; text: string; timestamp: Date }
 
@@ -25,16 +29,18 @@ function TypingMessage({ text }: { text: string }) {
   }, [text])
 
   return (
-    <span>
-      {displayed}
-      {!done && (
-        <motion.span
-          animate={{ opacity: [1, 0] }}
-          transition={{ repeat: Infinity, duration: 0.5 }}
-          className="cb-typing-cursor"
-        />
-      )}
-    </span>
+    <div className="relative">
+      <div className="markdown-chat">
+        <ReactMarkdown 
+          remarkPlugins={[remarkGfm]}
+          components={{
+             a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" />
+          }}
+        >
+          {displayed + (done ? '' : ' ▮')}
+        </ReactMarkdown>
+      </div>
+    </div>
   )
 }
 
@@ -48,7 +54,7 @@ export default function Chatbot() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'bot', text: 'Hello! I\'m the Morrigan AI — your guide to financial intelligence. Ask me anything about markets, strategy, or our journal.', timestamp: new Date() },
+    { role: 'bot', text: 'Hello! I\'m The Morrigan assistant - your guide to financial intelligence. How can I help you today?', timestamp: new Date() },
   ])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -59,17 +65,40 @@ export default function Chatbot() {
   // Auto-scroll on new message
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+      const timer = setTimeout(() => {
+        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+      }, 100)
+      return () => clearTimeout(timer)
     }
   }, [messages, isTyping])
 
-  // Focus input on open
+  // Focus input on open & aggressively lock background scroll entirely
   useEffect(() => {
     if (isOpen) {
       setUnread(0)
+      document.body.style.overflow = 'hidden'
+      document.documentElement.style.overflow = 'hidden'
       setTimeout(() => inputRef.current?.focus(), 320)
+    } else {
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
     }
   }, [isOpen])
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false)
+    }
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
+  }, [])
 
   // Auto-resize textarea
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -78,7 +107,7 @@ export default function Chatbot() {
     e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
   }, [])
 
-  const handleSend = useCallback(() => {
+  const handleSend = useCallback(async () => {
     if (!input.trim() || isTyping) return
     const userText = input.trim()
     setMessages(prev => [...prev, { role: 'user', text: userText, timestamp: new Date() }])
@@ -86,17 +115,48 @@ export default function Chatbot() {
     if (inputRef.current) inputRef.current.style.height = 'auto'
     setIsTyping(true)
 
-    setTimeout(() => {
+    try {
+      // Prepare payload with context
+      const payload: ChatPayload = {
+        message: userText,
+        page_url: window.location.href,
+        history: messages.slice(1).map(m => ({
+          role: m.role === 'bot' ? 'model' : 'user',
+          text: m.text
+        }))
+      }
+
+      // If we're on a blog page, try to get the article content for context
+      if (pathname?.includes('/blog/')) {
+        // Try to get the specific prose area first for cleaner content, fallback to entire article
+        const prose = document.querySelector('.prose-intel-root') || document.querySelector('article')
+        if (prose) {
+          // Increased limit to 50k characters to support deep Morrigan financial reports
+          payload.page_content = (prose as HTMLElement).innerText.slice(0, 50000)
+        }
+      }
+
+      const res = await sendChatMessage(payload)
+      
       setIsTyping(false)
       const reply: Message = {
         role: 'bot',
-        text: 'I\'m currently indexing the intelligence repository. Once backend integration is complete, I\'ll be able to surface real analysis and insights for you.',
+        text: res.response,
         timestamp: new Date()
       }
       setMessages(prev => [...prev, reply])
       if (!isOpen) setUnread(u => u + 1)
-    }, 1400)
-  }, [input, isTyping, isOpen])
+    } catch (err: any) {
+      console.error('Chat failed:', err)
+      setIsTyping(false)
+      const errorReply: Message = {
+        role: 'bot',
+        text: "I encountered a synchronization error with the intelligence repository. Please verify your connection and try again.",
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorReply])
+    }
+  }, [input, isTyping, isOpen, pathname])
 
   const handleClearChat = () => {
     setMessages([{
@@ -117,10 +177,7 @@ export default function Chatbot() {
   if (pathname && pathname.startsWith('/admin')) return null
 
   const suggestions = [
-    { label: 'What is Morrigan?', icon: '💡' },
-    { label: 'Latest articles', icon: '📰' },
-    { label: 'M&A coverage', icon: '🏢' },
-    { label: 'Stock analysis', icon: '📊' },
+    { label: 'Summarise', query: 'Summarize this page', icon: '📄' },
   ]
 
   return (
@@ -173,7 +230,7 @@ export default function Chatbot() {
             <div className="cb-accent-bar" />
 
             {/* ── Messages ───────────────────────────────────────────────── */}
-            <div ref={scrollRef} className="cb-messages">
+            <div ref={scrollRef} className="cb-messages" onWheel={(e) => e.stopPropagation()}>
               {messages.map((m, i) => (
                 <motion.div
                   key={i}
@@ -190,11 +247,23 @@ export default function Chatbot() {
                   )}
 
                   <div className="cb-msg-content-col">
-                    <div className={`cb-msg-bubble ${m.role}`}>
-                      {m.role === 'bot' && i === messages.length - 1
-                        ? <TypingMessage text={m.text} />
-                        : m.text
-                      }
+                    <div className={`cb-msg-bubble ${m.role} ${m.role === 'bot' ? 'bot-markdown-container' : ''}`}>
+                      {m.role === 'bot' ? (
+                          i === messages.length - 1 
+                            ? <TypingMessage text={m.text} />
+                            : <div className="markdown-chat">
+                                <ReactMarkdown 
+                                  remarkPlugins={[remarkGfm]}
+                                  components={{
+                                    a: ({node, ...props}) => <a {...props} target="_blank" rel="noopener noreferrer" />
+                                  }}
+                                >
+                                  {m.text}
+                                </ReactMarkdown>
+                              </div>
+                      ) : (
+                          m.text
+                      )}
                     </div>
                     <span className="cb-msg-time">{formatTime(m.timestamp)}</span>
                   </div>
@@ -253,7 +322,7 @@ export default function Chatbot() {
                     {suggestions.map(s => (
                       <button
                         key={s.label}
-                        onClick={() => { setInput(s.label); inputRef.current?.focus() }}
+                        onClick={() => { setInput(s.query); inputRef.current?.focus() }}
                         className="cb-suggestion-btn"
                       >
                         <span className="cb-suggestion-icon">{s.icon}</span>
@@ -381,10 +450,27 @@ export default function Chatbot() {
           backdrop-filter: blur(60px) saturate(180%);
           -webkit-backdrop-filter: blur(60px) saturate(180%);
           border: 1px solid rgba(255,255,255,0.7);
+          overscroll-behavior: contain;
           box-shadow:
             0 32px 80px -16px rgba(0,0,0,0.22),
             0 0 1px rgba(0,0,0,0.1),
             0 0 48px rgba(0,209,255,0.06);
+        }
+
+        @media (max-width: 640px) {
+          .cb-container {
+            bottom: 16px; 
+            right: 16px;
+          }
+          .cb-panel {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%; height: 100dvh;
+            max-height: 100dvh;
+            border-radius: 0;
+            border: none;
+            z-index: 2000;
+          }
         }
 
         .cb-ambient {
@@ -525,14 +611,31 @@ export default function Chatbot() {
           position: relative; z-index: 10;
           flex: 1;
           overflow-y: auto;
+          overflow-x: hidden;
           padding: 20px 18px;
           display: flex;
           flex-direction: column;
           gap: 16px;
           min-height: 0;
-          scrollbar-width: none;
+          overscroll-behavior: contain;
+          /* Premium scrollbar styling */
+          scrollbar-width: thin;
+          scrollbar-color: rgba(17, 82, 212, 0.2) transparent;
         }
-        .cb-messages::-webkit-scrollbar { display: none; }
+        .cb-messages::-webkit-scrollbar { 
+          width: 5px;
+        }
+        .cb-messages::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .cb-messages::-webkit-scrollbar-thumb {
+          background: rgba(17, 82, 212, 0.15);
+          border-radius: 10px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .cb-messages::-webkit-scrollbar-thumb:hover {
+          background: rgba(0, 209, 255, 0.3);
+        }
 
         .cb-msg-row {
           display: flex;
@@ -590,6 +693,54 @@ export default function Chatbot() {
           border-radius: 20px 20px 20px 6px;
           color: #000309;
           box-shadow: 0 2px 12px rgba(0,3,9,0.05);
+        }
+        
+        .bot-markdown-container .markdown-chat {
+          display: flex;
+          flex-direction: column;
+          gap: 0.65rem;
+          font-size: 0.85rem;
+          line-height: 1.6;
+        }
+        .markdown-chat p { margin: 0; }
+        .markdown-chat strong { font-weight: 700; color: #000; }
+        .markdown-chat em { font-style: italic; }
+        .markdown-chat code {
+          background: rgba(0,0,0,0.06);
+          padding: 0.15rem 0.35rem;
+          border-radius: 4px;
+          font-family: monospace;
+          font-size: 0.75rem;
+        }
+        .markdown-chat pre {
+          background: rgba(0,0,0,0.06);
+          padding: 0.8rem;
+          border-radius: 6px;
+          overflow-x: auto;
+        }
+        .markdown-chat pre code {
+          background: transparent;
+          padding: 0;
+        }
+        .markdown-chat ul {
+          list-style-type: disc;
+          padding-left: 1.2rem;
+        }
+        .markdown-chat ol {
+          list-style-type: decimal;
+          padding-left: 1.2rem;
+        }
+        .markdown-chat h1, .markdown-chat h2, .markdown-chat h3 {
+          font-family: var(--font-serif);
+          font-weight: 700;
+          color: #000;
+          margin-top: 0.3rem;
+          margin-bottom: 0.2rem;
+        }
+        .markdown-chat h3 { font-size: 1rem; }
+        .markdown-chat a {
+          color: #1152d4;
+          text-decoration: underline;
         }
         .cb-msg-bubble.user {
           background: linear-gradient(135deg, #00d1ff 0%, #0088bb 100%);
@@ -654,8 +805,7 @@ export default function Chatbot() {
         }
 
         .cb-suggestions-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
+          display: flex;
           gap: 8px;
         }
 

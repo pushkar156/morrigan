@@ -2,9 +2,11 @@
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { DEMO_BLOGS, Blog } from '@/lib/demo-data'
+import { fetchBlogs } from '@/lib/api'
+import type { Blog } from '@/lib/types'
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { FloatingOrb, ParticleField } from '@/components/HeroVFX'
+import Skeleton from '@/components/Skeleton'
 
 const CATEGORIES = [
     { id: 'all', label: 'All Posts' },
@@ -16,10 +18,10 @@ const CATEGORIES = [
 ]
 
 function JournalCard({ blog, index }: { blog: Blog; index: number }) {
-    const date = new Date(blog.published_at).toLocaleDateString('en-IN', {
+    const date = new Date(blog.published_at || blog.created_at).toLocaleDateString('en-IN', {
         day: 'numeric', month: 'short', year: 'numeric'
     })
-    const categoryDisplay = blog.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+    const categoryDisplay = (blog.category || '').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
 
     return (
         <motion.div
@@ -41,7 +43,7 @@ function JournalCard({ blog, index }: { blog: Blog; index: number }) {
                     </div>
                     <div className="journal-card-body">
                         <h3 className="journal-card-title">{blog.title}</h3>
-                        <p className="journal-card-excerpt">{blog.excerpt}</p>
+                        <p className="journal-card-excerpt">{blog.excerpt || ''}</p>
                         <div className="journal-card-meta">
                             <span className="journal-card-author">{blog.author}</span>
                             <span className="journal-card-dot">·</span>
@@ -56,12 +58,33 @@ function JournalCard({ blog, index }: { blog: Blog; index: number }) {
     )
 }
 
+function JournalSkeleton() {
+    return (
+        <div className="journal-card skeleton">
+            <div className="journal-card-img-wrap">
+                <Skeleton height="100%" borderRadius="0 0 0 0" />
+            </div>
+            <div className="journal-card-body" style={{ background: 'transparent' }}>
+                <Skeleton width="40%" height="16px" className="mb-4" />
+                <Skeleton width="90%" height="24px" className="mb-4" />
+                <Skeleton width="70%" height="16px" className="mb-6" />
+                <div className="flex gap-2">
+                    <Skeleton width="40px" height="12px" />
+                    <Skeleton width="40px" height="12px" />
+                </div>
+            </div>
+        </div>
+    )
+}
+
 function JournalContent() {
     const searchParams = useSearchParams()
     const router = useRouter()
     const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all')
     const [searchQuery, setSearchQuery] = useState('')
+    const [allBlogs, setAllBlogs] = useState<Blog[]>([])
     const [displayedBlogs, setDisplayedBlogs] = useState<Blog[]>([])
+    const [isLoadingData, setIsLoadingData] = useState(true)
     const searchRef = useRef<HTMLInputElement>(null)
     const headerRef = useRef<HTMLDivElement>(null)
     const [isNavHidden, setIsNavHidden] = useState(false)
@@ -96,8 +119,21 @@ function JournalContent() {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
+    // Fetch blogs from API on mount
     useEffect(() => {
-        let filtered = DEMO_BLOGS
+        fetchBlogs()
+            .then(data => {
+                setAllBlogs(data)
+                setIsLoadingData(false)
+            })
+            .catch(err => {
+                console.error('Failed to fetch blogs:', err)
+                setIsLoadingData(false)
+            })
+    }, [])
+
+    useEffect(() => {
+        let filtered = allBlogs
         if (activeCategory !== 'all') {
             filtered = filtered.filter(b => b.category === activeCategory)
         }
@@ -105,11 +141,11 @@ function JournalContent() {
             const q = searchQuery.toLowerCase()
             filtered = filtered.filter(b =>
                 b.title.toLowerCase().includes(q) ||
-                b.excerpt.toLowerCase().includes(q)
+                (b.excerpt || '').toLowerCase().includes(q)
             )
         }
         setDisplayedBlogs(filtered)
-    }, [activeCategory, searchQuery])
+    }, [activeCategory, searchQuery, allBlogs])
 
     const handleCategoryChange = (catId: string) => {
         setActiveCategory(catId)

@@ -1,6 +1,8 @@
 "use client"
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, useMotionValue, useSpring, AnimatePresence, useTransform } from 'framer-motion'
+import { submitContact } from '@/lib/api'
+import type { ContactPayload } from '@/lib/types'
 
 import { FloatingOrb, ParticleField } from '@/components/HeroVFX'
 
@@ -163,16 +165,36 @@ export default function ContactPage() {
         my.set((e.clientY - r.top) / r.height)
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!form.name || !form.email || !form.subject || !form.message) return
         setStatus('sending')
         setSendProgress(0)
+
         const start = Date.now()
-        const tick = setInterval(() => {
-            const p = Math.min((Date.now() - start) / 1600, 1)
+        // Progress simulation
+        const progressInterval = setInterval(() => {
+            const p = Math.min((Date.now() - start) / 2000, 0.9)
             setSendProgress(p)
-            if (p >= 1) { clearInterval(tick); setStatus('sent') }
-        }, 16)
+        }, 50)
+
+        try {
+            const payload: ContactPayload = {
+                name: form.name,
+                email: form.email,
+                subject: form.subject,
+                message: form.message
+            }
+            await submitContact(payload)
+            
+            clearInterval(progressInterval)
+            setSendProgress(1)
+            setStatus('sent')
+        } catch (err) {
+            console.error('Failed to send message:', err)
+            clearInterval(progressInterval)
+            setStatus('idle')
+            alert("Digital resonance failure. Please try contacting us directly via email.")
+        }
     }
 
     const contactItems = [

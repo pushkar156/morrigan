@@ -1,55 +1,241 @@
 "use client"
-import { useState, useRef, useCallback } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useRef, useCallback, useEffect, Suspense, useMemo } from 'react'
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { createBlog, updateBlog, uploadImage, fetchAdminBlogs } from '@/lib/api'
+import type { Blog } from '@/lib/types'
+import RichTextEditor from '@/components/RichTextEditor'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github-dark.css'
 
-export default function AdminEditor() {
+export default function AdminEditorPage() {
+    return (
+        <Suspense fallback={<div className="adm-editor-loading">Loading Command Suite...</div>}>
+            <AdminEditor />
+        </Suspense>
+    )
+}
+
+function AdminEditor() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const editId = searchParams.get('id')
+
+    // -- State --
+    const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
     const [isSaving, setIsSaving] = useState(false)
+    const [isZenMode, setIsZenMode] = useState(false)
     const [imageMode, setImageMode] = useState<'upload' | 'url'>('upload')
     const [imageFile, setImageFile] = useState<File | null>(null)
     const [isDragging, setIsDragging] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const [tagInput, setTagInput] = useState('')
+    const titleRef = useRef<HTMLTextAreaElement>(null)
+    const [activeId, setActiveId] = useState<string>('')
     const [formData, setFormData] = useState({
         title: '',
         excerpt: '',
+        author: '',
+        published_at: new Date().toISOString().split('T')[0],
         category: 'stock-analysis',
         read_time: '5',
         featured_image: '',
         content: '',
-        status: 'draft'
+        status: 'draft',
+        tags: [] as string[]
     })
 
-    const handleFileSelect = useCallback((file: File) => {
-        if (!file.type.startsWith('image/')) return
-        setImageFile(file)
-        const url = URL.createObjectURL(file)
-        setFormData(prev => ({ ...prev, featured_image: url }))
-    }, [])
+    // -- Metrics --
+    const metrics = useMemo(() => {
+        const words = formData.content.trim().split(/\s+/).filter(w => w.length > 0)
+        return { wordCount: words.length }
+    }, [formData.content])
 
-    const handleDrop = useCallback((e: React.DragEvent) => {
+    // Load Data --
+    useEffect(() => {
+        if (editId) {
+            fetchAdminBlogs().then(blogs => {
+                const blog = blogs.find(b => b.id === editId)
+                if (blog) {
+                    setFormData({
+                        title: blog.title,
+                        excerpt: blog.excerpt || '',
+                        author: blog.author || '',
+                        published_at: blog.published_at ? new Date(blog.published_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                        category: blog.category || 'stock-analysis',
+                        read_time: String(blog.read_time),
+                        featured_image: blog.featured_image || '',
+                        content: blog.content,
+                        status: blog.status,
+                        tags: blog.tags || []
+                    })
+                }
+            }).catch(err => console.error('Failed to load blog:', err))
+        }
+    }, [editId])
+
+    // Recalculate title height when switching back from preview
+    useEffect(() => {
+        if (activeTab === 'edit' && titleRef.current) {
+            const el = titleRef.current
+            el.style.height = 'auto'
+            el.style.height = el.scrollHeight + 'px'
+        }
+    }, [activeTab])
+
+    const { scrollYProgress } = useScroll()
+    const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
+
+    const toc = useMemo(() => {
+        if (!formData.content) return []
+        const lines = formData.content.split('\n')
+        return lines
+            .filter(line => line.startsWith('#'))
+            .map(line => {
+                const level = line.match(/^#+/)?.[0].length || 1
+                const text = line.replace(/^#+\s*/, '')
+                const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
+                return { level, text, id }
+            })
+    }, [formData.content])
+
+    // ScrollSpy Logic for Preview
+    useEffect(() => {
+        if (activeTab !== 'preview') return
+
+        const handleScroll = () => {
+            const headingElements = toc.map(item => {
+                const el = document.getElementById(item.id)
+                return { id: item.id, top: el ? el.getBoundingClientRect().top : Infinity }
+            })
+            // Find the last heading that is above the trigger line (e.g., top 40% of screen)
+            const activeHeader = headingElements.filter(h => h.top < window.innerHeight * 0.4).pop()
+            
+            if (activeHeader) {
+                setActiveId(activeHeader.id)
+            } else if (headingElements.length > 0 && headingElements[0].top >= window.innerHeight * 0.4) {
+                // If we're above the first heading
+                setActiveId('')
+            }
+        }
+
+        window.addEventListener('scroll', handleScroll, { passive: true })
+        handleScroll() // Trigger on mount
+
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [toc, activeTab])
+
+    const handleTocClick = (e: React.MouseEvent<HTMLSpanElement>, id: string) => {
         e.preventDefault()
-        setIsDragging(false)
-        const file = e.dataTransfer.files[0]
-        if (file) handleFileSelect(file)
-    }, [handleFileSelect])
-
-    const handleRemoveImage = () => {
-        setImageFile(null)
-        setFormData(prev => ({ ...prev, featured_image: '' }))
-        if (fileInputRef.current) fileInputRef.current.value = ''
+        const el = document.getElementById(id)
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth' })
+            setActiveId(id)
+        }
     }
 
-    const handleSave = (e: React.FormEvent) => {
-        e.preventDefault()
+
+
+    const markdownComponents = {
+        code({ className, children, ...props }: any) {
+            const match = /language-(\w+)/.exec(className || '')
+            const language = match ? match[1] : ''
+            return language ? (
+                <div className="syntax-highlighter-block">
+                    <pre>
+                        <code 
+                            className={`hljs language-${language}`}
+                            dangerouslySetInnerHTML={{ 
+                                __html: hljs.highlight(String(children).replace(/\n$/, ''), { language }).value 
+                            }}
+                        />
+                    </pre>
+                </div>
+            ) : (
+                <code className="inline-code-intel" {...props}>{children}</code>
+            )
+        },
+        blockquote({ children }: any) {
+            return (
+                <div className="intel-callout-box">
+                    <div className="pulse-indicator" />
+                    <div className="callout-inner">{children}</div>
+                </div>
+            )
+        },
+        table({ children }: any) {
+            return (
+                <div className="analyst-table-scroll">
+                    <table className="analyst-table">{children}</table>
+                </div>
+            )
+        },
+        h1: ({ children }: any) => {
+            const id = String(children).toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
+            return <h1 id={id} className="markdown-h-intel">{children}</h1>
+        },
+        h2: ({ children }: any) => {
+            const id = String(children).toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
+            return <h2 id={id} className="markdown-h-intel">{children}</h2>
+        },
+        h3: ({ children }: any) => {
+            const id = String(children).toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
+            return <h3 id={id} className="markdown-h-intel-sub">{children}</h3>
+        }
+    }
+
+    const handleSave = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault()
+        if (!formData.title.trim()) return
         setIsSaving(true)
-        setTimeout(() => {
-            setIsSaving(false)
-            alert('Intelligence saved to repository.')
+
+        try {
+            let imageUrl = formData.featured_image
+            if (imageFile) {
+                const uploadRes = await uploadImage(imageFile)
+                const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
+                imageUrl = `${apiBase.replace('/api', '')}${uploadRes.url}`
+            }
+
+            const payload = {
+                title: formData.title,
+                content: formData.content,
+                excerpt: formData.excerpt || undefined,
+                author: formData.author || undefined,
+                category: formData.category,
+                read_time: parseInt(formData.read_time) || 5,
+                featured_image: imageUrl || undefined,
+                status: formData.status,
+                published_at: formData.published_at ? new Date(formData.published_at).toISOString() : undefined,
+                tags: formData.tags.length > 0 ? formData.tags : undefined,
+            }
+
+            if (editId) await updateBlog(editId, payload)
+            else await createBlog(payload)
+
             router.push('/admin/dashboard')
-        }, 1200)
+        } catch (err: any) {
+            alert('Failed to save: ' + err.message)
+        } finally {
+            setIsSaving(false)
+        }
     }
+
+    const [isCatOpen, setIsCatOpen] = useState(false)
+    const catRef = useRef<HTMLDivElement>(null)
+
+    // Close dropdown on click outside
+    useEffect(() => {
+        const handleClick = (e: MouseEvent) => {
+            if (catRef.current && !catRef.current.contains(e.target as Node)) setIsCatOpen(false)
+        }
+        window.addEventListener('mousedown', handleClick)
+        return () => window.removeEventListener('mousedown', handleClick)
+    }, [])
 
     const categories = [
         { id: 'back-to-basics', name: 'Back to Basics' },
@@ -59,747 +245,974 @@ export default function AdminEditor() {
         { id: 'ma-diaries', name: 'M&A Diaries' }
     ]
 
-    return (
-        <div className="adm-editor">
-            {/* Header */}
-            <header className="adm-editor-header">
-                <div>
-                    <motion.div
-                        initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        <Link href="/admin/dashboard" className="adm-editor-back">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                            Back to Vault
-                        </Link>
-                    </motion.div>
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                        className="adm-editor-title"
-                    >New Article</motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2, duration: 0.6 }}
-                        className="adm-editor-desc"
-                    >Drafting Intelligence Report M-{(Math.random() * 1000).toFixed(0)}</motion.p>
-                </div>
-            </header>
+    const selectedCategoryName = categories.find(c => c.id === formData.category)?.name || 'SELECT CATEGORY'
 
-            {/* Form Section */}
-            <div className="adm-editor-grid">
-                {/* Main Content Area */}
-                <div className="adm-editor-main">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+    return (
+        <div className={`adm-editor-root ${isZenMode ? 'zen-active' : ''}`}>
+            {/* Header HUD */}
+            <AnimatePresence>
+                {!isZenMode && (
+                    <motion.header 
+                        initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3, duration: 0.6 }}
-                        className="adm-editor-content-card"
+                        exit={{ opacity: 0, y: -20 }}
+                        className="adm-editor-header"
                     >
-                        <input
-                            type="text"
-                            placeholder="ARTICLE HEADLINE"
-                            className="adm-editor-headline"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                            <div>
+                                <Link href="/admin/dashboard" className="adm-editor-back-hud">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+                                    <span>VAULT REPOSITORY</span>
+                                </Link>
+                                <h1 className="adm-editor-title-main">{editId ? 'ARTICLE EDITOR' : 'NEW INTEL'}</h1>
+                            </div>
+
+                            <div className="adm-editor-top-actions">
+                                <button onClick={() => setIsZenMode(true)} className="adm-editor-tool-btn" title="Focus Mode">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3" /></svg>
+                                    <span>ZEN</span>
+                                </button>
+                                <div className="adm-editor-tab-hud">
+                                    <div className="tab-slider" style={{ transform: `translateX(${activeTab === 'edit' ? '0%' : '100%'})` }} />
+                                    <button onClick={() => setActiveTab('edit')} className={activeTab === 'edit' ? 'active' : ''}>EDIT</button>
+                                    <button onClick={() => setActiveTab('preview')} className={activeTab === 'preview' ? 'active' : ''}>PREVIEW</button>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.header>
+                )}
+            </AnimatePresence>
+
+            <main className="adm-editor-viewport">
+                {activeTab === 'edit' ? (
+                    <div className="adm-editor-grid">
+                        {/* Write Column */}
+                        <div className="adm-editor-main-col">
+                            <motion.div layout className="adm-editor-glass-card main-writing-card">
+                                <textarea
+                                    ref={titleRef}
+                                    placeholder="REPORT HEADLINE..."
+                                    className="adm-editor-input-hero"
+                                    rows={1}
+                                    value={formData.title}
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, title: e.target.value });
+                                        // Auto-resize
+                                        e.target.style.height = 'auto';
+                                        e.target.style.height = e.target.scrollHeight + 'px';
+                                    }}
+                                    data-lenis-prevent
+                                />
+                                <div className="adm-editor-field">
+                                    <div className="field-header">
+                                        <label>EXECUTIVE SUMMARY</label>
+                                        <span className="char-count">{formData.excerpt.length}/400</span>
+                                    </div>
+                                    <textarea
+                                        placeholder="Briefly describe the report scope..."
+                                        className="adm-editor-text-area-minimal"
+                                        rows={4}
+                                        value={formData.excerpt}
+                                        onChange={(e) => setFormData({ ...formData, excerpt: e.target.value.substring(0, 400) })}
+                                        data-lenis-prevent
+                                    />
+                                </div>
+                                <div className="adm-editor-field editor-body-field">
+                                    <label>INTELLIGENCE BODY (MARKDOWN CODE)</label>
+                                    <div 
+                                        className="rich-editor-container-styled"
+                                        data-lenis-prevent
+                                    >
+                                        <RichTextEditor 
+                                            content={formData.content} 
+                                            onChange={(html) => setFormData({ ...formData, content: html })} 
+                                        />
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
+
+                        {/* Config Sidebar */}
+                        <AnimatePresence>
+                            {!isZenMode && (
+                                <motion.aside 
+                                    initial={{ opacity: 0, x: 40 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 40 }}
+                                    className="adm-editor-side-col"
+                                >
+                                    <div className="adm-editor-glass-card sidebar-config">
+                                        <div className="adm-editor-field">
+                                            <label>CLASSIFICATION</label>
+                                            <div className="adm-editor-cat-dropdown-root" ref={catRef}>
+                                                <button 
+                                                    className={`dropdown-trigger ${isCatOpen ? 'active' : ''}`}
+                                                    onClick={() => setIsCatOpen(!isCatOpen)}
+                                                >
+                                                    <span>{selectedCategoryName.toUpperCase()}</span>
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ transform: isCatOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s' }}>
+                                                        <path d="m6 9 6 6 6-6"/>
+                                                    </svg>
+                                                </button>
+                                                
+                                                <AnimatePresence>
+                                                    {isCatOpen && (
+                                                        <motion.div 
+                                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                            className="dropdown-list"
+                                                        >
+                                                            {categories.map(c => (
+                                                                <button 
+                                                                    key={c.id} 
+                                                                    className={`dropdown-item ${formData.category === c.id ? 'active' : ''}`}
+                                                                    onClick={() => {
+                                                                        setFormData({ ...formData, category: c.id })
+                                                                        setIsCatOpen(false)
+                                                                    }}
+                                                                >
+                                                                    {c.name.toUpperCase()}
+                                                                </button>
+                                                            ))}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+                                        </div>
+
+                                        <div className="adm-editor-field">
+                                            <label>AUTHOR NAME</label>
+                                            <div className="tag-input-wrap">
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="NAME..." 
+                                                    value={formData.author}
+                                                    onChange={e => setFormData(p => ({ ...p, author: e.target.value }))}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="adm-editor-field">
+                                            <label>DATE</label>
+                                            <div className="tag-input-wrap">
+                                                <input 
+                                                    type="date" 
+                                                    value={formData.published_at}
+                                                    onChange={e => setFormData(p => ({ ...p, published_at: e.target.value }))}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="adm-editor-field">
+                                            <label>READ TIME (MIN)</label>
+                                            <div className="tag-input-wrap">
+                                                <input 
+                                                    type="number" 
+                                                    value={formData.read_time}
+                                                    onChange={e => setFormData(p => ({ ...p, read_time: e.target.value }))}
+                                                    min="1"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="adm-editor-field">
+                                            <label>COVER INTEL (IMAGE)</label>
+                                            
+                                            <div className="img-mode-toggle-mini">
+                                                <button onClick={() => setImageMode('upload')} className={imageMode === 'upload' ? 'active' : ''}>FILE</button>
+                                                <button onClick={() => setImageMode('url')} className={imageMode === 'url' ? 'active' : ''}>URL</button>
+                                            </div>
+
+                                            {imageMode === 'upload' ? (
+                                                <div className="adm-editor-dropzone-tech" onClick={() => fileInputRef.current?.click()}>
+                                                    {formData.featured_image && imageMode === 'upload' ? (
+                                                        <div className="image-filled">
+                                                            <img src={formData.featured_image} alt="Cover" />
+                                                            <button onClick={(e) => { e.stopPropagation(); setFormData({...formData, featured_image: ''}); setImageFile(null); }}>REMOVE</button>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="dropzone-empty">
+                                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                                                            <span>DROP SCAN</span>
+                                                        </div>
+                                                    )}
+                                                    <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={e => {
+                                                        const f = e.target.files?.[0]
+                                                        if(f) {
+                                                            setImageFile(f)
+                                                            setFormData({...formData, featured_image: URL.createObjectURL(f)})
+                                                        }
+                                                    }} />
+                                                </div>
+                                            ) : (
+                                                <div className="tag-input-wrap">
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="IMAGE URL..." 
+                                                        value={formData.featured_image}
+                                                        onChange={e => setFormData(p => ({ ...p, featured_image: e.target.value }))}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="sidebar-metrics">
+                                            <div className="metric">
+                                                <span className="label">WORD COUNT</span>
+                                                <span className="val">{metrics.wordCount}</span>
+                                            </div>
+                                            <div className="metric">
+                                                <span className="label">READ TIME</span>
+                                                <span className="val">{formData.read_time}M</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.aside>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                ) : (
+                    <div className="adm-editor-preview-frame">
+                        {/* Reading Progress Bar */}
+                        <motion.div 
+                            className="fixed top-0 left-0 right-0 h-1 bg-[#00d1ff] z-[1001] origin-left"
+                            style={{ scaleX }}
                         />
 
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Executive Subtitle / Excerpt</label>
-                            <textarea
-                                rows={3}
-                                placeholder="A brief summary to draw the reader in..."
-                                className="adm-editor-textarea"
-                                value={formData.excerpt}
-                                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                            />
-                        </div>
-
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Intelligence Body (Markdown)</label>
-                            <textarea
-                                rows={20}
-                                placeholder="Begin drafting the analysis... (Supports Markdown)"
-                                className="adm-editor-textarea mono"
-                                value={formData.content}
-                                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                            />
-                        </div>
-                    </motion.div>
-                </div>
-
-                {/* Sidebar Configuration */}
-                <div className="adm-editor-sidebar">
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4, duration: 0.6 }}
-                        className="adm-editor-sidebar-card"
-                    >
-                        {/* Status Toggle */}
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Save State</label>
-                            <div className="adm-editor-status-toggle">
-                                <button
-                                    onClick={() => setFormData({ ...formData, status: 'draft' })}
-                                    className={`adm-editor-status-btn ${formData.status === 'draft' ? 'active' : ''}`}
-                                >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                    Draft
-                                </button>
-                                <button
-                                    onClick={() => setFormData({ ...formData, status: 'published' })}
-                                    className={`adm-editor-status-btn publish ${formData.status === 'published' ? 'active' : ''}`}
-                                >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" strokeLinecap="round" strokeLinejoin="round" /><polyline points="22 4 12 14.01 9 11.01" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                    Publish
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Category */}
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Category Classification</label>
-                            <div className="adm-editor-select-wrap">
-                                <select
-                                    className="adm-editor-select"
-                                    value={formData.category}
-                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                >
-                                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                </select>
-                                <svg className="adm-editor-select-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                            </div>
-                        </div>
-
-                        {/* Read Time */}
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Read Time (Minutes)</label>
-                            <input
-                                type="number"
-                                className="adm-editor-number-input"
-                                value={formData.read_time}
-                                onChange={(e) => setFormData({ ...formData, read_time: e.target.value })}
-                                min="1"
-                            />
-                        </div>
-
-                        {/* Cover Image */}
-                        <div className="adm-editor-field-group">
-                            <label className="adm-editor-label">Cover Image</label>
-
-                            {/* Mode Toggle */}
-                            <div className="adm-editor-img-mode-toggle">
-                                <button
-                                    onClick={() => setImageMode('upload')}
-                                    className={`adm-editor-img-mode-btn ${imageMode === 'upload' ? 'active' : ''}`}
-                                >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
-                                    Upload File
-                                </button>
-                                <button
-                                    onClick={() => setImageMode('url')}
-                                    className={`adm-editor-img-mode-btn ${imageMode === 'url' ? 'active' : ''}`}
-                                >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
-                                    Image URL
-                                </button>
+                        <div className="preview-inner">
+                            <div className="preview-hero" style={{ backgroundImage: `url(${formData.featured_image || '/logo.png'})` }}>
+                                <div className="hero-overlay" />
+                                <div className="hero-content">
+                                    <span className="cat">{categories.find(c => c.id === formData.category)?.name}</span>
+                                    <h1>{formData.title || 'UNTITLED REPORT'}</h1>
+                                    <div className="flex items-center justify-center gap-6 mt-6 text-[#1152d4] font-sans tracking-wide text-sm uppercase font-bold drop-shadow-sm">
+                                        <span>{formData.read_time || '0'} MIN READ</span>
+                                        <span className="w-1.5 h-1.5 bg-[#1152d4] rounded-full opacity-80" />
+                                        <span>PREVIEW MODE</span>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Upload Mode */}
-                            {imageMode === 'upload' && (
-                                <>
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0])}
-                                        className="adm-editor-file-hidden"
-                                    />
-                                    {!imageFile ? (
-                                        <div
-                                            className={`adm-editor-dropzone ${isDragging ? 'dragging' : ''}`}
-                                            onClick={() => fileInputRef.current?.click()}
-                                            onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
-                                            onDragLeave={() => setIsDragging(false)}
-                                            onDrop={handleDrop}
-                                        >
-                                            <div className="adm-editor-dropzone-icon">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                                    <circle cx="8.5" cy="8.5" r="1.5" />
-                                                    <polyline points="21 15 16 10 5 21" />
-                                                </svg>
-                                            </div>
-                                            <p className="adm-editor-dropzone-text">Drop an image here or <span>browse files</span></p>
-                                            <p className="adm-editor-dropzone-hint">PNG, JPG, WebP up to 5MB</p>
+                            <div className="container-custom max-w-[85rem] mx-auto py-20 px-6 flex flex-col xl:flex-row gap-12 lg:gap-16 relative">
+                                {/* TOC Sidebar */}
+                                <aside className="hidden lg:flex flex-col w-56 shrink-0 relative">
+                                    <div className="sticky top-40 flex flex-col gap-12">
+                                        <div className="flex flex-col gap-3">
+                                            <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest border-b border-black/5 pb-2">Analysis Root</p>
+                                            <nav className="flex items-center text-[11.5px] font-medium text-black/40">
+                                                <span className="transition-colors">Intel</span>
+                                                <svg className="mx-2 w-3 h-3 opacity-40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                                <span className="text-[#1152d4] font-semibold">{categories.find(c => c.id === formData.category)?.name || formData.category}</span>
+                                            </nav>
                                         </div>
-                                    ) : (
-                                        <div className="adm-editor-file-info">
-                                            <div className="adm-editor-file-info-left">
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                                    <circle cx="8.5" cy="8.5" r="1.5" />
-                                                    <polyline points="21 15 16 10 5 21" />
-                                                </svg>
-                                                <div>
-                                                    <span className="adm-editor-file-name">{imageFile.name}</span>
-                                                    <span className="adm-editor-file-size">{(imageFile.size / 1024).toFixed(1)} KB</span>
+
+                                        {toc.length > 0 && (
+                                            <div className="flex flex-col gap-4">
+                                                <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest border-b border-black/5 pb-2">Execution Path</p>
+                                                <div className="border-l border-black/10 ml-1.5">
+                                                    <ul className="flex flex-col gap-3 py-1">
+                                                        {toc.map((item, i) => {
+                                                            const isActive = activeId === item.id;
+                                                            return (
+                                                                <li key={i} style={{ paddingLeft: `${14 + (item.level - 1) * 16}px` }} className="relative group">
+                                                                    <div 
+                                                                        className={`absolute left-0 top-[9px] h-px transition-colors ${isActive ? 'bg-[#1152d4]' : 'bg-black/10 group-hover:bg-[#1152d4]'}`} 
+                                                                        style={{ width: `${8 + (item.level - 1) * 16}px` }}
+                                                                    />
+                                                                    <span 
+                                                                        onClick={(e) => handleTocClick(e, item.id)}
+                                                                        className={`block text-[12px] transition-colors tracking-tight leading-snug cursor-pointer ${isActive ? 'font-bold text-[#1152d4]' : item.level === 1 ? 'font-semibold text-black/70 hover:text-[#1152d4]' : 'font-medium text-black/45 hover:text-[#1152d4]'}`}
+                                                                    >
+                                                                        {item.text}
+                                                                    </span>
+                                                                </li>
+                                                            )
+                                                        })}
+                                                    </ul>
                                                 </div>
                                             </div>
-                                            <button onClick={handleRemoveImage} className="adm-editor-file-remove" aria-label="Remove image">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
-                                            </button>
+                                        )}
+                                    </div>
+                                </aside>
+
+                                <div className="w-full max-w-[70ch] mx-auto lg:mx-0">
+                                    <div className="briefing-content">
+                                        {formData.excerpt && (
+                                            <p className="primary-excerpt">
+                                                &ldquo;{formData.excerpt}&rdquo;
+                                            </p>
+                                        )}
+
+                                        <div className="prose-intel-root">
+                                            <ReactMarkdown 
+                                                remarkPlugins={[remarkGfm]} 
+                                                rehypePlugins={[rehypeRaw]}
+                                                components={markdownComponents}
+                                            >
+                                                {formData.content}
+                                            </ReactMarkdown>
                                         </div>
-                                    )}
-                                </>
-                            )}
+                                    </div>
 
-                            {/* URL Mode */}
-                            {imageMode === 'url' && (
-                                <input
-                                    type="text"
-                                    placeholder="https://example.com/cover.jpg"
-                                    className="adm-editor-text-input mono"
-                                    value={formData.featured_image}
-                                    onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
-                                />
-                            )}
-
-                            {/* Preview */}
-                            {formData.featured_image && (
-                                <div className="adm-editor-image-preview">
-                                    <img src={formData.featured_image} alt="Cover preview" />
-                                    <div className="adm-editor-image-preview-label">Cover Preview</div>
+                                    <div className="flex items-center justify-center gap-4 my-24 opacity-10">
+                                        <span className="w-1.5 h-1.5 bg-black rounded-full" />
+                                        <span className="w-2 h-2 bg-black rounded-full" />
+                                        <span className="w-1.5 h-1.5 bg-black rounded-full" />
+                                    </div>
                                 </div>
-                            )}
+
+                                {/* Right Sidebar Preview (Mock) */}
+                                <aside className="hidden xl:flex flex-col w-[320px] shrink-0 gap-12 lg:pl-4 mt-8">
+
+                                    <div className="flex flex-col gap-6">
+                                        <h3 className="text-[12px] font-bold text-black/50 uppercase tracking-widest border-b border-black/5 pb-2">Further Analysis</h3>
+                                        <div className="flex flex-col gap-7">
+                                            {/* Mock Related Report */}
+                                            <div className="group block cursor-pointer opactity-50">
+                                                <div className="aspect-[16/9] w-full mb-4 rounded-lg bg-[#e8f0fc] border border-black/5"></div>
+                                                <div className="flex flex-col gap-0.5 relative">
+                                                    <p className="text-[10px] font-bold text-[#1152d4] tracking-widest uppercase mb-0.5">MOCK CATEGORY</p>
+                                                    <h4 className="text-[16px] font-serif font-bold text-black/80 leading-[1.25]">Sample Related Briefing Will Appear Here</h4>
+                                                    <p className="text-[12.5px] text-black/60 leading-snug font-medium mt-1">This is a dynamic section that will populate with similar reports upon publication.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </aside>
+                            </div>
                         </div>
+                    </div>
+                )}
+            </main>
 
-                        {/* Divider */}
-                        <div className="adm-editor-divider" />
+            {/* Global Executive HUD (Floating Bar) */}
+            <motion.div 
+                initial={{ y: 100 }}
+                animate={{ y: 0 }}
+                className="adm-editor-exec-hud"
+            >
+                <div className="exec-hud-inner">
+                    <div className="exec-left">
+                        {isZenMode && (
+                            <button onClick={() => setIsZenMode(false)} className="exit-zen-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m15 18-6-6 6-6"/></svg>
+                                EXIT ZEN
+                            </button>
+                        )}
+                        <span className="save-status">
+                            <span className="status-dot pulsing" />
+                            {isSaving ? 'SYNCING...' : 'LOCAL CACHE READY'}
+                        </span>
+                    </div>
 
-                        {/* Submit */}
-                        <button
-                            onClick={handleSave}
-                            disabled={isSaving || !formData.title.trim()}
-                            className="adm-editor-submit"
+                    <div className="exec-center">
+                        <div className="status-segment-mini">
+                            <div className="seg-bg" style={{ transform: `translateX(${formData.status === 'draft' ? '0%' : '100%'})` }} />
+                            <button onClick={() => setFormData({...formData, status: 'draft'})} className={formData.status === 'draft' ? 'active' : ''}>DRAFT</button>
+                            <button onClick={() => setFormData({...formData, status: 'published'})} className={formData.status === 'published' ? 'active' : ''}>LIVE</button>
+                        </div>
+                    </div>
+
+                    <div className="exec-right">
+                        <button 
+                            disabled={isSaving || !formData.title.trim()} 
+                            onClick={() => handleSave()}
+                            className="exec-submit-btn"
                         >
-                            <span className="adm-editor-submit-text">
-                                {isSaving ? (
-                                    <>
-                                        <svg className="adm-editor-spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round" /></svg>
-                                        Synchronizing…
-                                    </>
-                                ) : (
-                                    <>
-                                        {formData.status === 'published' ? 'EXECUTE & PUBLISH' : 'SAVE DRAFT'}
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                    </>
-                                )}
-                            </span>
-                            <div className="adm-editor-submit-shimmer" />
+                            {formData.status === 'published' ? 'EXECUTE PUBLISH' : 'FINALIZE DRAFT'}
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                         </button>
-                    </motion.div>
+                    </div>
                 </div>
-            </div>
+            </motion.div>
 
             <style jsx global>{`
-                .adm-editor {
-                    max-width: 1100px;
+                body.lock-page-scroll {
+                    overflow: hidden !important;
+                }
+                :root {
+                    --c-cyan: #00d1ff;
+                    --c-blue: #1152d4;
+                    --glass: rgba(255,255,255,0.02);
+                    --glass-border: rgba(255,255,255,0.06);
+                }
+
+                .adm-editor-root {
+                    min-height: 100vh;
+                    padding: 40px 20px 120px;
+                    max-width: 1300px;
                     margin: 0 auto;
+                    transition: padding 0.5s ease;
+                }
+                .adm-editor-root.zen-active {
+                    max-width: 800px;
+                    padding-top: 80px;
                 }
 
-                .adm-editor-header {
-                    margin-bottom: 36px;
-                }
-
-                .adm-editor-back {
+                /* ══ Header HUD ══ */
+                .adm-editor-header { margin-bottom: 40px; }
+                .adm-editor-back-hud {
                     display: inline-flex;
                     align-items: center;
                     gap: 8px;
-                    text-decoration: none;
-                    font-family: var(--font-sans);
                     font-size: 0.65rem;
-                    font-weight: 700;
+                    font-weight: 800;
                     letter-spacing: 0.2em;
-                    text-transform: uppercase;
                     color: rgba(255,255,255,0.3);
-                    margin-bottom: 16px;
-                    transition: color 0.2s;
+                    margin-bottom: 8px;
+                    transition: color 0.3s;
                 }
-                .adm-editor-back:hover { color: #00d1ff; }
-
-                .adm-editor-title {
+                .adm-editor-back-hud:hover { color: var(--c-cyan); }
+                .adm-editor-title-main {
                     font-family: var(--font-serif);
-                    font-size: clamp(2rem, 4vw, 3rem);
+                    font-size: 2.2rem;
                     font-weight: 700;
-                    color: #fff;
                     letter-spacing: -0.02em;
-                    margin: 0 0 6px;
-                }
-
-                .adm-editor-desc {
-                    font-family: var(--font-sans);
-                    font-size: 0.85rem;
-                    font-weight: 500;
-                    color: rgba(255,255,255,0.3);
-                    margin: 0;
-                }
-
-                .adm-editor-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 340px;
-                    gap: 28px;
-                    align-items: start;
-                }
-                @media (max-width: 1024px) {
-                    .adm-editor-grid { grid-template-columns: 1fr; }
-                }
-
-                /* ══ Content Card ══ */
-                .adm-editor-content-card {
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 20px;
-                    padding: 40px;
-                }
-
-                .adm-editor-headline {
-                    width: 100%;
-                    font-family: var(--font-serif);
-                    font-size: clamp(1.8rem, 3vw, 3rem);
-                    font-weight: 700;
                     color: #fff;
-                    background: transparent;
-                    border: none;
-                    outline: none;
-                    margin-bottom: 32px;
-                    letter-spacing: -0.02em;
-                }
-                .adm-editor-headline::placeholder {
-                    color: rgba(255,255,255,0.08);
                 }
 
-                .adm-editor-field-group {
-                    margin-bottom: 24px;
-                }
-                .adm-editor-field-group:last-child {
-                    margin-bottom: 0;
-                }
-
-                .adm-editor-label {
-                    display: block;
-                    font-family: var(--font-sans);
-                    font-size: 0.6rem;
-                    font-weight: 700;
-                    letter-spacing: 0.2em;
-                    text-transform: uppercase;
-                    color: rgba(255,255,255,0.25);
-                    margin-bottom: 10px;
-                }
-
-                .adm-editor-textarea {
-                    width: 100%;
-                    padding: 16px 20px;
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 14px;
-                    font-family: var(--font-sans);
-                    font-size: 0.9rem;
-                    font-weight: 500;
-                    color: rgba(255,255,255,0.8);
-                    outline: none;
-                    resize: vertical;
-                    line-height: 1.7;
-                    transition: all 0.3s ease;
-                }
-                .adm-editor-textarea.mono {
-                    font-family: 'SF Mono', 'Fira Code', monospace;
-                    font-size: 0.82rem;
-                    line-height: 1.6;
-                }
-                .adm-editor-textarea::placeholder {
-                    color: rgba(255,255,255,0.15);
-                }
-                .adm-editor-textarea:focus {
-                    background: rgba(255,255,255,0.05);
-                    border-color: rgba(0,209,255,0.25);
-                    box-shadow: 0 0 0 3px rgba(0,209,255,0.05);
-                }
-
-                /* ══ Sidebar Card ══ */
-                .adm-editor-sidebar-card {
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 20px;
-                    padding: 32px;
-                    position: sticky;
-                    top: 24px;
-                }
-
-                .adm-editor-status-toggle {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 8px;
-                }
-
-                .adm-editor-status-btn {
+                .adm-editor-top-actions {
                     display: flex;
                     align-items: center;
-                    justify-content: center;
+                    gap: 16px;
+                }
+                .adm-editor-tool-btn {
+                    display: flex;
+                    align-items: center;
                     gap: 8px;
-                    padding: 12px;
+                    padding: 10px 16px;
+                    background: var(--glass);
+                    border: 1px solid var(--glass-border);
                     border-radius: 12px;
-                    border: 1px solid rgba(255,255,255,0.06);
-                    background: rgba(255,255,255,0.02);
-                    color: rgba(255,255,255,0.3);
-                    font-family: var(--font-sans);
-                    font-size: 0.7rem;
-                    font-weight: 700;
+                    color: rgba(255,255,255,0.4);
+                    font-size: 0.65rem;
+                    font-weight: 800;
                     letter-spacing: 0.1em;
-                    text-transform: uppercase;
-                    cursor: pointer;
-                    transition: all 0.25s ease;
-                }
-                .adm-editor-status-btn:hover {
-                    background: rgba(255,255,255,0.04);
-                    color: rgba(255,255,255,0.5);
-                }
-                .adm-editor-status-btn.active {
-                    background: rgba(255,255,255,0.06);
-                    border-color: rgba(255,255,255,0.12);
-                    color: rgba(255,255,255,0.8);
-                }
-                .adm-editor-status-btn.publish.active {
-                    background: rgba(0,209,255,0.08);
-                    border-color: rgba(0,209,255,0.2);
-                    color: #00d1ff;
-                }
-
-                .adm-editor-select-wrap {
-                    position: relative;
-                }
-
-                .adm-editor-select {
-                    width: 100%;
-                    padding: 14px 40px 14px 16px;
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 12px;
-                    font-family: var(--font-sans);
-                    font-size: 0.82rem;
-                    font-weight: 600;
-                    color: rgba(255,255,255,0.7);
-                    appearance: none;
-                    outline: none;
-                    cursor: pointer;
-                    transition: all 0.25s;
-                }
-                .adm-editor-select option {
-                    background: #1a2d42;
-                    color: #fff;
-                }
-                .adm-editor-select:focus {
-                    border-color: rgba(0,209,255,0.3);
-                }
-
-                .adm-editor-select-chevron {
-                    position: absolute;
-                    right: 14px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    color: rgba(255,255,255,0.25);
-                    pointer-events: none;
-                }
-
-                .adm-editor-number-input {
-                    width: 100%;
-                    padding: 14px 16px;
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 12px;
-                    font-family: var(--font-serif);
-                    font-size: 1.6rem;
-                    font-weight: 700;
-                    color: #00d1ff;
-                    text-align: center;
-                    outline: none;
-                    letter-spacing: -0.02em;
-                    transition: border-color 0.3s;
-                }
-                .adm-editor-number-input:focus {
-                    border-color: rgba(0,209,255,0.3);
-                }
-
-                .adm-editor-text-input {
-                    width: 100%;
-                    padding: 14px 16px;
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 12px;
-                    font-family: var(--font-sans);
-                    font-size: 0.8rem;
-                    font-weight: 500;
-                    color: rgba(255,255,255,0.6);
-                    outline: none;
-                    transition: border-color 0.3s;
-                }
-                .adm-editor-text-input.mono {
-                    font-family: 'SF Mono', 'Fira Code', monospace;
-                    font-size: 0.75rem;
-                    letter-spacing: -0.01em;
-                }
-                .adm-editor-text-input::placeholder {
-                    color: rgba(255,255,255,0.15);
-                }
-                .adm-editor-text-input:focus {
-                    border-color: rgba(0,209,255,0.3);
-                }
-
-                .adm-editor-image-preview {
-                    margin-top: 12px;
-                    width: 100%;
-                    height: 160px;
-                    border-radius: 14px;
-                    overflow: hidden;
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    position: relative;
-                }
-                .adm-editor-image-preview img {
-                    width: 100%; height: 100%;
-                    object-fit: cover;
-                }
-                .adm-editor-image-preview-label {
-                    position: absolute;
-                    bottom: 8px; left: 8px;
-                    padding: 4px 10px;
-                    background: rgba(0,0,0,0.5);
-                    backdrop-filter: blur(8px);
-                    border-radius: 8px;
-                    font-size: 0.55rem;
-                    font-weight: 700;
-                    letter-spacing: 0.15em;
-                    text-transform: uppercase;
-                    color: rgba(255,255,255,0.7);
-                }
-
-                /* ══ Image Upload ══ */
-                .adm-editor-img-mode-toggle {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 6px;
-                    margin-bottom: 12px;
-                }
-
-                .adm-editor-img-mode-btn {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 8px;
-                    padding: 10px;
-                    border-radius: 10px;
-                    border: 1px solid rgba(255,255,255,0.06);
-                    background: rgba(255,255,255,0.02);
-                    color: rgba(255,255,255,0.3);
-                    font-family: var(--font-sans);
-                    font-size: 0.62rem;
-                    font-weight: 700;
-                    letter-spacing: 0.08em;
-                    text-transform: uppercase;
-                    cursor: pointer;
-                    transition: all 0.25s ease;
-                }
-                .adm-editor-img-mode-btn:hover {
-                    color: rgba(255,255,255,0.5);
-                    background: rgba(255,255,255,0.04);
-                }
-                .adm-editor-img-mode-btn.active {
-                    color: #00d1ff;
-                    background: rgba(0,209,255,0.08);
-                    border-color: rgba(0,209,255,0.2);
-                }
-
-                .adm-editor-file-hidden {
-                    display: none;
-                }
-
-                .adm-editor-dropzone {
-                    padding: 32px 20px;
-                    border: 2px dashed rgba(255,255,255,0.1);
-                    border-radius: 14px;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: 10px;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    background: transparent;
-                }
-                .adm-editor-dropzone:hover,
-                .adm-editor-dropzone.dragging {
-                    border-color: rgba(0,209,255,0.35);
-                    background: rgba(0,209,255,0.04);
-                }
-
-                .adm-editor-dropzone-icon {
-                    width: 48px; height: 48px;
-                    border-radius: 14px;
-                    background: rgba(255,255,255,0.04);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: rgba(255,255,255,0.2);
                     transition: all 0.3s;
                 }
-                .adm-editor-dropzone:hover .adm-editor-dropzone-icon {
-                    color: rgba(0,209,255,0.5);
-                    background: rgba(0,209,255,0.06);
-                    border-color: rgba(0,209,255,0.15);
-                }
+                .adm-editor-tool-btn:hover { color: var(--c-cyan); border-color: rgba(0,209,255,0.3); background: rgba(0,209,255,0.04); }
 
-                .adm-editor-dropzone-text {
-                    font-size: 0.78rem;
-                    font-weight: 600;
-                    color: rgba(255,255,255,0.35);
-                    margin: 0;
-                }
-                .adm-editor-dropzone-text span {
-                    color: #00d1ff;
-                    text-decoration: underline;
-                    text-underline-offset: 2px;
-                }
-
-                .adm-editor-dropzone-hint {
-                    font-size: 0.62rem;
-                    font-weight: 600;
-                    color: rgba(255,255,255,0.15);
-                    letter-spacing: 0.06em;
-                    margin: 0;
-                }
-
-                .adm-editor-file-info {
+                .adm-editor-tab-hud {
+                    position: relative;
                     display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    padding: 14px 16px;
-                    background: rgba(0,209,255,0.04);
-                    border: 1px solid rgba(0,209,255,0.12);
+                    background: var(--glass);
+                    border: 1px solid var(--glass-border);
                     border-radius: 12px;
+                    padding: 4px;
+                    height: 42px;
                 }
-
-                .adm-editor-file-info-left {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    color: rgba(0,209,255,0.6);
-                }
-                .adm-editor-file-info-left div {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 2px;
-                }
-
-                .adm-editor-file-name {
-                    font-size: 0.75rem;
-                    font-weight: 600;
-                    color: rgba(255,255,255,0.7);
-                    max-width: 180px;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                }
-
-                .adm-editor-file-size {
-                    font-size: 0.6rem;
-                    font-weight: 600;
-                    color: rgba(255,255,255,0.25);
-                    letter-spacing: 0.05em;
-                }
-
-                .adm-editor-file-remove {
-                    width: 28px; height: 28px;
+                .adm-editor-tab-hud .tab-slider {
+                    position: absolute; top: 4px; bottom: 4px; left: 4px;
+                    width: calc(50% - 4px);
+                    background: rgba(255,255,255,0.08);
                     border-radius: 8px;
-                    border: 1px solid rgba(255,100,100,0.15);
-                    background: rgba(255,100,100,0.06);
-                    color: rgba(255,100,100,0.6);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
+                    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+                .adm-editor-tab-hud button {
+                    position: relative;
+                    z-index: 1;
+                    width: 70px;
+                    font-size: 0.6rem;
+                    font-weight: 800;
+                    color: rgba(255,255,255,0.25);
+                    transition: color 0.3s;
+                }
+                .adm-editor-tab-hud button.active { color: var(--c-cyan); }
+
+                /* ══ Layout ══ */
+                .adm-editor-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 320px;
+                    gap: 40px;
+                    align-items: start;
+                }
+                .zen-active .adm-editor-grid { grid-template-columns: 1fr; }
+
+                .adm-editor-preview-frame {
+                    background-color: #e8f0fc !important;
+                    min-height: 100vh;
+                    padding: 0;
+                    color: #000;
+                    margin: -40px -20px -120px; /* Offset root padding */
+                    padding-bottom: 200px;
+                }
+                .preview-inner {
+                    background: transparent !important;
+                    color: black;
+                    width: 100%;
+                    margin: 0;
+                    border-radius: 0;
+                    box-shadow: none;
+                }
+                .hero-content {
+                    max-width: 900px;
+                    margin: 0 auto;
+                }
+                .preview-body {
+                    padding: 60px;
+                    max-width: 900px;
+                    margin: 0 auto;
+                }
+                .adm-editor-glass-card {
+                    background: rgba(255,255,255,0.015);
+                    backdrop-filter: blur(20px);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 28px;
+                    padding: 48px;
+                    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.5);
+                }
+                .sidebar-config { padding: 32px; position: sticky; top: 40px; }
+
+                /* ══ Input Styling ══ */
+                .adm-editor-input-hero {
+                    width: 100%;
+                    background: transparent;
+                    border: none;
+                    outline: none;
+                    font-family: var(--font-serif);
+                    font-size: 3.5rem;
+                    font-weight: 700;
+                    color: #fff;
+                    margin-bottom: 40px;
+                    letter-spacing: -0.03em;
+                    resize: none;
+                    overflow-y: hidden;
+                    line-height: 1.1;
+                }
+                .adm-editor-input-hero::placeholder { color: rgba(255,255,255,0.05); }
+
+                .adm-editor-field { margin-bottom: 32px; }
+                .adm-editor-field label {
+                    display: block;
+                    font-size: 0.6rem;
+                    font-weight: 800;
+                    letter-spacing: 0.25em;
+                    color: rgba(255,255,255,0.2);
+                    margin-bottom: 12px;
+                }
+                .field-header { display: flex; justify-content: space-between; align-items: baseline; }
+                .char-count { font-size: 0.6rem; color: rgba(255,255,255,0.1); font-weight: 700; }
+
+                .adm-editor-text-area-minimal {
+                    width: 100%;
+                    min-height: 120px;
+                    overflow-y: auto;
+                    background: rgba(255,255,255,0.02);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 12px;
+                    padding: 16px;
+                    color: rgba(255,255,255,0.7);
+                    font-size: 0.95rem;
+                    line-height: 1.6;
+                    outline: none;
+                    resize: none;
+                    transition: border-color 0.3s;
+                }
+                .adm-editor-text-area-minimal:focus { border-color: rgba(0,209,255,0.3); }
+
+                /* Premium Internal Scrollbars */
+                .adm-editor-text-area-minimal::-webkit-scrollbar,
+                .rich-editor-internal-scroll::-webkit-scrollbar {
+                    width: 4px;
+                }
+                .adm-editor-text-area-minimal::-webkit-scrollbar-track,
+                .rich-editor-internal-scroll::-webkit-scrollbar-track {
+                    background: rgba(255,255,255,0.02);
+                }
+                .adm-editor-text-area-minimal::-webkit-scrollbar-thumb,
+                .rich-editor-internal-scroll::-webkit-scrollbar-thumb {
+                    background: var(--c-cyan);
+                    border-radius: 10px;
+                }
+
+                .rich-editor-container-styled {
+                    border-radius: 12px;
+                    overflow: hidden;
+                    border: 1px solid var(--glass-border);
+                }
+
+                /* Custom Cat Dropdown */
+                .adm-editor-cat-dropdown-root {
+                    position: relative;
+                }
+                .adm-editor-cat-dropdown-root .dropdown-trigger {
+                    width: 100%; height: 44px;
+                    background: rgba(255,255,255,0.03);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 10px;
+                    padding: 0 16px;
+                    display: flex; align-items: center; justify-content: space-between;
+                    font-size: 0.65rem; font-weight: 800; color: #fff;
+                    letter-spacing: 0.1em;
+                    transition: all 0.3s;
+                }
+                .adm-editor-cat-dropdown-root .dropdown-trigger:hover,
+                .adm-editor-cat-dropdown-root .dropdown-trigger.active {
+                    background: rgba(255,255,255,0.06); border-color: rgba(0,209,255,0.3);
+                }
+                .adm-editor-cat-dropdown-root .dropdown-trigger svg { color: rgba(255,255,255,0.2); }
+                .adm-editor-cat-dropdown-root .dropdown-trigger:hover svg { color: var(--c-cyan); }
+
+                .adm-editor-cat-dropdown-root .dropdown-list {
+                    position: absolute; top: calc(100% + 12px); left: 0; right: 0;
+                    background: rgba(10,15,26,0.95);
+                    backdrop-filter: blur(20px);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 14px;
+                    padding: 8px;
+                    z-index: 110;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(0,209,255,0.05);
+                }
+                .adm-editor-cat-dropdown-root .dropdown-item {
+                    width: 100%; padding: 12px 14px;
+                    text-align: left; border-radius: 8px;
+                    font-size: 0.6rem; font-weight: 800; color: rgba(255,255,255,0.4);
+                    letter-spacing: 0.05em;
                     transition: all 0.2s;
                 }
-                .adm-editor-file-remove:hover {
-                    color: #ff6b6b;
-                    background: rgba(255,100,100,0.12);
-                    border-color: rgba(255,100,100,0.3);
+                .adm-editor-cat-dropdown-root .dropdown-item:hover {
+                    background: rgba(255,255,255,0.05); color: #fff;
+                }
+                .adm-editor-cat-dropdown-root .dropdown-item.active {
+                    background: rgba(0,209,255,0.08); color: var(--c-cyan);
                 }
 
-                .adm-editor-divider {
-                    height: 1px;
-                    background: linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent);
-                    margin: 28px 0;
+                /* Tags & Inputs */
+                .tag-input-wrap input {
+                    width: 100%; height: 44px;
+                    background: var(--glass);
+                    border: 1px solid var(--glass-border);
+                    border-radius: 10px;
+                    padding: 0 14px;
+                    font-size: 0.7rem;
+                    font-weight: 700;
+                    color: #ffffff;
+                    outline: none;
                 }
-
-                .adm-editor-submit {
-                    position: relative;
-                    overflow: hidden;
-                    width: 100%;
-                    padding: 17px 28px;
-                    background: linear-gradient(135deg, #00d1ff, #1152d4);
-                    border: none;
-                    border-radius: 14px;
+                .tag-input-wrap input::placeholder { color: rgba(255,255,255,0.2); }
+                .tag-input-wrap input::-webkit-calendar-picker-indicator {
+                    filter: invert(1);
                     cursor: pointer;
-                    transition: box-shadow 0.3s, transform 0.3s;
                 }
-                .adm-editor-submit:hover {
-                    box-shadow: 0 12px 40px rgba(0,209,255,0.25);
-                    transform: translateY(-2px);
+                .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+                .tag-pill {
+                    display: flex; align-items: center; gap: 8px;
+                    padding: 6px 12px;
+                    background: rgba(0,209,255,0.08);
+                    border: 1px solid rgba(0,209,255,0.15);
+                    border-radius: 8px;
+                    font-size: 0.6rem; font-weight: 800; color: var(--c-cyan);
                 }
-                .adm-editor-submit:disabled {
-                    opacity: 0.5;
-                    cursor: not-allowed;
+                .tag-pill button { color: rgba(255,255,255,0.3); font-size: 1rem; line-height: 1; }
+
+                /* Image Mode Toggle */
+                .img-mode-toggle-mini {
+                    display: flex; gap: 4px; background: var(--glass); padding: 3px; border-radius: 8px; margin-bottom: 12px;
+                }
+                .img-mode-toggle-mini button {
+                    flex: 1; padding: 6px; font-size: 0.55rem; font-weight: 900; color: rgba(255,255,255,0.2); border-radius: 6px; transition: all 0.2s;
+                }
+                .img-mode-toggle-mini button.active { background: rgba(0,209,255,0.1); color: var(--c-cyan); }
+
+                /* Dropzone Tech */
+                .adm-editor-dropzone-tech {
+                    position: relative;
+                    width: 100%; height: 160px;
+                    background: rgba(255,255,255,0.01);
+                    border: 1px dashed var(--glass-border);
+                    border-radius: 16px;
+                    cursor: pointer;
+                    overflow: hidden;
+                    transition: all 0.3s;
+                }
+                .adm-editor-dropzone-tech:hover { border-color: var(--c-cyan); background: rgba(0,209,255,0.02); }
+                .dropzone-empty {
+                    height: 100%; width: 100%;
+                    display: flex; flex-direction: column; align-items: center; justify-content: center;
+                    gap: 12px; color: rgba(255,255,255,0.1);
+                }
+                .dropzone-empty span { font-size: 0.6rem; font-weight: 900; letter-spacing: 0.2em; }
+                .image-filled { width: 100%; height: 100%; position: relative; }
+                .image-filled img { width: 100%; height: 100%; object-fit: cover; }
+                .image-filled button {
+                    position: absolute; top: 12px; right: 12px;
+                    padding: 6px 12px; background: rgba(0,0,0,0.6); color: #fff;
+                    font-size: 0.55rem; font-weight: 900; border-radius: 6px; backdrop-filter: blur(4px);
+                }
+
+                /* Metrics */
+                .sidebar-metrics {
+                    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+                    margin-top: 40px; border-top: 1px solid var(--glass-border); padding-top: 24px;
+                }
+                .metric .label { font-size: 0.55rem; color: rgba(255,255,255,0.1); display: block; margin-bottom: 4px; }
+                .metric .val { font-size: 1.2rem; font-family: var(--font-serif); color: var(--c-cyan); font-weight: 700; }
+
+                /* ══ Executive HUD ══ */
+                .adm-editor-exec-hud {
+                    position: fixed; left: 0; right: 0; bottom: 0; 
+                    height: 90px;
+                    background: rgba(0,0,0,0.2);
+                    backdrop-filter: blur(30px);
+                    border-top: 1px solid var(--glass-border);
+                    display: flex; align-items: center;
+                    z-index: 100;
+                    padding: 0 40px;
+                }
+                .exec-hud-inner {
+                    max-width: 1300px; width: 100%; margin: 0 auto;
+                    display: flex; align-items: center; justify-content: space-between;
+                }
+                .exec-left { display: flex; align-items: center; gap: 24px; }
+                .exit-zen-btn {
+                    display: flex; align-items: center; gap: 8px;
+                    color: rgba(255,255,255,0.4); font-size: 0.65rem; font-weight: 900;
+                }
+                .save-status {
+                    display: flex; align-items: center; gap: 10px;
+                    font-size: 0.6rem; font-weight: 800; color: rgba(255,255,255,0.2); letter-spacing: 0.1em;
+                }
+                .status-dot { width: 6px; height: 6px; background: var(--c-cyan); border-radius: 50%; }
+                .pulsing { animation: dot-pulse 2s infinite; }
+                @keyframes dot-pulse { 0% { opacity:1; } 50% { opacity:0.3; } 100% { opacity:1; } }
+
+                .status-segment-mini {
+                    position: relative; display: flex;
+                    background: rgba(255,255,255,0.03); border-radius: 12px; padding: 4px;
+                }
+                .status-segment-mini .seg-bg {
+                    position: absolute; top: 4px; bottom: 4px; left: 4px; 
+                    width: calc(50% - 4px);
+                    background: var(--c-cyan); border-radius: 8px;
+                    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                    opacity: 0.15;
+                }
+                .status-segment-mini button {
+                    position: relative; z-index: 1; min-width: 80px; padding: 10px;
+                    font-size: 0.65rem; font-weight: 900; color: rgba(255,255,255,0.2); transition: color 0.3s;
+                }
+                .status-segment-mini button.active { color: var(--c-cyan); }
+
+                .exec-submit-btn {
+                    display: flex; align-items: center; gap: 12px;
+                    padding: 14px 32px;
+                    background: linear-gradient(135deg, var(--c-cyan), var(--c-blue));
+                    border-radius: 14px; color: #fff;
+                    border-radius: 14px;
+                    color: #fff;
+                    font-size: 0.75rem;
+                    font-weight: 800;
+                    letter-spacing: 0.1em;
+                    box-shadow: 0 10px 30px -10px var(--c-cyan);
+                    transition: all 0.3s;
+                }
+                .exec-submit-btn:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 15px 40px -10px var(--c-cyan);
+                }
+                .exec-submit-btn:disabled {
+                    opacity: 0.4;
                     transform: none;
                     box-shadow: none;
                 }
 
-                .adm-editor-submit-text {
-                    position: relative;
-                    z-index: 1;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
+                /* ══ Reading Suite Core Styling ══ */
+                .prose-intel-root {
                     font-family: var(--font-sans);
-                    font-size: 0.75rem;
+                    font-size: 1.15rem;
+                    line-height: 1.9;
+                    color: rgba(0, 0, 0, 0.8);
+                }
+                .prose-intel-root p {
+                    margin-bottom: 2.2rem;
+                }
+                .markdown-h-intel {
+                    font-family: var(--font-serif);
+                    font-size: 2.6rem;
                     font-weight: 700;
-                    letter-spacing: 0.12em;
+                    color: #000;
+                    margin: 4.5rem 0 1.8rem;
+                    letter-spacing: -0.03em;
+                    scroll-margin-top: 100px;
+                    line-height: 1.2;
+                }
+                .markdown-h-intel-sub {
+                    font-family: var(--font-serif);
+                    font-size: 1.9rem;
+                    font-weight: 700;
+                    color: #1a1a2e;
+                    margin: 3.5rem 0 1.4rem;
+                }
+                .inline-code-intel {
+                    background: rgba(0, 209, 255, 0.08);
+                    color: #1152d4;
+                    padding: 0.2rem 0.5rem;
+                    border-radius: 6px;
+                    font-family: var(--font-mono);
+                    font-size: 0.85em;
+                }
+                .syntax-highlighter-block {
+                    background: #030711 !important;
+                    padding: 1.5rem;
+                    border-radius: 16px;
+                    margin: 3rem 0;
+                    border: 1px solid rgba(255, 255, 255, 0.05);
+                    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+                }
+                .syntax-highlighter-block pre {
+                    margin: 0;
+                    padding: 0;
+                    overflow-x: auto;
+                }
+                .syntax-highlighter-block code {
+                    font-family: var(--font-mono) !important;
+                    font-size: 0.9rem !important;
+                    line-height: 1.6 !important;
+                }
+
+                .intel-callout-box {
+                    position: relative;
+                    background: white;
+                    border-left: 4px solid #00d1ff;
+                    padding: 2.5rem 3rem;
+                    margin: 3.5rem 0;
+                    border-radius: 4px 16px 16px 4px;
+                    box-shadow: 0 10px 40px rgba(0, 209, 255, 0.04);
+                }
+                .pulse-indicator {
+                    position: absolute;
+                    top: 1.5rem;
+                    left: -10px;
+                    width: 16px;
+                    height: 16px;
+                    background: #00d1ff;
+                    border-radius: 50%;
+                    box-shadow: 0 0 15px #00d1ff;
+                    animation: callout-pulse 2s infinite;
+                }
+                @keyframes callout-pulse {
+                    0% {
+                        transform: scale(1);
+                        opacity: 0.8;
+                    }
+                    50% {
+                        transform: scale(1.8);
+                        opacity: 0;
+                    }
+                    100% {
+                        transform: scale(1);
+                        opacity: 0.8;
+                    }
+                }
+
+                .analyst-table-scroll {
+                    width: 100%;
+                    overflow-x: auto;
+                    margin: 3.5rem 0;
+                    border-radius: 12px;
+                    border: 1px solid rgba(0, 0, 0, 0.08);
+                }
+                .analyst-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    background: white;
+                    font-family: var(--font-mono);
+                    font-size: 0.85rem;
+                }
+                .analyst-table th {
+                    background: #f8faff;
+                    padding: 1.2rem 1rem;
+                    text-align: left;
+                    font-weight: 800;
+                    border-bottom: 2px solid #e8f0fc;
+                    color: #1152d4;
                     text-transform: uppercase;
-                    color: #fff;
+                }
+                .analyst-table td {
+                    padding: 1.2rem 1rem;
+                    border-bottom: 1px solid #e8f0fc;
+                    color: rgba(0, 0, 0, 0.7);
+                    font-variant-numeric: tabular-nums;
+                }
+                .analyst-table tr:nth-child(even) { background: #fcfdfe; }
+
+                .primary-excerpt {
+                    font-family: var(--font-serif);
+                    font-style: italic;
+                    color: #333;
+                    font-size: 1.4rem;
+                    line-height: 1.6;
+                    margin-bottom: 60px;
+                    border-left: 4px solid #00d1ff;
+                    padding-left: 30px;
+                    font-weight: 500;
+                    text-align: left;
                 }
 
-                .adm-editor-submit-shimmer {
-                    position: absolute; inset: 0;
-                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-                    transform: translateX(-100%);
-                    transition: transform 0.55s ease;
+                /* ══ Preview Layout ══ */
+                .adm-editor-preview-frame {
+                    background: #e8f0fc !important;
+                    border-radius: 32px;
+                    overflow: hidden;
+                    color: #000;
+                    margin: -40px -20px -120px;
+                    padding-bottom: 200px;
                 }
-                .adm-editor-submit:hover .adm-editor-submit-shimmer {
-                    transform: translateX(100%);
+                .preview-inner {
+                    background: transparent !important;
+                    width: 100%;
+                    margin: 0;
                 }
-
-                .adm-editor-spinner {
-                    animation: adm-editor-spin 0.75s linear infinite;
+                .hero-content {
+                    max-width: 900px;
+                    margin: 0 auto;
+                    position: absolute;
+                    bottom: 60px;
+                    left: 0;
+                    right: 0;
+                    padding: 0 40px;
+                    color: #000;
                 }
-                @keyframes adm-editor-spin { to { transform: rotate(360deg); } }
-
-                @media (max-width: 640px) {
-                    .adm-editor-content-card { padding: 24px 20px; }
-                    .adm-editor-sidebar-card { padding: 24px 20px; }
+                .hero-content h1 {
+                    font-family: var(--font-serif);
+                    font-size: 3.5rem;
+                    margin: 15px 0;
+                    font-weight: 700;
+                    color: #000;
+                    letter-spacing: -0.02em;
+                }
+                .hero-content .cat {
+                    text-[#00d1ff] font-bold tracking-[0.3em] text-[10px] uppercase mb-4;
+                }
+                .hero-content .meta {
+                    text-black/40 font-bold tracking-widest text-[10px] uppercase;
+                }
+                .preview-hero {
+                    height: 400px;
+                    background-size: cover;
+                    background-position: center;
+                    position: relative;
+                }
+                .hero-overlay {
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(to top, #e8f0fc, transparent);
+                }
+                .preview-body {
+                    max-width: 900px;
+                    margin: 0 auto;
+                    padding: 80px 40px;
+                    background: transparent;
+                }
+                .preview-body .excerpt {
+                    font-style: italic;
+                    color: #333;
+                    font-size: 1.4rem;
+                    margin-bottom: 60px;
+                    border-left: 4px solid var(--c-cyan);
+                    padding-left: 30px;
+                    font-family: var(--font-serif);
                 }
             `}</style>
         </div>

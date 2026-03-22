@@ -1,8 +1,7 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware
 from dotenv import load_dotenv
 import os
 
@@ -11,42 +10,34 @@ load_dotenv()
 from database.connection import engine, Base
 from api import blogs, contact, chat, admin, upload
 
-# Create all tables on startup
-Base.metadata.create_all(bind=engine)
+# 🚀 [Morrigan API] Startup Sequence
+app = FastAPI(title="Morrigan API", version="1.0.0")
 
-app = FastAPI(
-    title="Morrigan API",
-    description="Backend API for Morrigan Editorial Platform — Blog management, AI chatbot, and content intelligence",
-    version="1.0.0",
-    docs_url="/api/docs",
-    redoc_url="/api/redoc"
-)
-
-# ── CORS ──────────────────────────────────────────────────────────────────────
-# Dynamic CORS Origins based on Environment
+# ── 🛡️ 1. CORS SHIELD (MUST BE FIRST) ──────────────────────────────────────────
 env = os.getenv("ENV", "development")
 if env == "production":
-    # In production, ONLY allow your official Vercel domain
     origins_raw = os.getenv("ALLOWED_ORIGINS", "").split(",")
     ALLOWED_ORIGINS = [o.strip().rstrip("/") for o in origins_raw if o.strip()]
-    if "*" in ALLOWED_ORIGINS:
-        # FastAPI safety: allow_credentials=True cannot be used with "*"
-        ALLOW_CREDENTIALS = False
-    else:
-        ALLOW_CREDENTIALS = True
+    # FastAPI requirement: allow_credentials cannot be True if using "*"
+    ALLOW_CREDENTIALS = False if "*" in ALLOWED_ORIGINS else True
 else:
     ALLOWED_ORIGINS = ["http://localhost:3000"]
     ALLOW_CREDENTIALS = True
 
-print(f"🚀 [CORS] Initialized with Origins: {ALLOWED_ORIGINS}")
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS or ["*"], # Fallback to * if empty
+    allow_origins=ALLOWED_ORIGINS or ["*"],
     allow_credentials=ALLOW_CREDENTIALS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ── 🗄️ 2. DATABASE INIT (DEFERRED) ─────────────────────────────────────────────
+try:
+    Base.metadata.create_all(bind=engine)
+    print("✅ [DB] System Online")
+except Exception as e:
+    print(f"❌ [DB] Startup Delay: {e}")
 
 # ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(blogs.router, prefix="/api", tags=["Blogs"])
@@ -60,90 +51,24 @@ UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/api/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
-# ── Root & Health ─────────────────────────────────────────────────────────────
-
 @app.get("/")
 def root():
     return {
         "service": "Morrigan API",
-        "version": "1.0.0",
         "status": "online",
-        "documentation": "/api/docs",
-        "endpoints": {
-            "blogs": "/api/blogs",
-            "contact": "/api/contact",
-            "chat": "/api/chat",
-            "auth": "/api/auth/login",
-            "upload": "/api/upload"
-        }
+        "env": env
     }
-
-
-@app.get("/health")
-def health_check():
-    return {
-        "status": "healthy",
-        "database": "connected",
-        "api": "operational"
-    }
-
-
-@app.get("/api/status")
-def api_status():
-    gemini_key = os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY_1")
-    pinecone_key = os.getenv("PINECONE_API_KEY")
-
-    return {
-        "api": "online",
-        "services": {
-            "database": "operational",
-            "gemini_ai": "configured" if gemini_key and gemini_key != "your_actual_gemini_key_here" else "not_configured",
-            "pinecone": "configured" if pinecone_key and pinecone_key != "your_actual_pinecone_key_here" else "not_configured",
-            "chatbot": "ready" if (gemini_key and pinecone_key) else "blocked"
-        },
-        "features": {
-            "blogs": "enabled",
-            "contact_form": "enabled",
-            "chatbot": "pending_api_keys" if not (gemini_key and pinecone_key) else "enabled"
-        }
-    }
-
 
 # ── Error Handlers ────────────────────────────────────────────────────────────
-
 @app.exception_handler(404)
 async def not_found_handler(request, exc):
-    return JSONResponse(
-        status_code=404,
-        content={
-            "error": "Not Found",
-            "message": "The requested resource was not found",
-            "path": str(request.url)
-        }
-    )
-
+    return JSONResponse(status_code=404, content={"error": "Not Found"})
 
 @app.exception_handler(500)
 async def server_error_handler(request, exc):
-    return JSONResponse(
-        status_code=500,
-        content={
-            "error": "Internal Server Error",
-            "message": "An unexpected error occurred. Please try again later."
-        }
-    )
-
-
-# ── Run ───────────────────────────────────────────────────────────────────────
+    return JSONResponse(status_code=500, content={"error": "Internal Error"})
 
 if __name__ == "__main__":
     import uvicorn
-
     port = int(os.getenv("PORT", 8000))
-
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=port,
-        reload=True
-    )
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

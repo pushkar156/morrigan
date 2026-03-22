@@ -2,6 +2,8 @@ import Hero from "@/components/Hero";
 import CategoryScroll from "@/components/CategoryScroll";
 import { fetchBlogs } from "@/lib/api";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const blogs = await fetchBlogs();
 

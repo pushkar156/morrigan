@@ -43,6 +43,11 @@ export const metadata: Metadata = {
     description: "AI-powered editorial platform focused on finance, business strategy, and technology.",
     images: ['/logo.png'],
   },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({

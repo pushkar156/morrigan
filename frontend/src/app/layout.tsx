@@ -19,6 +19,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://themorrigan.com"), // Important for absolute image URLs on social media
   title: "The Morrigan",
   description: "AI-powered editorial platform focused on finance, business strategy, and technology.",
   openGraph: {

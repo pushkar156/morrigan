@@ -8,7 +8,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const pathname = usePathname()
     const router = useRouter()
     const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-    const { isAuthenticated, isLoading, logout } = useAuth()
+    const { isAuthenticated, isLoading, logout, token } = useAuth()
 
     const handleLogout = () => {
         logout()
@@ -16,10 +16,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     useEffect(() => {
-        if (!isLoading && !isAuthenticated) {
+        console.log("[Auth Guard] isLoading:", isLoading, "token:", token ? "Exists" : "None")
+        if (!isLoading && !token) {
             router.push('/admin/login')
         }
-    }, [isLoading, isAuthenticated, router])
+    }, [isLoading, token, router])
+
+    if (isLoading) {
+        return (
+            <div className="flex h-screen w-screen items-center justify-center bg-[#0d1b2a]">
+                <div className="flex flex-col items-center gap-6">
+                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#00d1ff]/20 border-t-[#00d1ff]"></div>
+                    <span className="text-[11px] font-black tracking-[0.3em] text-[#00d1ff] uppercase">Security Verification</span>
+                </div>
+            </div>
+        )
+    }
+
+    if (!token) {
+        return null
+    }
 
     const navLinks = [
         { name: 'Dashboard', href: '/admin/dashboard', icon: 'M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h6v6h-6z' },

@@ -57,6 +57,7 @@ export interface ContactPayload {
 
 export interface ChatPayload {
     message: string
+    history?: { role: "user" | "model"; text: string }[]
     blog_id?: string
     page_url?: string
     page_content?: string

@@ -15,6 +15,7 @@ async def chat_with_morrigan(
     blog_id = payload.get("blog_id")
     page_url = payload.get("page_url")
     page_content = payload.get("page_content")
+    history = payload.get("history", [])
 
     if not query:
         raise HTTPException(status_code=400, detail="Message is required")
@@ -25,7 +26,8 @@ async def chat_with_morrigan(
             blog_id=blog_id,
             db=db,
             page_url=page_url,
-            page_content=page_content
+            page_content=page_content,
+            history=history
         )
         return {"response": response}
     except Exception as e:

@@ -71,7 +71,8 @@ async def ask_morrigan(
     blog_id: Optional[str] = None,
     db: Optional[Session] = None,
     page_url: Optional[str] = None,
-    page_content: Optional[str] = None
+    page_content: Optional[str] = None,
+    history: Optional[list] = None
 ) -> str:
     if not is_service_available():
         return "I apologize, but the AI service is currently unavailable. Please contact the administrator."
@@ -82,7 +83,7 @@ async def ask_morrigan(
 
         if page_content and (is_page_specific_question(query, page_url) or "/blog/" in (page_url or "")):
             # If on a blog, prioritize the local page context for better relevance
-            return await answer_page_question_dynamic(query, page_content, page_url)
+            return await answer_page_question_dynamic(query, page_content, page_url, history=history)
 
         res = execute_with_fallback("Embed Content", 
             genai.embed_content,
@@ -117,7 +118,7 @@ async def ask_morrigan(
 
         if not context_text:
             if page_content:
-                return await answer_page_question_dynamic(query, page_content, page_url)
+                return await answer_page_question_dynamic(query, page_content, page_url, history=history)
             return "I couldn't find any relevant information to answer that question. Could you try rephrasing or asking about a different topic?"
 
         final_prompt = f"""You are "The Morrigan" — a highly knowledgeable AI assistant for The Morrigan editorial platform, specializing in finance, strategy, M&A, and market analysis.
@@ -139,7 +140,18 @@ INSTRUCTIONS:
 
         def generate():
             model = genai.GenerativeModel(CHAT_MODEL)
-            return model.generate_content(final_prompt)
+            if history:
+                formatted_history = []
+                for msg in history:
+                    if "role" in msg and "text" in msg:
+                        formatted_history.append({
+                            "role": msg["role"],
+                            "parts": [msg["text"]]
+                        })
+                chat = model.start_chat(history=formatted_history)
+                return chat.send_message(final_prompt)
+            else:
+                return model.generate_content(final_prompt)
             
         response = execute_with_fallback("Generate Content", generate)
         return response.text
@@ -174,7 +186,7 @@ def is_page_specific_question(query: str, page_url: Optional[str]) -> bool:
     return any(kw in query_lower for kw in keywords)
 
 
-async def answer_page_question_dynamic(query: str, page_content: str, page_url: Optional[str] = None) -> str:
+async def answer_page_question_dynamic(query: str, page_content: str, page_url: Optional[str] = None, history: Optional[list] = None) -> str:
     try:
         page_name = "this page"
         if page_url:
@@ -201,7 +213,18 @@ Answer the question based on what you can see on the page. Be helpful and specif
 
         def generate_dynamic():
             model = genai.GenerativeModel(CHAT_MODEL)
-            return model.generate_content(prompt)
+            if history:
+                formatted_history = []
+                for msg in history:
+                    if "role" in msg and "text" in msg:
+                        formatted_history.append({
+                            "role": msg["role"],
+                            "parts": [msg["text"]]
+                        })
+                chat = model.start_chat(history=formatted_history)
+                return chat.send_message(prompt)
+            else:
+                return model.generate_content(prompt)
             
         response = execute_with_fallback("Dynamic Content", generate_dynamic)
         return response.text

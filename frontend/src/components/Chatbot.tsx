@@ -95,6 +95,10 @@ export default function Chatbot() {
       const payload: ChatPayload = {
         message: userText,
         page_url: window.location.href,
+        history: messages.slice(1).map(m => ({
+          role: m.role === 'bot' ? 'model' : 'user',
+          text: m.text
+        }))
       }
 
       // If we're on a blog page, try to get the article content for context

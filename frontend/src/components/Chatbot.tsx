@@ -67,11 +67,22 @@ export default function Chatbot() {
     }
   }, [messages, isTyping])
 
-  // Focus input on open
+  // Focus input on open & aggressively lock background scroll entirely
   useEffect(() => {
     if (isOpen) {
       setUnread(0)
+      document.body.style.overflow = 'hidden'
+      document.documentElement.style.overflow = 'hidden'
       setTimeout(() => inputRef.current?.focus(), 320)
+    } else {
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
     }
   }, [isOpen])
 
@@ -152,10 +163,7 @@ export default function Chatbot() {
   if (pathname && pathname.startsWith('/admin')) return null
 
   const suggestions = [
-    { label: 'What is Morrigan?', icon: '💡' },
-    { label: 'Latest articles', icon: '📰' },
-    { label: 'M&A coverage', icon: '🏢' },
-    { label: 'Stock analysis', icon: '📊' },
+    { label: 'Summarise', query: 'Summarize this page', icon: '📄' },
   ]
 
   return (
@@ -208,7 +216,7 @@ export default function Chatbot() {
             <div className="cb-accent-bar" />
 
             {/* ── Messages ───────────────────────────────────────────────── */}
-            <div ref={scrollRef} className="cb-messages">
+            <div ref={scrollRef} className="cb-messages" onWheel={(e) => e.stopPropagation()}>
               {messages.map((m, i) => (
                 <motion.div
                   key={i}
@@ -291,7 +299,7 @@ export default function Chatbot() {
                     {suggestions.map(s => (
                       <button
                         key={s.label}
-                        onClick={() => { setInput(s.label); inputRef.current?.focus() }}
+                        onClick={() => { setInput(s.query); inputRef.current?.focus() }}
                         className="cb-suggestion-btn"
                       >
                         <span className="cb-suggestion-icon">{s.icon}</span>
@@ -419,6 +427,7 @@ export default function Chatbot() {
           backdrop-filter: blur(60px) saturate(180%);
           -webkit-backdrop-filter: blur(60px) saturate(180%);
           border: 1px solid rgba(255,255,255,0.7);
+          overscroll-behavior: contain;
           box-shadow:
             0 32px 80px -16px rgba(0,0,0,0.22),
             0 0 1px rgba(0,0,0,0.1),
@@ -569,6 +578,7 @@ export default function Chatbot() {
           flex-direction: column;
           gap: 16px;
           min-height: 0;
+          overscroll-behavior: contain;
           /* Premium scrollbar styling */
           scrollbar-width: thin;
           scrollbar-color: rgba(17, 82, 212, 0.2) transparent;
@@ -756,8 +766,7 @@ export default function Chatbot() {
         }
 
         .cb-suggestions-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
+          display: flex;
           gap: 8px;
         }
 

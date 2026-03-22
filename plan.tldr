@@ -478,6 +478,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "contact page email connection"
 												}
 											]
@@ -698,6 +703,36 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
+													"text": "chatbot ui"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "chatbot answering format"
 												}
 											]
@@ -718,6 +753,11 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
 													"text": "chatbot testing and working"
 												}
 											]
@@ -738,7 +778,52 @@
 											"content": [
 												{
 													"type": "text",
+													"marks": [
+														{
+															"type": "highlight"
+														}
+													],
+													"text": "responsive website"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
 													"text": "Remove the files dont need (Cleaning codebase)"
+												}
+											]
+										}
+									]
+								},
+								{
+									"type": "listItem",
+									"attrs": {
+										"dir": "auto"
+									},
+									"content": [
+										{
+											"type": "paragraph",
+											"attrs": {
+												"dir": "auto"
+											},
+											"content": [
+												{
+													"type": "text",
+													"text": "shareable link with custom cards"
 												}
 											]
 										}
@@ -869,7 +954,7 @@
 			"selectedShapeIds": [
 				"shape:LnL7WgtCHXucFLuKWC5AW"
 			],
-			"hoveredShapeId": null,
+			"hoveredShapeId": "shape:LnL7WgtCHXucFLuKWC5AW",
 			"erasingShapeIds": [],
 			"hintingShapeIds": [],
 			"focusedGroupId": null,
@@ -879,9 +964,9 @@
 			"typeName": "instance_page_state"
 		},
 		{
-			"x": 3064.889507453318,
-			"y": 688.4896391440477,
-			"z": 0.35976641356906197,
+			"x": 3891.881135271676,
+			"y": 377.3694667858693,
+			"z": 0.34259972504436315,
 			"meta": {},
 			"id": "camera:page:page",
 			"typeName": "camera"

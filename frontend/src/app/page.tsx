@@ -1,20 +1,9 @@
-"use client"
 import Hero from "@/components/Hero";
 import CategoryScroll from "@/components/CategoryScroll";
 import { fetchBlogs } from "@/lib/api";
-import type { Blog } from "@/lib/types";
-import { useEffect, useState } from "react";
 
-export default function Home() {
-  const [blogs, setBlogs] = useState<Blog[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    fetchBlogs()
-      .then(data => setBlogs(data))
-      .catch(err => console.error('Failed to fetch blogs:', err))
-      .finally(() => setIsLoading(false))
-  }, [])
+export default async function Home() {
+  const blogs = await fetchBlogs();
 
   const categories = [
     { title: "Back to Basics", subtitle: "Essential groundwork for institutional knowledge", id: "back-to-basics", theme: "light" },
@@ -40,7 +29,7 @@ export default function Home() {
               blogs={blogs}
               theme={cat.theme as "light" | "dark"}
               index={index}
-              isLoading={isLoading}
+              isLoading={false}
             />
           ))}
         </div>

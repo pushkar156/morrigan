@@ -27,19 +27,23 @@ app = FastAPI(
 env = os.getenv("ENV", "development")
 if env == "production":
     # In production, ONLY allow your official Vercel domain
-    # Provide this via environment variable: e.g., "https://themorrigan.vercel.app"
-    # We strip whitespace and trailing slashes for robustness
     origins_raw = os.getenv("ALLOWED_ORIGINS", "").split(",")
     ALLOWED_ORIGINS = [o.strip().rstrip("/") for o in origins_raw if o.strip()]
+    if "*" in ALLOWED_ORIGINS:
+        # FastAPI safety: allow_credentials=True cannot be used with "*"
+        ALLOW_CREDENTIALS = False
+    else:
+        ALLOW_CREDENTIALS = True
 else:
-    # In development, allow localhost
-    # Also strip for consistency
     ALLOWED_ORIGINS = ["http://localhost:3000"]
+    ALLOW_CREDENTIALS = True
+
+print(f"🚀 [CORS] Initialized with Origins: {ALLOWED_ORIGINS}")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
+    allow_origins=ALLOWED_ORIGINS or ["*"], # Fallback to * if empty
+    allow_credentials=ALLOW_CREDENTIALS,
     allow_methods=["*"],
     allow_headers=["*"],
 )

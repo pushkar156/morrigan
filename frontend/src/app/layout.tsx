@@ -21,10 +21,10 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL("https://themorrigan.com"), // Important for absolute image URLs on social media
   title: "The Morrigan",
-  description: "AI-powered editorial platform focused on finance, business strategy, and technology.",
+  description: "Editorial platform focused on finance, business strategy, and technology.",
   openGraph: {
     title: "The Morrigan",
-    description: "AI-powered editorial platform focused on finance, business strategy, and technology.",
+    description: "Editorial platform focused on finance, business strategy, and technology.",
     url: 'https://themorrigan.com', // Replace with your actual domain
     siteName: 'The Morrigan',
     images: [
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: "The Morrigan",
-    description: "AI-powered editorial platform focused on finance, business strategy, and technology.",
+    description: "Editorial platform focused on finance, business strategy, and technology.",
     images: ['/logo.png'],
   },
   icons: {

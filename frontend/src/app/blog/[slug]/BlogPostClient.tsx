@@ -120,8 +120,40 @@ export default function BlogPostClient({ blog, relatedBlogs }: { blog: Blog, rel
         : 'Unpublished'
     const categoryDisplay = (blog.category || '').replace(/-/g, ' ').toUpperCase()
 
+    // Structured Data (JSON-LD) for Search Engines
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": blog.title,
+        "description": blog.excerpt || blog.title,
+        "image": blog.featured_image || '/logo.png',
+        "author": {
+            "@type": "Person",
+            "name": blog.author || 'Pushkar'
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "The Morrigan",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://themorrigan.com/logo.png"
+            }
+        },
+        "datePublished": blog.published_at || new Date().toISOString(),
+        "dateModified": blog.updated_at || blog.published_at || new Date().toISOString(),
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": `https://themorrigan.com/blog/${blog.slug}`
+        }
+    }
+
     return (
         <article className="min-h-screen bg-[#e8f0fc] selection:bg-[#00d1ff] selection:text-black">
+            {/* JSON-LD Structured Data */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             {/* Intel Reading Progress Bar */}
             <motion.div 
                 className="fixed top-0 left-0 right-0 h-1 bg-[#00d1ff] z-[100] origin-left"

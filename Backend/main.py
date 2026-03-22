@@ -13,17 +13,9 @@ from api import blogs, contact, chat, admin, upload
 # 🚀 [Morrigan API] Startup Sequence
 app = FastAPI(title="Morrigan API", version="1.0.0")
 
-# ── 🛡️ 1. CORS SHIELD (MUST BE FIRST) ──────────────────────────────────────────
-env = os.getenv("ENV", "development").lower()
-print(f"🌍 [ENVIRONMENT]: {env}")
-if env == "production":
-    origins_raw = os.getenv("ALLOWED_ORIGINS", "").split(",")
-    ALLOWED_ORIGINS = [o.strip().rstrip("/") for o in origins_raw if o.strip()]
-    # FastAPI requirement: allow_credentials cannot be True if using "*"
-    ALLOW_CREDENTIALS = False if "*" in ALLOWED_ORIGINS else True
-else:
-    ALLOWED_ORIGINS = ["http://localhost:3000"]
-    ALLOW_CREDENTIALS = True
+# ── 🛡️ 1. OPEN TEST CORS (BYPASS WALL) ──────────────────────────────────────────
+ALLOWED_ORIGINS = ["*"]
+ALLOW_CREDENTIALS = False # Must be false when using *
 
 app.add_middleware(
     CORSMiddleware,

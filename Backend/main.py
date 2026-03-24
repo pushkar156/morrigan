@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api import auth, blogs, upload, admin, chat
+from api import blogs, upload, admin, chat, auth
 from database.connection import engine, Base
 
 # ── 🏗️ 1. SETUP ───────────────────────────────────────────────────────────────

@@ -1,1 +1,1 @@
-from . import blogs, contact, chat, admin, upload
+from . import blogs, contact, chat, admin, upload, auth

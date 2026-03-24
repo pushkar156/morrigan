@@ -37,25 +37,29 @@ async function handleResponse<T>(res: Response): Promise<T> {
 
 // ── Blog Endpoints ───────────────────────────────────────────────────────────
 
-/** Fetch published blogs. No fallback to demo data since it was removed. */
+/** Fetch published blogs with cache-busting. */
 export async function fetchBlogs(category?: string): Promise<Blog[]> {
     try {
         const url = new URL(`${API_BASE}/blogs`)
         if (category) url.searchParams.set('category', category)
-        // 🚀 Cache-Buster: Forces Vercel Edge to fetch fresh data every time
         url.searchParams.set('_cb', Date.now().toString())
+        
+        console.log(`📡 [API-Audit] GET: ${url.toString()}`)
+        
         const res = await fetch(url.toString(), { cache: 'no-store' })
         return await handleResponse<Blog[]>(res)
     } catch (err) {
         console.error('[API] fetchBlogs failed:', err)
-        return [] // Return empty list on failure
+        return []
     }
 }
 
-/** Fetch a single blog by slug. Returns null if not found or on API failure. */
+/** Fetch a single blog by slug. */
 export async function fetchBlog(slug: string): Promise<Blog | null> {
     try {
-        const res = await fetch(`${API_BASE}/blogs/${slug}`, { cache: 'no-store' })
+        const url = `${API_BASE}/blogs/${slug}?_cb=${Date.now()}`
+        console.log(`📡 [API-Audit] GET (Single): ${url}`)
+        const res = await fetch(url, { cache: 'no-store' })
         if (res.status === 404) return null
         return await handleResponse<Blog>(res)
     } catch (err) {
@@ -66,9 +70,11 @@ export async function fetchBlog(slug: string): Promise<Blog | null> {
 
 // ── Admin Blog Endpoints (JWT required) ──────────────────────────────────────
 
-/** Fetch all blogs (admin: includes drafts). */
+/** Fetch all blogs for admin. */
 export async function fetchAdminBlogs(): Promise<Blog[]> {
-    const res = await fetch(`${API_BASE}/blogs/admin/all`, {
+    const url = `${API_BASE}/blogs/admin/all?_cb=${Date.now()}`
+    console.log(`📡 [API-Audit] GET (Admin): ${url}`)
+    const res = await fetch(url, {
         headers: authHeaders(),
         cache: 'no-store',
     })
@@ -77,7 +83,9 @@ export async function fetchAdminBlogs(): Promise<Blog[]> {
 
 /** Create a new blog. */
 export async function createBlog(data: BlogCreatePayload, token?: string): Promise<Blog> {
-    const res = await fetch(`${API_BASE}/blogs`, {
+    const url = `${API_BASE}/blogs`
+    console.log(`📡 [API-Audit] POST: ${url}`)
+    const res = await fetch(url, {
         method: 'POST',
         headers: authHeaders(token),
         body: JSON.stringify(data),
@@ -87,7 +95,9 @@ export async function createBlog(data: BlogCreatePayload, token?: string): Promi
 
 /** Update an existing blog by ID. */
 export async function updateBlog(id: string, data: BlogUpdatePayload, token?: string): Promise<Blog> {
-    const res = await fetch(`${API_BASE}/blogs/${id}`, {
+    const url = `${API_BASE}/blogs/${id}`
+    console.log(`📡 [API-Audit] PUT: ${url}`)
+    const res = await fetch(url, {
         method: 'PUT',
         headers: authHeaders(token),
         body: JSON.stringify(data),
@@ -97,7 +107,9 @@ export async function updateBlog(id: string, data: BlogUpdatePayload, token?: st
 
 /** Delete a blog by ID. */
 export async function deleteBlog(id: string, token?: string): Promise<void> {
-    const res = await fetch(`${API_BASE}/blogs/${id}`, {
+    const url = `${API_BASE}/blogs/${id}`
+    console.log(`📡 [API-Audit] DELETE: ${url}`)
+    const res = await fetch(url, {
         method: 'DELETE',
         headers: authHeaders(token),
     })
@@ -109,9 +121,10 @@ export async function deleteBlog(id: string, token?: string): Promise<void> {
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
-/** Login and receive a JWT access token. */
 export async function loginAdmin(username: string, password: string): Promise<AuthToken> {
-    const res = await fetch(`${API_BASE}/auth/login`, {
+    const url = `${API_BASE}/auth/login`
+    console.log(`📡 [API-Audit] Auth Attempt: ${url}`)
+    const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -121,8 +134,9 @@ export async function loginAdmin(username: string, password: string): Promise<Au
 
 // ── Upload ───────────────────────────────────────────────────────────────────
 
-/** Upload an image file. Returns the URL for the stored image. */
 export async function uploadImage(file: File, token?: string): Promise<UploadResponse> {
+    const url = `${API_BASE}/upload`
+    console.log(`📡 [API-Audit] Uploading to: ${url}`)
     const t = token || getToken()
     const formData = new FormData()
     formData.append('file', file)
@@ -130,7 +144,7 @@ export async function uploadImage(file: File, token?: string): Promise<UploadRes
     const headers: Record<string, string> = {}
     if (t) headers['Authorization'] = `Bearer ${t}`
 
-    const res = await fetch(`${API_BASE}/upload`, {
+    const res = await fetch(url, {
         method: 'POST',
         headers,
         body: formData,
@@ -140,9 +154,9 @@ export async function uploadImage(file: File, token?: string): Promise<UploadRes
 
 // ── Contact ──────────────────────────────────────────────────────────────────
 
-/** Submit a contact form. */
 export async function submitContact(data: ContactPayload): Promise<{ status: string; message: string }> {
-    const res = await fetch(`${API_BASE}/contact`, {
+    const url = `${API_BASE}/contact`
+    const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -152,9 +166,10 @@ export async function submitContact(data: ContactPayload): Promise<{ status: str
 
 // ── Chat ─────────────────────────────────────────────────────────────────────
 
-/** Send a message to the Morrigan AI chatbot. */
 export async function sendChatMessage(data: ChatPayload): Promise<ChatResponse> {
-    const res = await fetch(`${API_BASE}/chat`, {
+    const url = `${API_BASE}/chat`
+    console.log(`📡 [API-Audit] Sending Chat query: ${url}`)
+    const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

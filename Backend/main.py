@@ -29,7 +29,7 @@ app.add_middleware(
     allow_origins=ALLOWED_ORIGINS or ["*"],
     allow_credentials=ALLOW_CREDENTIALS,
     allow_methods=["*"],
-    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "Access-Control-Allow-Origin"],
+    allow_headers=["*"],
     expose_headers=["Content-Length", "Authorization"],
 )
 

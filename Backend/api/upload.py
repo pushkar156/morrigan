@@ -7,52 +7,52 @@ from utils.auth import get_current_admin
 
 router = APIRouter()
 
-# 1. Configure Cloudinary from environment variables
-cloudinary.config(
-    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.getenv("CLOUDINARY_API_KEY"),
-    api_secret=os.getenv("CLOUDINARY_API_SECRET")
-)
+# ── 🔍 [Cloud-Status] Initializing Cloudinary ──────────────────────────────────
+c_name = os.getenv("CLOUDINARY_CLOUD_NAME")
+c_key = os.getenv("CLOUDINARY_API_KEY")
+c_sec = os.getenv("CLOUDINARY_API_SECRET")
 
-# Dev fallback for local storage
-UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "uploads")
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"}
-MAX_SIZE_MB = 5
-
+if c_name and c_key and c_sec:
+    cloudinary.config(
+        cloud_name=c_name,
+        api_key=c_key,
+        api_secret=c_sec,
+        secure=True
+    )
+    print("✅ [Cloudinary] Integrated")
+else:
+    print("❌ [Cloudinary] Key(s) missing from environment")
 
 @router.post("/upload")
 async def upload_image(
+    request: Request,
     file: UploadFile = File(...),
     admin: str = Depends(get_current_admin)
 ):
-    """Upload an image file. Prioritizes Cloudinary, falls back to local in Dev."""
-
-    if file.content_type not in ALLOWED_TYPES:
-        raise HTTPException(
-            status_code=400,
-            detail=f"File type '{file.content_type}' not allowed."
-        )
-
+    # ── 🔍 [Audit] Incoming Request ──────────────────────────────────────────
+    print(f"🧐 [Cloud-Audit] Upload started by {admin}")
+    print(f"🧐 [Cloud-Audit] Config Check: NAME={'✅' if c_name else '❌'} KEY={'✅' if c_key else '❌'} SEC={'✅' if c_sec else '❌'}")
+    
     content = await file.read()
-
-    if len(content) > MAX_SIZE_MB * 1024 * 1024:
-        raise HTTPException(status_code=400, detail=f"File exceeds {MAX_SIZE_MB}MB limit")
-
+    
     # --- ☁️ Attempt Cloudinary Upload ---
-    if os.getenv("CLOUDINARY_CLOUD_NAME"):
+    if c_name:
         try:
-            # Re-upload directly from standard memory using upload()
             result = cloudinary.uploader.upload(content, folder="morrigan/uploads")
-            # Always return the full secure URL from Cloudinary
-            return {"url": result.get("secure_url"), "filename": str(uuid.uuid4())}
+            print(f"✅ [Cloudinary] Success: {result.get('secure_url')}")
+            return {
+                "url": result.get("secure_url"),
+                "filename": str(uuid.uuid4())
+            }
         except Exception as e:
             print(f"❌ [Cloudinary Error] {str(e)}")
-            # If Cloudinary is configured but fails, we shouldn't continue to local silently
+            # Fail fast if keys are present but upload fails (likely key typo)
             raise HTTPException(status_code=500, detail=f"Cloudinary upload failed: {str(e)}")
 
     # --- 🏠 Local Fallback (Development Only) ---
+    UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    
     file_extension = os.path.splitext(file.filename or "image.jpg")[1].lower()
     new_filename = f"{uuid.uuid4()}{file_extension}"
     file_path = os.path.join(UPLOAD_DIR, new_filename)
@@ -61,17 +61,12 @@ async def upload_image(
         with open(file_path, "wb") as buffer:
             buffer.write(content)
         
-        # Build an absolute URL so the frontend knows to look at RENDER (not Vercel)
-        # Use the Request object's base URL
-        from fastapi import Request
-        def get_base_url(request: Request):
-            return str(request.base_url).rstrip("/")
-            
-        # We need the request object here, let's update the signature
-        # Note: I'll manually add the request dependency to the function locally
+        # Build absolute URL using the Request host
+        base_url = str(request.base_url).rstrip("/")
+        full_url = f"{base_url}/api/uploads/{new_filename}"
+        print(f"⚠️ [Fallback] Local storage used: {full_url}")
         
-        return {"url": f"/api/uploads/{new_filename}", "filename": new_filename}
+        return {"url": full_url, "filename": new_filename}
 
     except Exception as e:
-        print(f"[Upload Error] {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to save image")
+        raise HTTPException(status_code=500, detail=f"Local store failed: {e}")

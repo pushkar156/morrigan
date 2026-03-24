@@ -42,6 +42,8 @@ export async function fetchBlogs(category?: string): Promise<Blog[]> {
     try {
         const url = new URL(`${API_BASE}/blogs`)
         if (category) url.searchParams.set('category', category)
+        // 🚀 Cache-Buster: Forces Vercel Edge to fetch fresh data every time
+        url.searchParams.set('_cb', Date.now().toString())
         const res = await fetch(url.toString(), { cache: 'no-store' })
         return await handleResponse<Blog[]>(res)
     } catch (err) {

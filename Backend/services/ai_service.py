@@ -8,14 +8,17 @@ from pinecone import Pinecone
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
-load_dotenv()
-
-gemini_keys = [
-    os.getenv(f"GEMINI_API_KEY_{i}") for i in range(1, 10)
-]
+# ── 🔍 [AI-Audit] Check Configuration ──────────────────
+gemini_keys = [os.getenv(f"GEMINI_API_KEY_{i}") for i in range(1, 10)]
 gemini_keys = [k for k in gemini_keys if k and k != "your_actual_gemini_key_here"]
+
 if not gemini_keys and os.getenv("GEMINI_API_KEY"):
     gemini_keys = [os.getenv("GEMINI_API_KEY")]
+
+pinecone_key = os.getenv("PINECONE_API_KEY")
+pinecone_index_name = os.getenv("PINECONE_INDEX_NAME")
+
+print(f"🧐 [AI-Audit] GEMINI: {'✅' if gemini_keys else '❌'} PINECONE: {'✅' if pinecone_key else '❌'} INDEX: {'✅' if pinecone_index_name else '❌'}")
 
 def execute_with_fallback(action_name, func, *args, **kwargs):
     """Executes a Gemini function, falling back to next keys sequentially on failure."""
